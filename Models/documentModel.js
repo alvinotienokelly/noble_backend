@@ -17,11 +17,11 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       uploaded_by: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: "users", // name of the target table
-          key: "user_id", // key in the target table
+          key: "id", // key in the target table
         },
       },
       file_name: {
