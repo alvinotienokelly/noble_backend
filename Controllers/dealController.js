@@ -1,6 +1,7 @@
 // Controllers/dealController.js
 const db = require("../Models");
 const Deal = db.deals;
+const User = db.users; // Assuming User model is available in db
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -38,7 +39,12 @@ const createDeal = async (req, res) => {
 // Get all deals
 const getAllDeals = async (req, res) => {
   try {
-    const deals = await Deal.findAll();
+    const deals = await Deal.findAll({
+      include: [
+        { model: User, as: 'createdBy' },
+        { model: User, as: 'targetCompany' }
+      ]
+    });
     res.status(200).json({ status: "true", deals });
   } catch (error) {
     res.status(500).json({ status: "false", message: error.message });
@@ -48,7 +54,13 @@ const getAllDeals = async (req, res) => {
 // Get a single deal by deal_id (UUID)
 const getDealById = async (req, res) => {
   try {
-    const deal = await Deal.findOne({ where: { deal_id: req.params.id } });
+    const deal = await Deal.findOne({
+      where: { deal_id: req.params.id },
+      include: [
+        { model: User, as: 'createdBy'},
+        { model: User, as: 'targetCompany'},
+      ]
+    });
     if (!deal) {
       return res
         .status(404)
