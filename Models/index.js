@@ -27,6 +27,7 @@ db.sequelize = sequelize;
 db.users = require("./userModel")(sequelize, DataTypes);
 db.deals = require("./dealModel")(sequelize, DataTypes);
 db.documents = require("./documentModel")(sequelize, DataTypes);
+db.Transaction = require("./transaction")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -39,6 +40,15 @@ db.documents.belongsTo(db.users, { foreignKey: "uploaded_by", as: "uploader" });
 
 db.deals.hasMany(db.documents, { foreignKey: "deal_id", as: "dealDocuments" });
 db.documents.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+
+
+// Define relationships
+db.deals.hasMany(db.Transaction, { foreignKey: 'deal_id' });
+db.Transaction.belongsTo(db.deals, { foreignKey: 'deal_id' });
+
+db.users.hasMany(db.Transaction, { foreignKey: 'user_id' });
+db.Transaction.belongsTo(db.users, { foreignKey: 'user_id' });
+
 
 //exporting the module
 module.exports = db;

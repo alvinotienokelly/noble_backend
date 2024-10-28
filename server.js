@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser')
  const userRoutes = require ('./Routes/userRoutes')
  const dealRoutes = require('./Routes/dealRoutes')
  const documentRoutes = require('./Routes/documentRoutes') // Add this line
+ const transactionRoutes = require('./Routes/transactionRoutes'); // Add this line
 
 
 //setting up your port
@@ -29,6 +30,8 @@ db.sequelize.sync({ force: false }).then(() => {
 app.use('/api/users', userRoutes)
 app.use('/api/deals', dealRoutes)
 app.use('/api/documents', documentRoutes) 
+app.use('/api/transactions', transactionRoutes); // Add this line
+
 
 //listening to server connection
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`))
