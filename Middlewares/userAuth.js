@@ -33,6 +33,7 @@ const saveUser = async (req, res, next) => {
       return res
         .status(200)
         .json({ status: false, message: "Email already taken" });
+        
     }
 
     next();
