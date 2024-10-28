@@ -28,10 +28,10 @@ db.users = require("./userModel")(sequelize, DataTypes);
 db.deals = require("./dealModel")(sequelize, DataTypes);
 
 // Define associations
-db.users.hasMany(db.deals, { foreignKey: "created_by" });
-db.users.hasMany(db.deals, { foreignKey: "target_company_id" });
-db.deals.belongsTo(db.users, { foreignKey: "created_by" });
-db.deals.belongsTo(db.users, { foreignKey: "target_company_id" });
+db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
+db.users.hasMany(db.deals, { foreignKey: "target_company_id", as: "targetCompanyDeals"  });
+db.deals.belongsTo(db.users, { foreignKey: "created_by" , as: "createdBy" });
+db.deals.belongsTo(db.users, { foreignKey: "target_company_id", as: "targetCompany" });
 
 //exporting the module
 module.exports = db;
