@@ -54,6 +54,22 @@ The server will start on the port specified in the `.env` file or default to por
 - **PUT** `/api/deals/:id` - Update a deal by ID
 - **DELETE** `/api/deals/:id` - Delete a deal by ID
 
+### Document Routes
+
+- **POST** `/api/documents` - Create a new document
+- **GET** `/api/documents` - Get all documents
+- **GET** `/api/documents/:id` - Get a document by ID
+- **PUT** `/api/documents/:id` - Update a document by ID
+- **DELETE** `/api/documents/:id` - Delete a document by ID
+
+### Transaction Routes
+
+- **POST** `/api/transactions` - Create a new transaction
+- **GET** `/api/transactions` - Get all transactions
+- **GET** `/api/transactions/:id` - Get a transaction by ID
+- **PUT** `/api/transactions/:id` - Update a transaction by ID
+- **DELETE** `/api/transactions/:id` - Delete a transaction by ID
+
 ## Environment Variables
 
 The following environment variables are used in the project:
