@@ -19,6 +19,15 @@ const sequelize = new Sequelize('postgres://postgres:@@7389@localhost:5432/noble
 
 //connecting to model
 db.users = require('./userModel') (sequelize, DataTypes)
+db.documents = require('./documentModel')(sequelize, DataTypes);
+
+
+// Define relationships
+db.users.hasMany(db.documents, { foreignKey: "uploaded_by", as: "uploadedDocuments" });
+db.documents.belongsTo(db.users, { foreignKey: "uploaded_by", as: "uploader" });
+
+db.deals.hasMany(db.documents, { foreignKey: "deal_id", as: "dealDocuments" });
+db.documents.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
 //exporting the module
 module.exports = db
