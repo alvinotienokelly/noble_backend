@@ -29,6 +29,7 @@ db.deals = require("./dealModel")(sequelize, DataTypes);
 db.documents = require("./documentModel")(sequelize, DataTypes);
 db.Transaction = require("./transaction")(sequelize, DataTypes);
 db.AuditLog = require("./auditLogModel")(sequelize, DataTypes);
+db.investorsDeals = require("./investorsDealsModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -59,6 +60,18 @@ db.Transaction.belongsTo(db.users, { foreignKey: "user_id" });
 
 db.users.hasMany(db.AuditLog, { foreignKey: "user_id" });
 db.AuditLog.belongsTo(db.users, { foreignKey: "user_id" });
+
+// Define many-to-many relationships
+db.users.belongsToMany(db.deals, {
+  through: db.investorsDeals,
+  foreignKey: "investor_id",
+  as: "investedDeals",
+});
+db.deals.belongsToMany(db.users, {
+  through: db.investorsDeals,
+  foreignKey: "deal_id",
+  as: "investors",
+});
 
 //exporting the module
 module.exports = db;
