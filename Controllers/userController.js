@@ -2,6 +2,8 @@
 const bcrypt = require("bcrypt");
 const db = require("../Models");
 const jwt = require("jsonwebtoken");
+const { VerificationCode } = require("../Models");
+const { sendVerificationCode } = require("../Middlewares/emailService");
 
 // Assigning users to the variable User
 const User = db.users;
@@ -41,6 +43,42 @@ const signup = async (req, res) => {
   }
 };
 
+const verifyCode = async (req, res) => {
+  try {
+    const { userId, code } = req.body;
+
+    // Find the verification code in the database
+    const verificationCode = await VerificationCode.findOne({
+      where: {
+        user_id: userId,
+        code: code,
+        already_used: false,
+      },
+    });
+
+    if (verificationCode) {
+      // Mark the verification code as used
+      verificationCode.already_used = true;
+      await verificationCode.save();
+      // Code is valid
+      return res
+        .status(200)
+        .json({ status: "true", message: "Verification successful." });
+    } else {
+      // Code is invalid or expired
+      return res.status(400).json({
+        status: "false",
+        message: "Invalid or expired verification code.",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ status: "false", message: "Internal server error." });
+  }
+};
+
 //login authentication
 
 const login = async (req, res) => {
@@ -66,6 +104,20 @@ const login = async (req, res) => {
           expiresIn: 1 * 24 * 60 * 60 * 1000,
         });
 
+        // Generate a verification code
+        const verificationCode = Math.floor(
+          100000 + Math.random() * 900000
+        ).toString();
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // Code expires in 15 minutes
+
+        // Store the verification code in the database
+        await VerificationCode.create({
+          user_id: user.id,
+          code: verificationCode,
+        });
+
+        // await sendVerificationCode(user.email, verificationCode);
+
         //if password matches wit the one in the database
         //go ahead and generate a cookie for the user
         res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
@@ -87,4 +139,5 @@ const login = async (req, res) => {
 module.exports = {
   signup,
   login,
+  verifyCode,
 };

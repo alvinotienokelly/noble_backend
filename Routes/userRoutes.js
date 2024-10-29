@@ -1,7 +1,7 @@
 //importing modules
 const express = require("express");
 const userController = require("../Controllers/userController");
-const { signup, login } = userController;
+const { signup, login, verifyCode } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
 const db = require("../Models");
@@ -16,6 +16,8 @@ router.post("/signup", userAuth.saveUser, signup);
 
 //login route
 router.post("/login", login);
+
+router.post("/verify-code", verifyCode);
 
 router.get("/profile", authMiddleware, async (req, res) => {
   try {
