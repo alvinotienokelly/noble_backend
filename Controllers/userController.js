@@ -8,6 +8,14 @@ const { sendVerificationCode } = require("../Middlewares/emailService");
 // Assigning users to the variable User
 const User = db.users;
 
+// Utility function to mask email
+const maskEmail = (email) => {
+  const [localPart, domain] = email.split("@");
+  const maskedLocalPart =
+    localPart.slice(0, 2) + "*".repeat(localPart.length - 2);
+  return `${maskedLocalPart}@${domain}`;
+};
+
 //signing a user up
 //hashing users password before its saved to the database with bcrypt
 const signup = async (req, res) => {
@@ -125,8 +133,15 @@ const login = async (req, res) => {
         res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
         console.log("user", JSON.stringify(user, null, 2));
         console.log(token);
+        const maskedEmail = maskEmail(user.email);
+
         //send user data
-        return res.status(200).json({ token: token, user: user, status: true });
+        return res.status(200).json({
+          token: token,
+          user: user,
+          status: true,
+          message: "Veritication code sent to " + maskedEmail,
+        });
       } else {
         return res
           .status(200)
