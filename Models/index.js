@@ -30,6 +30,8 @@ db.documents = require("./documentModel")(sequelize, DataTypes);
 db.Transaction = require("./transaction")(sequelize, DataTypes);
 db.AuditLog = require("./auditLogModel")(sequelize, DataTypes);
 db.investorsDeals = require("./investorsDealsModel")(sequelize, DataTypes);
+db.VerificationCode = require('./verificationCodeModel')(sequelize, DataTypes);
+
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -72,6 +74,9 @@ db.deals.belongsToMany(db.users, {
   foreignKey: "deal_id",
   as: "investors",
 });
+
+db.users.hasMany(db.VerificationCode, { foreignKey: 'user_id', as: 'verificationCodes' });
+db.VerificationCode.belongsTo(db.users, { foreignKey: 'user_id', as: 'user' });
 
 //exporting the module
 module.exports = db;
