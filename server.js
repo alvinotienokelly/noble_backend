@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser')
  const documentRoutes = require('./Routes/documentRoutes') // Add this line
  const transactionRoutes = require('./Routes/transactionRoutes'); // Add this line
  const auditLogRoutes = require('./Routes/auditLogRoutes'); // Add this line
+ const investorsDealsRoutes = require('./Routes/investorsDealsRouter'); // Add this line
 
 
 //setting up your port
@@ -33,6 +34,8 @@ app.use('/api/deals', dealRoutes)
 app.use('/api/documents', documentRoutes) 
 app.use('/api/transactions', transactionRoutes); // Add this line
 app.use('/api/audit-logs', auditLogRoutes); // Add this line
+app.use('/api/audit-logs', auditLogRoutes); // Add this line
+app.use('/api/investors-deals', investorsDealsRoutes); // Add this line
 
 
 //listening to server connection
