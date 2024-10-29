@@ -70,6 +70,12 @@ The server will start on the port specified in the `.env` file or default to por
 - **PUT** `/api/transactions/:id` - Update a transaction by ID
 - **DELETE** `/api/transactions/:id` - Delete a transaction by ID
 
+### Audit Log Routes
+
+- **POST** `/api/audit-logs` - Create a new audit log entry
+- **GET** `/api/audit-logs` - Get all audit logs
+- **GET** `/api/audit-logs/:id` - Get an audit log by ID
+
 ## Environment Variables
 
 The following environment variables are used in the project:
