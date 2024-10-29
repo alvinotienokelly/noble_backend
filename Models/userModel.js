@@ -22,6 +22,14 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Pending", "Verified", "Rejected"],
         defaultValue: "Pending",
       },
+      preference_sector: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+      preference_region: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
