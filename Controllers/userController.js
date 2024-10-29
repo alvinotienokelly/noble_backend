@@ -34,7 +34,9 @@ const signup = async (req, res) => {
       console.log("user", JSON.stringify(user, null, 2));
       console.log(token);
       //send users details
-      return res.status(201).send(user);
+      return res
+        .status(200)
+        .json({ status: true, message: "Registration successfull." });
     } else {
       return res.status(409).send("Details are not correct");
     }
@@ -124,12 +126,16 @@ const login = async (req, res) => {
         console.log("user", JSON.stringify(user, null, 2));
         console.log(token);
         //send user data
-        return res.status(200).json({ token: token, user: user });
+        return res.status(200).json({ token: token, user: user, status: true });
       } else {
-        return res.status(401).send("Authentication failed");
+        return res
+          .status(200)
+          .json({ status: false, message: "Invalid password" });
       }
     } else {
-      return res.status(401).send("Authentication failed");
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid credentials" });
     }
   } catch (error) {
     console.log(error);
