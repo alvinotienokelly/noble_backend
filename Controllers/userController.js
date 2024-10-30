@@ -19,9 +19,66 @@ const maskEmail = (email) => {
 //logout function
 const logout = (req, res) => {
   res.cookie("jwt", "", { maxAge: 1, httpOnly: true });
-  return res.status(200).json({ status: "true", message: "Logout successful." });
+  return res.status(200).json({ status: true, message: "Logout successful." });
 };
 
+//forgot password function
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    //find a user by their email
+    const user = await User.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) {
+      return res
+        .status(200)
+        .json({ status: false, message: "User not found." });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    await VerificationCode.create({ user_id: user.id, code });
+
+    // await sendVerificationCode(email, code);
+
+    res
+      .status(200)
+      .json({ status: true, message: "Verification code sent to email." });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
+//reset password function
+const resetPassword = async (req, res) => {
+  try {
+    const { email, code, password } = req.body;
+    //find a user by their email
+    const user = await User.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) {
+      return res
+        .status(200)
+        .json({ status: false, message: "User not found." });
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+
+    res
+      .status(200)
+      .json({ status: true, message: "Password reset successful." });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
 
 //signing a user up
 //hashing users password before its saved to the database with bcrypt
@@ -62,7 +119,7 @@ const signup = async (req, res) => {
 
 const verifyCode = async (req, res) => {
   try {
-    const { email, code } = req.body;
+    const { email, code, type } = req.body;
 
     // Find the user in the database
     const user = await User.findOne({
@@ -86,30 +143,35 @@ const verifyCode = async (req, res) => {
       await verificationCode.save();
       // Code is valid
 
+      if (type === "forgot-password") {
+        return res.status(200).json({
+          status: true,
+          message: "Verification successful.",
+        });
+      }
+
       let token = jwt.sign({ id: user.id }, process.env.secretKey, {
         expiresIn: 1 * 24 * 60 * 60 * 1000,
       });
 
-      return res
-        .status(200)
-        .json({
-          status: "true",
-          message: "Verification successful.",
-          token: token,
-          user: user,
-        });
+      return res.status(200).json({
+        status: true,
+        message: "Verification successful.",
+        token: token,
+        user: user,
+      });
     } else {
       // Code is invalid or expired
-      return res.status(400).json({
-        status: "false",
+      return res.status(200).json({
+        status: false,
         message: "Invalid or expired verification code.",
       });
     }
   } catch (error) {
     console.log(error);
     res
-      .status(500)
-      .json({ status: "false", message: "Internal server error." });
+      .status(200)
+      .json({ status: false, message: "Internal server error." });
   }
 };
 
@@ -183,5 +245,7 @@ module.exports = {
   signup,
   login,
   verifyCode,
-  logout
+  logout,
+  forgotPassword,
+  resetPassword,
 };

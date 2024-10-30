@@ -1,7 +1,7 @@
 //importing modules
 const express = require("express");
 const userController = require("../Controllers/userController");
-const { signup, login, verifyCode, logout } = userController;
+const { signup, login, verifyCode, logout, forgotPassword, resetPassword } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
 const db = require("../Models");
@@ -17,10 +17,17 @@ router.post("/signup", userAuth.saveUser, signup);
 //login route
 router.post("/login", login);
 
+//verify code route
 router.post("/verify-code", verifyCode);
 
+//logout route
 router.post("/logout", authMiddleware, logout);
 
+//forgot password route
+router.post("/forgot-password", forgotPassword);
+
+//reset password route
+router.post("/reset-password", resetPassword);
 
 router.get("/profile", authMiddleware, async (req, res) => {
   try {
