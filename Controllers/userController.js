@@ -55,12 +55,20 @@ const signup = async (req, res) => {
 
 const verifyCode = async (req, res) => {
   try {
-    const { userId, code } = req.body;
+    const { email, code } = req.body;
+
+    // Find the user in the database
+    const user = await User.findOne({
+      where: {
+        email: email,
+      },
+    });
+    
 
     // Find the verification code in the database
     const verificationCode = await VerificationCode.findOne({
       where: {
-        user_id: userId,
+        user_id: user.id,
         code: code,
         already_used: false,
       },
