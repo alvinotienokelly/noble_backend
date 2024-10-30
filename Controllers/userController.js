@@ -16,6 +16,13 @@ const maskEmail = (email) => {
   return `${maskedLocalPart}@${domain}`;
 };
 
+//logout function
+const logout = (req, res) => {
+  res.cookie("jwt", "", { maxAge: 1, httpOnly: true });
+  return res.status(200).json({ status: "true", message: "Logout successful." });
+};
+
+
 //signing a user up
 //hashing users password before its saved to the database with bcrypt
 const signup = async (req, res) => {
@@ -63,7 +70,6 @@ const verifyCode = async (req, res) => {
         email: email,
       },
     });
-    
 
     // Find the verification code in the database
     const verificationCode = await VerificationCode.findOne({
@@ -79,9 +85,19 @@ const verifyCode = async (req, res) => {
       verificationCode.already_used = true;
       await verificationCode.save();
       // Code is valid
+
+      let token = jwt.sign({ id: user.id }, process.env.secretKey, {
+        expiresIn: 1 * 24 * 60 * 60 * 1000,
+      });
+
       return res
         .status(200)
-        .json({ status: "true", message: "Verification successful." });
+        .json({
+          status: "true",
+          message: "Verification successful.",
+          token: token,
+          user: user,
+        });
     } else {
       // Code is invalid or expired
       return res.status(400).json({
@@ -145,8 +161,6 @@ const login = async (req, res) => {
 
         //send user data
         return res.status(200).json({
-          token: token,
-          user: user,
           status: true,
           message: "Veritication code sent to " + maskedEmail,
         });
@@ -169,4 +183,5 @@ module.exports = {
   signup,
   login,
   verifyCode,
+  logout
 };
