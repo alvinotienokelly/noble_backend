@@ -50,6 +50,12 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Due Diligence", "Term Sheet", "Closed"],
         allowNull: false,
       },
+      status: {
+        type: DataTypes.ENUM,
+        values: ["Active", "Pending", "Inactive"],
+        allowNull: false,
+        defaultValue: "Active",
+      },
       deal_size: {
         type: DataTypes.DECIMAL,
         allowNull: false,
