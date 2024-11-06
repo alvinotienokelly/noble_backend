@@ -48,10 +48,12 @@ const getAllDeals = async (req, res) => {
     const totalDeals = await Deal.count();
     const activeDeals = await Deal.count({ where: { status: "Active" } });
     const inactiveDeals = await Deal.count({ where: { status: "Inactive" } });
+    const totalDealSize = await Deal.sum('deal_size');
     res
       .status(200)
       .json({
         status: true,
+        totalDealSize: totalDealSize,
         totalDeals: totalDeals,
         activeDeals: activeDeals,
         inactiveDeals: inactiveDeals,
