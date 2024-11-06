@@ -42,7 +42,7 @@ const forgotPassword = async (req, res) => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     await VerificationCode.create({ user_id: user.id, code });
 
-    // await sendVerificationCode(email, code);
+    await sendVerificationCode(email, code);
 
     res
       .status(200)
@@ -212,7 +212,7 @@ const login = async (req, res) => {
           code: verificationCode,
         });
 
-        // await sendVerificationCode(user.email, verificationCode);
+        await sendVerificationCode(user.email, verificationCode);
 
         //if password matches wit the one in the database
         //go ahead and generate a cookie for the user
