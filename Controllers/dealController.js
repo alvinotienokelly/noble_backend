@@ -1,5 +1,7 @@
 // Controllers/dealController.js
 const db = require("../Models");
+const { Op } = require("sequelize");
+const moment = require("moment");
 const Deal = db.deals;
 const User = db.users; // Assuming User model is available in db
 
@@ -48,17 +50,113 @@ const getAllDeals = async (req, res) => {
     const totalDeals = await Deal.count();
     const activeDeals = await Deal.count({ where: { status: "Active" } });
     const inactiveDeals = await Deal.count({ where: { status: "Inactive" } });
-    const totalDealSize = await Deal.sum('deal_size');
-    res
-      .status(200)
-      .json({
-        status: true,
-        totalDealSize: totalDealSize,
-        totalDeals: totalDeals,
-        activeDeals: activeDeals,
-        inactiveDeals: inactiveDeals,
-        deals,
-      });
+
+    const startOfCurrentMonth = moment().startOf("month").toDate();
+    const startOfLastMonth = moment()
+      .subtract(1, "months")
+      .startOf("month")
+      .toDate();
+    const endOfLastMonth = moment()
+      .subtract(1, "months")
+      .endOf("month")
+      .toDate();
+
+    const lastMonthActiveDealsCount = await Deal.count({
+      where: {
+        status: "Active",
+        createdAt: {
+          [Op.between]: [startOfLastMonth, endOfLastMonth],
+        },
+      },
+    });
+
+    const currentMonthActiveDealsCount = await Deal.count({
+      where: {
+        status: "Active",
+        createdAt: {
+          [Op.gte]: startOfCurrentMonth,
+        },
+      },
+    });
+
+    let activeDealsPercentageChange = 0;
+    if (lastMonthActiveDealsCount > 0) {
+      activeDealsPercentageChange =
+        ((currentMonthActiveDealsCount - lastMonthActiveDealsCount) /
+          lastMonthActiveDealsCount) *
+        100;
+    } else if (currentMonthActiveDealsCount > 0) {
+      activeDealsPercentageChange = 100;
+    }
+
+    const currentMonthDealsCount = await Deal.count({
+      where: {
+        createdAt: {
+          [Op.gte]: startOfCurrentMonth,
+        },
+      },
+    });
+
+    const lastMonthDealsCount = await Deal.count({
+      where: {
+        createdAt: {
+          [Op.between]: [startOfLastMonth, endOfLastMonth],
+        },
+      },
+    });
+
+    let dealsPercentageChange = 0;
+    if (lastMonthDealsCount > 0) {
+      dealsPercentageChange =
+        ((currentMonthDealsCount - lastMonthDealsCount) / lastMonthDealsCount) *
+        100;
+    } else if (currentMonthDealsCount > 0) {
+      dealsPercentageChange = 100;
+    }
+    const totalDealSize = await Deal.sum("deal_size");
+    const startOfYear = moment().startOf("year").toDate();
+    const startOfLastYear = moment()
+      .subtract(1, "years")
+      .startOf("year")
+      .toDate();
+    const endOfLastYear = moment().subtract(1, "years").endOf("year").toDate();
+
+    const lastYearTotalDealSize = await Deal.sum("deal_size", {
+      where: {
+        createdAt: {
+          [Op.between]: [startOfLastYear, endOfLastYear],
+        },
+      },
+    });
+
+    const currentYearTotalDealSize = await Deal.sum("deal_size", {
+      where: {
+        createdAt: {
+          [Op.gte]: startOfYear,
+        },
+      },
+    });
+
+    let totalDealSizePercentageChange = 0;
+    if (lastYearTotalDealSize > 0) {
+      totalDealSizePercentageChange =
+        ((currentYearTotalDealSize - lastYearTotalDealSize) /
+          lastYearTotalDealSize) *
+        100;
+    } else if (currentYearTotalDealSize > 0) {
+      totalDealSizePercentageChange = 100;
+    }
+    res.status(200).json({
+      status: true,
+      totalDealSize: totalDealSize,
+      totalDeals: totalDeals,
+      activeDeals: activeDeals,
+      inactiveDeals: inactiveDeals,
+      dealsPercentageChange: dealsPercentageChange,
+      activeDealsPercentageChange: activeDealsPercentageChange,
+      totalDealSizePercentageChange: totalDealSizePercentageChange,
+      deals,
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
