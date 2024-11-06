@@ -30,9 +30,9 @@ const createDeal = async (req, res) => {
       created_by,
     });
 
-    res.status(201).json({ status: "true", deal: newDeal });
+    res.status(201).json({ status: true, deal: newDeal });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -41,13 +41,24 @@ const getAllDeals = async (req, res) => {
   try {
     const deals = await Deal.findAll({
       include: [
-        { model: User, as: 'createdBy' },
-        { model: User, as: 'targetCompany' }
-      ]
+        { model: User, as: "createdBy" },
+        { model: User, as: "targetCompany" },
+      ],
     });
-    res.status(200).json({ status: "true", deals });
+    const totalDeals = await Deal.count();
+    const activeDeals = await Deal.count({ where: { status: "Active" } });
+    const inactiveDeals = await Deal.count({ where: { status: "Inactive" } });
+    res
+      .status(200)
+      .json({
+        status: true,
+        totalDeals: totalDeals,
+        activeDeals: activeDeals,
+        inactiveDeals: inactiveDeals,
+        deals,
+      });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -57,18 +68,18 @@ const getDealById = async (req, res) => {
     const deal = await Deal.findOne({
       where: { deal_id: req.params.id },
       include: [
-        { model: User, as: 'createdBy'},
-        { model: User, as: 'targetCompany'},
-      ]
+        { model: User, as: "createdBy" },
+        { model: User, as: "targetCompany" },
+      ],
     });
     if (!deal) {
       return res
         .status(404)
         .json({ status: "false", message: "Deal not found." });
     }
-    res.status(200).json({ status: "true", deal });
+    res.status(200).json({ status: true, deal });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -90,7 +101,7 @@ const updateDeal = async (req, res) => {
     if (!deal) {
       return res
         .status(404)
-        .json({ status: "false", message: "Deal not found." });
+        .json({ status: false, message: "Deal not found." });
     }
 
     await deal.update({
@@ -104,9 +115,9 @@ const updateDeal = async (req, res) => {
       key_investors,
     });
 
-    res.status(200).json({ status: "true", deal });
+    res.status(200).json({ status: true, deal });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -118,15 +129,15 @@ const deleteDeal = async (req, res) => {
     if (!deal) {
       return res
         .status(404)
-        .json({ status: "false", message: "Deal not found." });
+        .json({ status: false, message: "Deal not found." });
     }
 
     await deal.destroy();
     res
       .status(200)
-      .json({ status: "true", message: "Deal deleted successfully." });
+      .json({ status: true, message: "Deal deleted successfully." });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
