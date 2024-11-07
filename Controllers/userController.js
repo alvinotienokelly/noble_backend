@@ -33,31 +33,35 @@ const getUsersByType = async (req, res) => {
         role: type,
       },
     });
-
     const totalUsersCount = await User.count({
       where: {
         role: type,
       },
     });
 
-    const activeUsersCount = await User.count({
-      where: {
-        kyc_status: "Verified",
-      },
+    const kycStatusCounts = await User.findAll({
+      attributes: [
+        "kyc_status",
+        [db.Sequelize.fn("COUNT", db.Sequelize.col("kyc_status")), "count"],
+      ],
+      group: ["kyc_status"],
     });
 
-    const rejectedUsersCount = await User.count({
-      where: {
-        kyc_status: "Rejected",
-      },
+    const counts = {
+      Verified: 0,
+      Rejected: 0,
+    };
+
+    kycStatusCounts.forEach((item) => {
+      counts[item.kyc_status] = parseInt(item.dataValues.count, 10);
     });
 
     if (users.length > 0) {
       return res.status(200).json({
         status: true,
         totalUsersCount: totalUsersCount,
-        activeUsersCount: activeUsersCount,
-        inactiveUsersCount: rejectedUsersCount,
+        activeUsersCount: counts.Verified,
+        rejectedUsersCount: counts.Rejected,
         users,
       });
     } else {
