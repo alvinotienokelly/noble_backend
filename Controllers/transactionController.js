@@ -6,9 +6,9 @@ const Transaction = db.Transaction;
 const createTransaction = async (req, res) => {
   try {
     const transaction = await Transaction.create(req.body);
-    res.status(201).json({ status: "true", transaction });
+    res.status(201).json({ status: true, transaction });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -16,9 +16,31 @@ const createTransaction = async (req, res) => {
 const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.findAll();
-    res.status(200).json({ status: "true", transactions });
+    const totalAmount = await Transaction.sum("amount");
+
+    const completedAmount = await Transaction.sum("amount", {
+      where: { status: "Completed" },
+    });
+
+    const pendingAmount = await Transaction.sum("amount", {
+      where: { status: "Pending" },
+    });
+    const failedAmount = await Transaction.sum("amount", {
+      where: { status: "Failed" },
+    });
+
+    res
+      .status(200)
+      .json({
+        status: true,
+        totalAmount: totalAmount,
+        failedAmount: failedAmount,
+        completedAmount: completedAmount,
+        pendingAmount: pendingAmount,
+        transactions,
+      });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -26,12 +48,17 @@ const getAllTransactions = async (req, res) => {
 const getTransactionById = async (req, res) => {
   try {
     const transaction = await Transaction.findByPk(req.params.id);
+
+    const totalAmount = await Transaction.sum("amount");
+
     if (!transaction) {
-      return res.status(404).json({ status: "false", message: "Transaction not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Transaction not found." });
     }
-    res.status(200).json({ status: "true", transaction });
+    res.status(200).json({ status: true, transaction });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -42,12 +69,14 @@ const updateTransaction = async (req, res) => {
       where: { transaction_id: req.params.id },
     });
     if (!updated) {
-      return res.status(404).json({ status: "false", message: "Transaction not found." });
+      return res
+        .status(404)
+        .json({ status: "false", message: "Transaction not found." });
     }
     const updatedTransaction = await Transaction.findByPk(req.params.id);
-    res.status(200).json({ status: "true", transaction: updatedTransaction });
+    res.status(200).json({ status: true, transaction: updatedTransaction });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -58,9 +87,13 @@ const deleteTransaction = async (req, res) => {
       where: { transaction_id: req.params.id },
     });
     if (!deleted) {
-      return res.status(404).json({ status: "false", message: "Transaction not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Transaction not found." });
     }
-    res.status(200).json({ status: "true", message: "Transaction deleted successfully." });
+    res
+      .status(200)
+      .json({ status: true, message: "Transaction deleted successfully." });
   } catch (error) {
     res.status(500).json({ status: "false", message: error.message });
   }
