@@ -75,7 +75,6 @@ const getTransactionById = async (req, res) => {
   try {
     const transaction = await Transaction.findByPk(req.params.id);
 
-    const totalAmount = await Transaction.sum("amount");
 
     if (!transaction) {
       return res
