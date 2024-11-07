@@ -11,6 +11,10 @@ const createTransaction = async (req, res) => {
 
     const deal = await Deal.findByPk(deal_id);
     if (!deal) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Deal not found." });
+    } else {
       const transaction = await Transaction.create({
         deal_id,
         user_id,
