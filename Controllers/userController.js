@@ -34,8 +34,32 @@ const getUsersByType = async (req, res) => {
       },
     });
 
+    const totalUsersCount = await User.count({
+      where: {
+        role: type,
+      },
+    });
+
+    const activeUsersCount = await User.count({
+      where: {
+        kyc_status: "Verified",
+      },
+    });
+
+    const rejectedUsersCount = await User.count({
+      where: {
+        kyc_status: "Rejected",
+      },
+    });
+
     if (users.length > 0) {
-      return res.status(200).json({ status: true, users });
+      return res.status(200).json({
+        status: true,
+        totalUsersCount: totalUsersCount,
+        activeUsersCount: activeUsersCount,
+        inactiveUsersCount: rejectedUsersCount,
+        users,
+      });
     } else {
       return res
         .status(200)
@@ -270,5 +294,5 @@ module.exports = {
   logout,
   forgotPassword,
   resetPassword,
-  getUsersByType
+  getUsersByType,
 };
