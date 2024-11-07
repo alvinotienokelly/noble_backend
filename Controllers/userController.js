@@ -22,6 +22,30 @@ const logout = (req, res) => {
   return res.status(200).json({ status: true, message: "Logout successful." });
 };
 
+// Function to get users by type
+const getUsersByType = async (req, res) => {
+  try {
+    const { type } = req.params;
+
+    // Find users by their type
+    const users = await User.findAll({
+      where: {
+        role: type,
+      },
+    });
+
+    if (users.length > 0) {
+      return res.status(200).json({ status: true, users });
+    } else {
+      return res
+        .status(200)
+        .json({ status: false, message: "No users found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 //forgot password function
 const forgotPassword = async (req, res) => {
   try {
@@ -169,9 +193,7 @@ const verifyCode = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res
-      .status(200)
-      .json({ status: false, message: "Internal server error." });
+    res.status(200).json({ status: false, message: "Internal server error." });
   }
 };
 
@@ -248,4 +270,5 @@ module.exports = {
   logout,
   forgotPassword,
   resetPassword,
+  getUsersByType
 };
