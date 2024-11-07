@@ -39,23 +39,30 @@ const getAllTransactions = async (req, res) => {
     const transactions = await Transaction.findAll();
     const totalAmount = await Transaction.sum("amount");
 
-    const completedAmount = await Transaction.sum("amount", {
-      where: { status: "Completed" },
+    const amountsByStatus = await Transaction.findAll({
+      attributes: [
+        "status",
+        [db.Sequelize.fn("SUM", db.Sequelize.col("amount")), "totalAmount"],
+      ],
+      group: ["status"],
     });
 
-    const pendingAmount = await Transaction.sum("amount", {
-      where: { status: "Pending" },
-    });
-    const failedAmount = await Transaction.sum("amount", {
-      where: { status: "Failed" },
+    const amounts = {
+      Completed: 0,
+      Pending: 0,
+      Failed: 0,
+    };
+
+    amountsByStatus.forEach((item) => {
+      amounts[item.status] = parseFloat(item.dataValues.totalAmount);
     });
 
     res.status(200).json({
       status: true,
       totalAmount: totalAmount,
-      failedAmount: failedAmount,
-      completedAmount: completedAmount,
-      pendingAmount: pendingAmount,
+      completedAmount: amounts.Completed,
+      pendingAmount: amounts.Pending,
+      failedAmount: amounts.Failed,
       transactions,
     });
   } catch (error) {
