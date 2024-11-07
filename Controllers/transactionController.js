@@ -1,14 +1,31 @@
 // Controllers/transactionController.js
 const db = require("../Models");
 const Transaction = db.Transaction;
+const Deal = db.deals;
 
 // Create a new transaction
 const createTransaction = async (req, res) => {
   try {
-    const transaction = await Transaction.create(req.body);
-    res.status(201).json({ status: true, transaction });
+    const { deal_id, amount, transaction_type, payment_method } = req.body;
+    const user_id = req.user.id; // Assuming the user ID is available in req.user
+
+    const deal = await Deal.findByPk(deal_id);
+    if (!deal) {
+      const transaction = await Transaction.create({
+        deal_id,
+        user_id,
+        amount,
+        transaction_type,
+        payment_method,
+      });
+      res.status(200).json({
+        status: true,
+        message: "Transaction created successfully.",
+        transaction,
+      });
+    }
   } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
+    res.status(200).json({ status: false, message: error.message });
   }
 };
 
@@ -29,18 +46,16 @@ const getAllTransactions = async (req, res) => {
       where: { status: "Failed" },
     });
 
-    res
-      .status(200)
-      .json({
-        status: true,
-        totalAmount: totalAmount,
-        failedAmount: failedAmount,
-        completedAmount: completedAmount,
-        pendingAmount: pendingAmount,
-        transactions,
-      });
+    res.status(200).json({
+      status: true,
+      totalAmount: totalAmount,
+      failedAmount: failedAmount,
+      completedAmount: completedAmount,
+      pendingAmount: pendingAmount,
+      transactions,
+    });
   } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
+    res.status(200).json({ status: false, message: error.message });
   }
 };
 
@@ -58,7 +73,7 @@ const getTransactionById = async (req, res) => {
     }
     res.status(200).json({ status: true, transaction });
   } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
+    res.status(200).json({ status: false, message: error.message });
   }
 };
 
@@ -70,13 +85,13 @@ const updateTransaction = async (req, res) => {
     });
     if (!updated) {
       return res
-        .status(404)
-        .json({ status: "false", message: "Transaction not found." });
+        .status(200)
+        .json({ status: false, message: "Transaction not found." });
     }
     const updatedTransaction = await Transaction.findByPk(req.params.id);
     res.status(200).json({ status: true, transaction: updatedTransaction });
   } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
+    res.status(200).json({ status: false, message: error.message });
   }
 };
 
@@ -88,7 +103,7 @@ const deleteTransaction = async (req, res) => {
     });
     if (!deleted) {
       return res
-        .status(404)
+        .status(200)
         .json({ status: false, message: "Transaction not found." });
     }
     res
