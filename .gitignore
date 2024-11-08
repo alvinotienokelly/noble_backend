@@ -1,6 +1,18 @@
 # Node.js dependencies
 /node_modules
 
+# Build files
+/build
+
+# coverage files
+/coverage
+
+# Local development environment
+.env
+
+# Upload files
+/uploads
+
 # Environment variables
 .env
 
