@@ -5,12 +5,26 @@ const User = db.users; // Assuming User model is available in db
 
 const createDocument = async (req, res) => {
   try {
-    const uploaded_by = req.user.id; // Assuming the user ID is available in req.user
+    const uploaded_by = req.user.id;
     req.body.uploaded_by = uploaded_by;
-    const document = await Document.create(req.body);
-    res.status(201).json({ status: "true", document });
+    const { originalname, path } = req.file;
+
+    const deal = await Deal.findByPk(req.body.deal_id);
+    if (!deal) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Deal not found." });
+    }
+
+    const document = await Document.create({
+      deal_id: req.body.deal_id,
+      uploaded_by: uploaded_by,
+      file_name: originalname,
+      file_path: path,
+    });
+    res.status(200).json({ status: true, document });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(200).json({ status: false, message: error.message });
   }
 };
 
@@ -50,16 +64,27 @@ const getDocumentById = async (req, res) => {
 
 const updateDocument = async (req, res) => {
   try {
+    const uploaded_by = req.user.id;
+    req.body.uploaded_by = uploaded_by;
+
     const document = await Document.findByPk(req.params.id);
     if (!document) {
       return res
-        .status(404)
-        .json({ status: "false", message: "Document not found." });
+        .status(200)
+        .json({ status: false, message: "Document not found." });
     }
+
+    // Handle file upload
+    if (req.file) {
+      const { originalname, path } = req.file;
+      req.body.file_name = originalname;
+      req.body.file_path = path;
+    }
+
     await document.update(req.body);
-    res.status(200).json({ status: "true", document });
+    res.status(200).json({ status: true, document });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(200).json({ status: false, message: error.message });
   }
 };
 

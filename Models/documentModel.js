@@ -34,8 +34,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       file_type: {
         type: DataTypes.ENUM,
-        values: ["PDF", "DOCX", "XLSX"],
-        allowNull: false,
+        values: ["pdf", "docx", "xlsx"],
+        allowNull: true,
       },
       version_number: {
         type: DataTypes.INTEGER,
