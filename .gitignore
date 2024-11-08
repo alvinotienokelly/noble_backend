@@ -4,6 +4,9 @@
 # Build files
 /build
 
+# coverage files
+/coverage
+
 # Local development environment
 .env
 
