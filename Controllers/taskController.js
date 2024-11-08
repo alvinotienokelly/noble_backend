@@ -79,6 +79,28 @@ const updateTask = async (req, res) => {
   }
 };
 
+// Get tasks assigned to a specific user
+const getTasksByUserId = async (req, res) => {
+  try {
+    const tasks = await Task.findAll({
+      where: { assigned_to: req.params.userId },
+      include: [
+        { model: User, as: "assignee" },
+        { model: User, as: "creator" },
+        { model: Deal, as: "deal" },
+      ],
+    });
+    if (!tasks || tasks.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "No tasks found for this user." });
+    }
+    res.status(200).json({ status: true, tasks });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 // Get tasks by deal ID
 const getTaskByDealId = async (req, res) => {
   try {
@@ -97,7 +119,7 @@ const getTaskByDealId = async (req, res) => {
     }
     res.status(200).json({ status: true, tasks });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(200).json({ status: false, message: "nn" });
   }
 };
 
@@ -125,5 +147,6 @@ module.exports = {
   getTaskById,
   updateTask,
   deleteTask,
-  getTaskByDealId
+  getTaskByDealId,
+  getTasksByUserId
 };
