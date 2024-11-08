@@ -33,6 +33,7 @@ db.investorsDeals = require("./investorsDealsModel")(sequelize, DataTypes);
 db.VerificationCode = require('./verificationCodeModel')(sequelize, DataTypes);
 db.dealMeetings = require('./dealMeetings')(sequelize, DataTypes);
 db.tasks = require("./taskModel")(sequelize, DataTypes);
+db.notifications = require("./notificationModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -88,6 +89,10 @@ db.users.hasMany(db.tasks, { foreignKey: "created_by", as: "createdTasks" });
 db.tasks.belongsTo(db.users, { foreignKey: "assigned_to", as: "assignee" });
 db.tasks.belongsTo(db.users, { foreignKey: "created_by", as: "creator" });
 db.tasks.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+
+// Define notification associations
+db.users.hasMany(db.notifications, { foreignKey: "user_id", as: "notifications" });
+db.notifications.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
 
 //exporting the module
 module.exports = db;
