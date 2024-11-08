@@ -12,6 +12,7 @@ const transactionRoutes = require('./Routes/transactionRoutes');
 const auditLogRoutes = require('./Routes/auditLogRoutes');
 const investorsDealsRoutes = require('./Routes/investorsDealsRouter');
 const teamsRoutes = require('./Routes/teamsRoutes');
+const taskRoutes = require('./Routes/taskRoutes');
 
 const PORT = process.env.PORT || 8080;
 
@@ -33,6 +34,6 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/audit-logs', auditLogRoutes);
 app.use('/api/investors-deals', investorsDealsRoutes);
 app.use('/api/noble-teams', teamsRoutes);
-
+app.use('/api/tasks', taskRoutes);
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));
