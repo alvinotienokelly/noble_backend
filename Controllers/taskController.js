@@ -5,6 +5,7 @@ const User = db.users;
 const Deal = db.deals;
 const { Op } = require("sequelize");
 const { sendTaskReminder } = require("../Middlewares/emailService");
+const { createNotification } = require("./notificationController");
 
 // Create a new task
 const createTask = async (req, res) => {
@@ -222,6 +223,11 @@ const sendTaskReminders = async () => {
 
     for (const task of tasks) {
       await sendTaskReminder(task.assignee.email, task);
+      await createNotification(
+        task.assignee.id,
+        `Task Reminder: ${task.title}`,
+        `The task "${task.title}" is due on ${task.due_date}.`
+      );
     }
 
     console.log("Task reminders sent successfully.");
@@ -328,5 +334,5 @@ module.exports = {
   filterTasks,
   sendTaskReminders,
   assignTaskToUser,
-  changeTaskStatus
+  changeTaskStatus,
 };
