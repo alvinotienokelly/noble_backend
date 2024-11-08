@@ -17,28 +17,30 @@ const scheduleDealMeeting = async (req, res) => {
       });
     }
 
-    const event = {
-      subject,
-      start: {
-        dateTime: startDateTime,
-        timeZone: "UTC",
-      },
-      end: {
-        dateTime: endDateTime,
-        timeZone: "UTC",
-      },
-      attendees: attendees.map((email) => ({
-        emailAddress: {
-          address: email,
-          name: email,
-        },
-        type: "required",
-      })),
-      isOnlineMeeting: true,
-      onlineMeetingProvider: "teamsForBusiness",
-    };
+    //ToDo :: Integrate with Microsoft Graph API
 
-    const response = await graphClient.api("/me/events").post(event);
+    // const event = {
+    //   subject,
+    //   start: {
+    //     dateTime: startDateTime,
+    //     timeZone: "UTC",
+    //   },
+    //   end: {
+    //     dateTime: endDateTime,
+    //     timeZone: "UTC",
+    //   },
+    //   attendees: attendees.map((email) => ({
+    //     emailAddress: {
+    //       address: email,
+    //       name: email,
+    //     },
+    //     type: "required",
+    //   })),
+    //   isOnlineMeeting: true,
+    //   onlineMeetingProvider: "teamsForBusiness",
+    // };
+
+    // const response = await graphClient.api("/me/events").post(event);
 
     const meeting = await dealMeetings.create({
       deal_id: dealId,
@@ -46,7 +48,7 @@ const scheduleDealMeeting = async (req, res) => {
       start: startDateTime,
       end: endDateTime,
       attendees,
-      meeting_link: response.onlineMeeting.joinUrl,
+      meeting_link: "response.onlineMeeting.joinUrl", // Todo ::  intergration with Microsoft Graph API
     });
 
     res.status(200).json({
@@ -57,7 +59,7 @@ const scheduleDealMeeting = async (req, res) => {
   } catch (error) {
     console.error("Error scheduling meeting:", error);
     res
-      .status(500)
+      .status(200)
       .json({ status: false, message: "Error scheduling meeting." });
   }
 };
