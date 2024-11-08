@@ -10,6 +10,7 @@ const {
   getTaskByDealId,
   getTasksByUserId,
   getTasksByDueDateRange,
+  filterTasks
 } = taskController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 
@@ -23,5 +24,6 @@ router.get("/user/:userId", authMiddleware, getTasksByUserId);
 router.get("/deal/:dealId", authMiddleware, getTaskByDealId);
 router.get("/date/due-date-range", authMiddleware, getTasksByDueDateRange);
 router.delete("/:id", authMiddleware, deleteTask);
+router.get("/filter/tasks", authMiddleware, filterTasks);
 
 module.exports = router;

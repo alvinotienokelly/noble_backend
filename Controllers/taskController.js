@@ -164,6 +164,74 @@ const getTasksByDueDateRange = async (req, res) => {
   }
 };
 
+// Filter tasks by various columns
+const filterTasks = async (req, res) => {
+  try {
+    const {
+      title,
+      status,
+      assigned_to,
+      created_by,
+      deal_id,
+      startDate,
+      endDate,
+    } = req.query;
+    const whereClause = {};
+
+    if (title) {
+      whereClause.title = { [Op.iLike]: `%${title}%` }; // Case-insensitive search
+    }
+
+    if (status) {
+      whereClause.status = status;
+    }
+
+    if (assigned_to) {
+      whereClause.assigned_to = assigned_to;
+    }
+
+    if (created_by) {
+      whereClause.created_by = created_by;
+    }
+
+    if (deal_id) {
+      whereClause.deal_id = deal_id;
+    }
+
+    if (startDate) {
+      whereClause.due_date = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+      if (whereClause.due_date) {
+        whereClause.due_date[Op.lte] = new Date(endDate);
+      } else {
+        whereClause.due_date = { [Op.lte]: new Date(endDate) };
+      }
+    }
+
+    const tasks = await Task.findAll({
+      where: whereClause,
+      include: [
+        { model: User, as: "assignee" },
+        { model: User, as: "creator" },
+        { model: Deal, as: "deal" },
+      ],
+    });
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No tasks found for the specified criteria.",
+      });
+    }
+
+    res.status(200).json({ status: true, tasks });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 // Delete a task
 const deleteTask = async (req, res) => {
   try {
@@ -191,4 +259,5 @@ module.exports = {
   getTaskByDealId,
   getTasksByUserId,
   getTasksByDueDateRange,
+  filterTasks
 };
