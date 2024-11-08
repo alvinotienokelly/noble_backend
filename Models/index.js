@@ -30,10 +30,11 @@ db.documents = require("./documentModel")(sequelize, DataTypes);
 db.Transaction = require("./transaction")(sequelize, DataTypes);
 db.AuditLog = require("./auditLogModel")(sequelize, DataTypes);
 db.investorsDeals = require("./investorsDealsModel")(sequelize, DataTypes);
-db.VerificationCode = require('./verificationCodeModel')(sequelize, DataTypes);
-db.dealMeetings = require('./dealMeetings')(sequelize, DataTypes);
+db.VerificationCode = require("./verificationCodeModel")(sequelize, DataTypes);
+db.dealMeetings = require("./dealMeetings")(sequelize, DataTypes);
 db.tasks = require("./taskModel")(sequelize, DataTypes);
 db.notifications = require("./notificationModel")(sequelize, DataTypes);
+db.milestones = require("./milestoneModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -80,8 +81,11 @@ db.deals.belongsToMany(db.users, {
   as: "investors",
 });
 
-db.users.hasMany(db.VerificationCode, { foreignKey: 'user_id', as: 'verificationCodes' });
-db.VerificationCode.belongsTo(db.users, { foreignKey: 'user_id', as: 'user' });
+db.users.hasMany(db.VerificationCode, {
+  foreignKey: "user_id",
+  as: "verificationCodes",
+});
+db.VerificationCode.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
 
 // Define task associations
 db.users.hasMany(db.tasks, { foreignKey: "assigned_to", as: "assignedTasks" });
@@ -91,8 +95,15 @@ db.tasks.belongsTo(db.users, { foreignKey: "created_by", as: "creator" });
 db.tasks.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
 // Define notification associations
-db.users.hasMany(db.notifications, { foreignKey: "user_id", as: "notifications" });
+db.users.hasMany(db.notifications, {
+  foreignKey: "user_id",
+  as: "notifications",
+});
 db.notifications.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
+
+// Define milestone associations
+db.deals.hasMany(db.milestones, { foreignKey: "deal_id", as: "milestones" });
+db.milestones.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
 //exporting the module
 module.exports = db;

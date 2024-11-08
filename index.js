@@ -14,6 +14,7 @@ const investorsDealsRoutes = require("./Routes/investorsDealsRouter");
 const teamsRoutes = require("./Routes/teamsRoutes");
 const taskRoutes = require("./Routes/taskRoutes");
 const notificationRoutes = require("./Routes/notificationRoutes");
+const milestoneRoutes = require("./Routes/milestoneRoutes");
 const { sendTaskReminders } = require("./Controllers/taskController");
 const cron = require("node-cron");
 
@@ -39,6 +40,7 @@ app.use("/api/investors-deals", investorsDealsRoutes);
 app.use("/api/noble-teams", teamsRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/milestones", milestoneRoutes);
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));
 
