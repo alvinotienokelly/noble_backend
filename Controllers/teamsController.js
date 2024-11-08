@@ -57,7 +57,6 @@ const scheduleDealMeeting = async (req, res) => {
       meeting,
     });
   } catch (error) {
-    console.error("Error scheduling meeting:", error);
     res
       .status(200)
       .json({ status: false, message: "Error scheduling meeting." });
