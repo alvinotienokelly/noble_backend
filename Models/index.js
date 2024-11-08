@@ -32,6 +32,7 @@ db.AuditLog = require("./auditLogModel")(sequelize, DataTypes);
 db.investorsDeals = require("./investorsDealsModel")(sequelize, DataTypes);
 db.VerificationCode = require('./verificationCodeModel')(sequelize, DataTypes);
 db.dealMeetings = require('./dealMeetings')(sequelize, DataTypes);
+db.tasks = require("./taskModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -80,6 +81,13 @@ db.deals.belongsToMany(db.users, {
 
 db.users.hasMany(db.VerificationCode, { foreignKey: 'user_id', as: 'verificationCodes' });
 db.VerificationCode.belongsTo(db.users, { foreignKey: 'user_id', as: 'user' });
+
+// Define task associations
+db.users.hasMany(db.tasks, { foreignKey: "assigned_to", as: "assignedTasks" });
+db.users.hasMany(db.tasks, { foreignKey: "created_by", as: "createdTasks" });
+db.tasks.belongsTo(db.users, { foreignKey: "assigned_to", as: "assignee" });
+db.tasks.belongsTo(db.users, { foreignKey: "created_by", as: "creator" });
+db.tasks.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
 //exporting the module
 module.exports = db;
