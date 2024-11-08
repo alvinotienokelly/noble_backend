@@ -2,6 +2,7 @@
 const db = require("../Models");
 const Milestone = db.milestones;
 const Deal = db.deals;
+const { Op } = require("sequelize");
 
 // Create a new milestone
 const createMilestone = async (req, res) => {
@@ -52,6 +53,54 @@ const updateMilestone = async (req, res) => {
   }
 };
 
+// Filter milestones by various criteria
+const filterMilestones = async (req, res) => {
+  try {
+    const { title, status, deal_id, startDate, endDate } = req.query;
+    const whereClause = {};
+
+    if (title) {
+      whereClause.title = { [Op.iLike]: `%${title}%` }; // Case-insensitive search
+    }
+
+    if (status) {
+      whereClause.status = status;
+    }
+
+    if (deal_id) {
+      whereClause.deal_id = deal_id;
+    }
+
+    if (startDate) {
+      whereClause.due_date = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+      if (whereClause.due_date) {
+        whereClause.due_date[Op.lte] = new Date(endDate);
+      } else {
+        whereClause.due_date = { [Op.lte]: new Date(endDate) };
+      }
+    }
+
+    const milestones = await Milestone.findAll({
+      where: whereClause,
+      order: [["createdAt", "ASC"]],
+    });
+
+    if (!milestones || milestones.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "No milestones found for the specified criteria.",
+      });
+    }
+
+    res.status(200).json({ status: true, milestones });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 // Delete a milestone
 const deleteMilestone = async (req, res) => {
   try {
@@ -76,4 +125,5 @@ module.exports = {
   getMilestonesByDealId,
   updateMilestone,
   deleteMilestone,
+  filterMilestones
 };
