@@ -3,13 +3,21 @@
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// const transporter = nodemailer.createTransport({
-//   service: "gmail", // Use your email service
-//   auth: {
-//     user: process.env.EMAIL_USER, // Your email address
-//     pass: process.env.EMAIL_PASS, // Your email password
-//   },
-// });
+const sendTaskReminder = async (email, task) => {
+  const msg = {
+    to: email,
+    from: process.env.EMAIL_USER, // Your verified sender email
+    subject: `Reminder: Task "${task.title}" is due soon`,
+    text: `Hello,\n\nThis is a reminder that the task "${task.title}" is due on ${task.due_date}.\n\nDescription: ${task.description}\n\nPlease make sure to complete it on time.\n\nBest regards,\nYour Team`,
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log("Task reminder sent to:", email);
+  } catch (error) {
+    console.error("Error sending task reminder:", error);
+  }
+};
 
 const sendVerificationCode = async (email, code) => {
   const msg = {
@@ -27,4 +35,4 @@ const sendVerificationCode = async (email, code) => {
   }
 };
 
-module.exports = { sendVerificationCode };
+module.exports = { sendVerificationCode, sendTaskReminder };

@@ -4,6 +4,7 @@ const Task = db.tasks;
 const User = db.users;
 const Deal = db.deals;
 const { Op } = require("sequelize");
+const { sendTaskReminder } = require("../Middlewares/emailService");
 
 // Create a new task
 const createTask = async (req, res) => {
@@ -164,6 +165,33 @@ const getTasksByDueDateRange = async (req, res) => {
   }
 };
 
+// Function to send task reminders
+const sendTaskReminders = async () => {
+  try {
+    const tasks = await Task.findAll({
+      where: {
+        due_date: {
+          [db.Sequelize.Op.lte]: new Date(
+            new Date().getTime() + 24 * 60 * 60 * 1000
+          ), // Tasks due within the next 24 hours
+        },
+        status: {
+          [db.Sequelize.Op.ne]: "Completed",
+        },
+      },
+      include: [{ model: User, as: "assignee" }],
+    });
+
+    for (const task of tasks) {
+      await sendTaskReminder(task.assignee.email, task);
+    }
+
+    console.log("Task reminders sent successfully.");
+  } catch (error) {
+    console.error("Error sending task reminders:", error);
+  }
+};
+
 // Filter tasks by various columns
 const filterTasks = async (req, res) => {
   try {
@@ -259,5 +287,6 @@ module.exports = {
   getTaskByDealId,
   getTasksByUserId,
   getTasksByDueDateRange,
-  filterTasks
+  filterTasks,
+  sendTaskReminders
 };
