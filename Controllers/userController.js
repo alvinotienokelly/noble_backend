@@ -136,11 +136,20 @@ const resetPassword = async (req, res) => {
 //hashing users password before its saved to the database with bcrypt
 const signup = async (req, res) => {
   try {
-    const { name, email, role, password } = req.body;
+    const {
+      name,
+      email,
+      role,
+      password,
+      preference_sector,
+      preference_region,
+    } = req.body;
     const data = {
       name,
       email,
       role,
+      preference_sector,
+      preference_region,
       password: await bcrypt.hash(password, 10),
     };
     //saving the user
