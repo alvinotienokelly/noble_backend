@@ -31,7 +31,7 @@ db.Transaction = require("./transaction")(sequelize, DataTypes);
 db.AuditLog = require("./auditLogModel")(sequelize, DataTypes);
 db.investorsDeals = require("./investorsDealsModel")(sequelize, DataTypes);
 db.VerificationCode = require('./verificationCodeModel')(sequelize, DataTypes);
-
+db.dealMeetings = require('./dealMeetings')(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -56,6 +56,9 @@ db.documents.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
 db.deals.hasMany(db.Transaction, { foreignKey: "deal_id" });
 db.Transaction.belongsTo(db.deals, { foreignKey: "deal_id" });
+
+db.deals.hasMany(db.dealMeetings, { foreignKey: "deal_id", as: "meetings" });
+db.dealMeetings.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
 db.users.hasMany(db.Transaction, { foreignKey: "user_id" });
 db.Transaction.belongsTo(db.users, { foreignKey: "user_id" });
