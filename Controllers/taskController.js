@@ -165,6 +165,25 @@ const getTasksByDueDateRange = async (req, res) => {
   }
 };
 
+// Change task status
+const changeTaskStatus = async (req, res) => {
+  try {
+    const { taskId, status } = req.body;
+    const task = await Task.findByPk(taskId);
+
+    if (!task) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Task not found." });
+    }
+
+    await task.update({ status });
+    res.status(200).json({ status: true, task });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 // Assign task to user
 const assignTaskToUser = async (req, res) => {
   try {
@@ -308,5 +327,6 @@ module.exports = {
   getTasksByDueDateRange,
   filterTasks,
   sendTaskReminders,
-  assignTaskToUser
+  assignTaskToUser,
+  changeTaskStatus
 };
