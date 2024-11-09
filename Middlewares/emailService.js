@@ -19,6 +19,23 @@ const sendTaskReminder = async (email, task) => {
   }
 };
 
+
+const sendEmail = async (to, subject, text) => {
+  const msg = {
+    to,
+    from: process.env.EMAIL_USER, // Your verified sender email
+    subject,
+    text,
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log("Email sent to:", to);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
+
 const sendVerificationCode = async (email, code) => {
   const msg = {
     to: email,
@@ -35,4 +52,4 @@ const sendVerificationCode = async (email, code) => {
   }
 };
 
-module.exports = { sendVerificationCode, sendTaskReminder };
+module.exports = { sendVerificationCode, sendTaskReminder, sendEmail };

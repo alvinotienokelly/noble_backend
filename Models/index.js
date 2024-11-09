@@ -35,6 +35,7 @@ db.dealMeetings = require("./dealMeetings")(sequelize, DataTypes);
 db.tasks = require("./taskModel")(sequelize, DataTypes);
 db.notifications = require("./notificationModel")(sequelize, DataTypes);
 db.milestones = require("./milestoneModel")(sequelize, DataTypes);
+db.deal_access_invite = require("./dealAccessInviteModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -104,6 +105,14 @@ db.notifications.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
 // Define milestone associations
 db.deals.hasMany(db.milestones, { foreignKey: "deal_id", as: "milestones" });
 db.milestones.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+
+// Define deal access invite associations
+
+db.users.hasMany(db.deal_access_invite, { foreignKey: "investor_id", as: "dealAccessInvites" });
+db.deals.hasMany(db.deal_access_invite, { foreignKey: "deal_id", as: "dealAccessInvites" });
+db.deal_access_invite.belongsTo(db.users, { foreignKey: "investor_id", as: "investor" });
+db.deal_access_invite.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+
 
 //exporting the module
 module.exports = db;
