@@ -38,6 +38,54 @@ const createDeal = async (req, res) => {
   }
 };
 
+// Get deals based on user's saved preference_sector & preference_region
+const getDealsByUserPreferences = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming the user ID is available in req.user
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res
+        .status(200)
+        .json({ status: false, message: "User not found." });
+    }
+
+    const preferenceSectorArray = user.preference_sector
+      
+    const preferenceRegionArray = user.preference_region
+     
+
+    if (!preferenceSectorArray || !preferenceRegionArray) {
+      const deals = await Deal.findAll({
+        include: [
+          { model: User, as: "createdBy" },
+          { model: User, as: "targetCompany" },
+        ],
+      });
+      return res.status(200).json({ status: true, message:"" });
+    }
+
+    const deals = await Deal.findAll({
+      where: {
+        sector: {
+          [Op.in]: preferenceSectorArray,
+        },
+        region: {
+          [Op.in]: preferenceRegionArray,
+        },
+      },
+      include: [
+        { model: User, as: "createdBy" },
+        { model: User, as: "targetCompany" },
+      ],
+    });
+
+    res.status(200).json({ status: true, deals });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 // Get all deals
 const getAllDeals = async (req, res) => {
   try {
@@ -247,4 +295,5 @@ module.exports = {
   getDealById,
   updateDeal,
   deleteDeal,
+  getDealsByUserPreferences,
 };
