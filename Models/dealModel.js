@@ -80,6 +80,11 @@ module.exports = (sequelize, DataTypes) => {
           key: "id", // key in the target table
         },
       },
+      visibility: {
+        type: DataTypes.ENUM,
+        values: ["Public", "Private"],
+        defaultValue: "Public",
+      },
     },
     {
       timestamps: true,
