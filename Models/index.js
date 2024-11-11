@@ -111,8 +111,7 @@ db.milestones.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 db.users.hasMany(db.deal_access_invite, { foreignKey: "investor_id", as: "dealAccessInvites" });
 db.deals.hasMany(db.deal_access_invite, { foreignKey: "deal_id", as: "dealAccessInvites" });
 db.deal_access_invite.belongsTo(db.users, { foreignKey: "investor_id", as: "investor" });
-db.deal_access_invite.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
-
+db.deal_access_invite.belongsTo(db.deals, {gnKey: "deal_id", as: "deal" });
 
 //exporting the module
 module.exports = db;
