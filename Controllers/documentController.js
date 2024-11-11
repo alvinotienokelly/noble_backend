@@ -2,6 +2,7 @@ const db = require("../Models");
 const Document = db.documents;
 const Deal = db.deals;
 const User = db.users; // Assuming User model is available in db
+const { createEnvelope } = require("../Middlewares/docusignService");
 
 const createDocument = async (req, res) => {
   try {
@@ -21,7 +22,15 @@ const createDocument = async (req, res) => {
       uploaded_by: uploaded_by,
       file_name: originalname,
       file_path: path,
+      requires_signature: req.body.requires_signature || false,
     });
+
+    if (document.requires_signature) {
+      const envelopeId = await createEnvelope(document);
+      document.docusign_envelope_id = envelopeId;
+      await document.save();
+    }
+
     res.status(200).json({ status: true, document });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -79,6 +88,8 @@ const updateDocument = async (req, res) => {
       const { originalname, path } = req.file;
       req.body.file_name = originalname;
       req.body.file_path = path;
+      const envelopeId = await createEnvelope(document);
+      req.body.docusign_envelope_id = envelopeId;
     }
 
     await document.update(req.body);
