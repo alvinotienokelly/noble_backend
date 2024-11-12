@@ -115,8 +115,8 @@ db.deal_access_invite.belongsTo(db.users, { foreignKey: "investor_id", as: "inve
 db.deal_access_invite.belongsTo(db.deals, {gnKey: "deal_id", as: "deal" });
 
 // Define signature record associations
-db.documents.hasMany(db.signature_record, { foreignKey: "document_id", as: "signatureRecords" });
-db.deals.hasMany(db.signature_record, { foreignKey: "deal_id", as: "signatureRecords" });
+db.documents.hasMany(db.signature_record, { foreignKey: "document_id", as: "signatureRecords", onDelete: "CASCADE" });
+db.deals.hasMany(db.signature_record, { foreignKey: "deal_id", as: "signatureRecords", onDelete: "CASCADE" });
 db.users.hasMany(db.signature_record, { foreignKey: "user_id", as: "signatureRecords" });
 db.signature_record.belongsTo(db.documents, { foreignKey: "document_id", as: "document" });
 db.signature_record.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
