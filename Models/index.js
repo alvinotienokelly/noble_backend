@@ -93,7 +93,7 @@ db.users.hasMany(db.tasks, { foreignKey: "assigned_to", as: "assignedTasks" });
 db.users.hasMany(db.tasks, { foreignKey: "created_by", as: "createdTasks" });
 db.tasks.belongsTo(db.users, { foreignKey: "assigned_to", as: "assignee" });
 db.tasks.belongsTo(db.users, { foreignKey: "created_by", as: "creator" });
-db.tasks.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+db.tasks.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal", onDelete: "CASCADE" });
 
 // Define notification associations
 db.users.hasMany(db.notifications, {
@@ -103,13 +103,13 @@ db.users.hasMany(db.notifications, {
 db.notifications.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
 
 // Define milestone associations
-db.deals.hasMany(db.milestones, { foreignKey: "deal_id", as: "milestones" });
+db.deals.hasMany(db.milestones, { foreignKey: "deal_id", as: "milestones", onDelete: "CASCADE" });
 db.milestones.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
 // Define deal access invite associations
 
 db.users.hasMany(db.deal_access_invite, { foreignKey: "investor_id", as: "dealAccessInvites" });
-db.deals.hasMany(db.deal_access_invite, { foreignKey: "deal_id", as: "dealAccessInvites" });
+db.deals.hasMany(db.deal_access_invite, { foreignKey: "deal_id", as: "dealAccessInvites", onDelete: "CASCADE" });
 db.deal_access_invite.belongsTo(db.users, { foreignKey: "investor_id", as: "investor" });
 db.deal_access_invite.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
