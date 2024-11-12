@@ -304,6 +304,34 @@ const filterTasks = async (req, res) => {
   }
 };
 
+// Get tasks for deals that belong to the logged-in user
+const getTasksForUserDeals = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const deals = await Deal.findAll({ where: { target_company_id: userId } });
+    const dealIds = deals.map((deal) => deal.deal_id);
+
+    const tasks = await Task.findAll({
+      where: { deal_id: { [Op.in]: dealIds } },
+      include: [
+        { model: User, as: "assignee" },
+        { model: User, as: "creator" },
+        { model: Deal, as: "deal" },
+      ],
+    });
+
+    if (!tasks || tasks.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "No tasks found for your deals." });
+    }
+
+    res.status(200).json({ status: true, tasks });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 // Delete a task
 const deleteTask = async (req, res) => {
   try {
@@ -335,4 +363,5 @@ module.exports = {
   sendTaskReminders,
   assignTaskToUser,
   changeTaskStatus,
+  getTasksForUserDeals,
 };
