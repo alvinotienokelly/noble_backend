@@ -103,9 +103,11 @@ const getAllDeals = async (req, res) => {
         { model: User, as: "targetCompany" },
       ],
     });
-    const totalDeals = await Deal.count();
-    const activeDeals = await Deal.count({ where: { status: "Active" } });
-    const inactiveDeals = await Deal.count({ where: { status: "Inactive" } });
+    const totalDeals = deals.length;
+    const activeDeals = deals.filter((deal) => deal.status === "Active").length;
+    const inactiveDeals = deals.filter(
+      (deal) => deal.status === "Inactive"
+    ).length;
 
     const startOfCurrentMonth = moment().startOf("month").toDate();
     const startOfLastMonth = moment()
@@ -117,23 +119,17 @@ const getAllDeals = async (req, res) => {
       .endOf("month")
       .toDate();
 
-    const lastMonthActiveDealsCount = await Deal.count({
-      where: {
-        status: "Active",
-        createdAt: {
-          [Op.between]: [startOfLastMonth, endOfLastMonth],
-        },
-      },
-    });
+    const lastMonthActiveDealsCount = deals.filter(
+      (deal) =>
+        deal.status === "Active" &&
+        moment(deal.createdAt).isBetween(startOfLastMonth, endOfLastMonth)
+    ).length;
 
-    const currentMonthActiveDealsCount = await Deal.count({
-      where: {
-        status: "Active",
-        createdAt: {
-          [Op.gte]: startOfCurrentMonth,
-        },
-      },
-    });
+    const currentMonthActiveDealsCount = deals.filter(
+      (deal) =>
+        deal.status === "Active" &&
+        moment(deal.createdAt).isSameOrAfter(startOfCurrentMonth)
+    ).length;
 
     let activeDealsPercentageChange = 0;
     if (lastMonthActiveDealsCount > 0) {
@@ -145,21 +141,13 @@ const getAllDeals = async (req, res) => {
       activeDealsPercentageChange = 100;
     }
 
-    const currentMonthDealsCount = await Deal.count({
-      where: {
-        createdAt: {
-          [Op.gte]: startOfCurrentMonth,
-        },
-      },
-    });
+    const currentMonthDealsCount = deals.filter((deal) =>
+      moment(deal.createdAt).isSameOrAfter(startOfCurrentMonth)
+    ).length;
 
-    const lastMonthDealsCount = await Deal.count({
-      where: {
-        createdAt: {
-          [Op.between]: [startOfLastMonth, endOfLastMonth],
-        },
-      },
-    });
+    const lastMonthDealsCount = deals.filter((deal) =>
+      moment(deal.createdAt).isBetween(startOfLastMonth, endOfLastMonth)
+    ).length;
 
     let dealsPercentageChange = 0;
     if (lastMonthDealsCount > 0) {
@@ -169,29 +157,148 @@ const getAllDeals = async (req, res) => {
     } else if (currentMonthDealsCount > 0) {
       dealsPercentageChange = 100;
     }
-    const totalDealSize = await Deal.sum("deal_size");
+    const totalDealSize = deals.reduce((sum, deal) => sum + deal.deal_size, 0);
     const startOfYear = moment().startOf("year").toDate();
     const startOfLastYear = moment()
       .subtract(1, "years")
       .startOf("year")
       .toDate();
+
     const endOfLastYear = moment().subtract(1, "years").endOf("year").toDate();
 
-    const lastYearTotalDealSize = await Deal.sum("deal_size", {
+    const lastYearTotalDealSize = deals
+      .filter((deal) =>
+        moment(deal.createdAt).isBetween(startOfLastYear, endOfLastYear)
+      )
+      .reduce((sum, deal) => sum + deal.deal_size, 0);
+
+    const currentYearTotalDealSize = deals
+      .filter((deal) => moment(deal.createdAt).isSameOrAfter(startOfYear))
+      .reduce((sum, deal) => sum + deal.deal_size, 0);
+
+    let totalDealSizePercentageChange = 0;
+    if (lastYearTotalDealSize > 0) {
+      totalDealSizePercentageChange =
+        ((currentYearTotalDealSize - lastYearTotalDealSize) /
+          lastYearTotalDealSize) *
+        100;
+    } else if (currentYearTotalDealSize > 0) {
+      totalDealSizePercentageChange = 100;
+    }
+    res.status(200).json({
+      status: true,
+      totalDealSize: totalDealSize,
+      totalDeals: totalDeals,
+      activeDeals: activeDeals,
+      inactiveDeals: inactiveDeals,
+      dealsPercentageChange: dealsPercentageChange,
+      activeDealsPercentageChange: activeDealsPercentageChange,
+      totalDealSizePercentageChange: totalDealSizePercentageChange,
+      deals,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Get getTargetCompanyDeals
+const getTargetCompanyDeals = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming the user ID is available in req.user
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res
+        .status(200)
+        .json({ status: false, message: "User not found." });
+    }
+
+    if (user.role !== "Target Company") {
+      return res.status(200).json({ status: false, message: "Access denied." });
+    }
+    const deals = await Deal.findAll({
       where: {
-        createdAt: {
-          [Op.between]: [startOfLastYear, endOfLastYear],
-        },
+        [Op.or]: [{ created_by: userId }, { target_company_id: userId }],
       },
+      include: [
+        { model: User, as: "createdBy" },
+        { model: User, as: "targetCompany" },
+      ],
     });
 
-    const currentYearTotalDealSize = await Deal.sum("deal_size", {
-      where: {
-        createdAt: {
-          [Op.gte]: startOfYear,
-        },
-      },
-    });
+    const totalDeals = deals.length;
+    const activeDeals = deals.filter((deal) => deal.status === "Active").length;
+    const inactiveDeals = deals.filter(
+      (deal) => deal.status === "Inactive"
+    ).length;
+
+    const startOfCurrentMonth = moment().startOf("month").toDate();
+    const startOfLastMonth = moment()
+      .subtract(1, "months")
+      .startOf("month")
+      .toDate();
+    const endOfLastMonth = moment()
+      .subtract(1, "months")
+      .endOf("month")
+      .toDate();
+
+    const lastMonthActiveDealsCount = deals.filter(
+      (deal) =>
+        deal.status === "Active" &&
+        moment(deal.createdAt).isBetween(startOfLastMonth, endOfLastMonth)
+    ).length;
+
+    const currentMonthActiveDealsCount = deals.filter(
+      (deal) =>
+        deal.status === "Active" &&
+        moment(deal.createdAt).isSameOrAfter(startOfCurrentMonth)
+    ).length;
+
+    let activeDealsPercentageChange = 0;
+    if (lastMonthActiveDealsCount > 0) {
+      activeDealsPercentageChange =
+        ((currentMonthActiveDealsCount - lastMonthActiveDealsCount) /
+          lastMonthActiveDealsCount) *
+        100;
+    } else if (currentMonthActiveDealsCount > 0) {
+      activeDealsPercentageChange = 100;
+    }
+
+    const currentMonthDealsCount = deals.filter((deal) =>
+      moment(deal.createdAt).isSameOrAfter(startOfCurrentMonth)
+    ).length;
+
+    const lastMonthDealsCount = deals.filter((deal) =>
+      moment(deal.createdAt).isBetween(startOfLastMonth, endOfLastMonth)
+    ).length;
+
+    let dealsPercentageChange = 0;
+    if (lastMonthDealsCount > 0) {
+      dealsPercentageChange =
+        ((currentMonthDealsCount - lastMonthDealsCount) / lastMonthDealsCount) *
+        100;
+    } else if (currentMonthDealsCount > 0) {
+      dealsPercentageChange = 100;
+    }
+    const totalDealSize = deals.reduce((sum, deal) => sum + deal.deal_size, 0);
+    const startOfYear = moment().startOf("year").toDate();
+    const startOfLastYear = moment()
+      .subtract(1, "years")
+      .startOf("year")
+      .toDate();
+
+    const endOfLastYear = moment().subtract(1, "years").endOf("year").toDate();
+
+    const lastYearTotalDealSize = deals
+      .filter((deal) =>
+        moment(deal.createdAt).isBetween(startOfLastYear, endOfLastYear)
+      )
+      .reduce((sum, deal) => sum + deal.deal_size, 0);
+
+    const currentYearTotalDealSize = deals
+      .filter((deal) => moment(deal.createdAt).isSameOrAfter(startOfYear))
+      .reduce((sum, deal) => sum + deal.deal_size, 0);
 
     let totalDealSizePercentageChange = 0;
     if (lastYearTotalDealSize > 0) {
@@ -314,4 +421,5 @@ module.exports = {
   updateDeal,
   deleteDeal,
   getDealsByUserPreferences,
+  getTargetCompanyDeals,
 };
