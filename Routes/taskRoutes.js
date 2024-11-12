@@ -13,7 +13,7 @@ const {
   filterTasks,
   assignTaskToUser,
   changeTaskStatus,
-  getTasksForUserDeals
+  getTasksForUserDeals,
 } = taskController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 
@@ -30,6 +30,6 @@ router.delete("/:id", authMiddleware, deleteTask);
 router.get("/filter/tasks", authMiddleware, filterTasks);
 router.post("/assign/user", authMiddleware, assignTaskToUser);
 router.put("/change/status", authMiddleware, changeTaskStatus);
-router.get("/user/:userId/deals", authMiddleware, getTasksForUserDeals);
+router.get("/user-tasks/tasks", authMiddleware, getTasksForUserDeals);
 
 module.exports = router;
