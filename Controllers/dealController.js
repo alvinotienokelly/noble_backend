@@ -12,6 +12,7 @@ const InvestorsDeals = db.investorsDeals;
 const DealMeetings = db.dealMeetings;
 const Milestone = db.milestones;
 const DealAccessInvite = db.deal_access_invite;
+const SignatureRecord = db.signature_record;
 
 // Create a new deal
 const createDeal = async (req, res) => {
