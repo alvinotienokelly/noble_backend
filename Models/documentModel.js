@@ -55,6 +55,15 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         allowNull: true,
       },
+      docusign_envelope_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      requires_signature: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     { timestamps: true }
   );

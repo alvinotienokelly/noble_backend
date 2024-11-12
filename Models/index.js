@@ -36,6 +36,7 @@ db.tasks = require("./taskModel")(sequelize, DataTypes);
 db.notifications = require("./notificationModel")(sequelize, DataTypes);
 db.milestones = require("./milestoneModel")(sequelize, DataTypes);
 db.deal_access_invite = require("./dealAccessInviteModel")(sequelize, DataTypes);
+db.signature_record = require("./signatureRecordModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -111,7 +112,15 @@ db.milestones.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 db.users.hasMany(db.deal_access_invite, { foreignKey: "investor_id", as: "dealAccessInvites" });
 db.deals.hasMany(db.deal_access_invite, { foreignKey: "deal_id", as: "dealAccessInvites", onDelete: "CASCADE" });
 db.deal_access_invite.belongsTo(db.users, { foreignKey: "investor_id", as: "investor" });
-db.deal_access_invite.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+db.deal_access_invite.belongsTo(db.deals, {gnKey: "deal_id", as: "deal" });
+
+// Define signature record associations
+db.documents.hasMany(db.signature_record, { foreignKey: "document_id", as: "signatureRecords" });
+db.deals.hasMany(db.signature_record, { foreignKey: "deal_id", as: "signatureRecords" });
+db.users.hasMany(db.signature_record, { foreignKey: "user_id", as: "signatureRecords" });
+db.signature_record.belongsTo(db.documents, { foreignKey: "document_id", as: "document" });
+db.signature_record.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+db.signature_record.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
 
 
 //exporting the module

@@ -17,6 +17,8 @@ const notificationRoutes = require("./Routes/notificationRoutes");
 const milestoneRoutes = require("./Routes/milestoneRoutes");
 const dealAccessInviteRoutes = require("./Routes/dealAccessInviteRoutes");
 const { sendTaskReminders } = require("./Controllers/taskController");
+const docusignWebhookRoutes = require("./Routes/docusignWebhookRoutes");
+
 const cron = require("node-cron");
 
 const PORT = process.env.PORT || 8080;
@@ -43,6 +45,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/milestones", milestoneRoutes);
 app.use("/api/deal-access-invites", dealAccessInviteRoutes);
+app.use("/api/docusign", docusignWebhookRoutes);
 
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));
