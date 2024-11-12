@@ -2,8 +2,11 @@ const db = require("../Models");
 const Document = db.documents;
 const Deal = db.deals;
 const User = db.users; // Assuming User model is available in db
-const { createEnvelope } = require("../Middlewares/docusignService");
-
+const {
+  createEnvelope,
+  createEmbeddedSigningUrl,
+} = require("../Middlewares/docusignService");
+const logger = require("../Middlewares/logger");
 const createDocument = async (req, res) => {
   try {
     const uploaded_by = req.user.id;
@@ -45,9 +48,9 @@ const getAllDocuments = async (req, res) => {
         { model: Deal, as: "deal" },
       ],
     });
-    res.status(200).json({ status: "true", documents });
+    res.status(200).json({ status: true, documents });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -62,12 +65,31 @@ const getDocumentById = async (req, res) => {
     });
     if (!document) {
       return res
-        .status(404)
-        .json({ status: "false", message: "Document not found." });
+        .status(200)
+        .json({ status: false, message: "Document not found." });
     }
-    res.status(200).json({ status: "true", document });
+    // Check if the document requires a signature
+    if (document.requires_signature) {
+      const userId= req.user.id;
+      const user = await User.findByPk(userId);
+      const email = user.email;
+      const name = user.name;
+
+
+      const returnUrl = "http://localhost:8080"; // Replace with your return URL
+
+      const signingUrl = await createEmbeddedSigningUrl(
+        document,
+        email,
+        name,
+        returnUrl
+      );
+
+      return res.status(200).json({ status: true, signingUrl });
+    }
+    res.status(200).json({ status: true, document });
   } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -105,7 +127,7 @@ const deleteDocument = async (req, res) => {
     if (!document) {
       return res
         .status(404)
-        .json({ status: "false", message: "Document not found." });
+        .json({ status: false, message: "Document not found." });
     }
     await document.destroy();
     res
