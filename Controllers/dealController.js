@@ -4,6 +4,14 @@ const { Op } = require("sequelize");
 const moment = require("moment");
 const Deal = db.deals;
 const User = db.users; // Assuming User model is available in db
+const Task = db.tasks;
+const Document = db.documents;
+const Transaction = db.Transaction;
+const AuditLog = db.AuditLog;
+const InvestorsDeals = db.investorsDeals;
+const DealMeetings = db.dealMeetings;
+const Milestone = db.milestones;
+const DealAccessInvite = db.deal_access_invite;
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -50,10 +58,9 @@ const getDealsByUserPreferences = async (req, res) => {
         .json({ status: false, message: "User not found." });
     }
 
-    const preferenceSectorArray = user.preference_sector
-      
-    const preferenceRegionArray = user.preference_region
-     
+    const preferenceSectorArray = user.preference_sector;
+
+    const preferenceRegionArray = user.preference_region;
 
     if (!preferenceSectorArray || !preferenceRegionArray) {
       const deals = await Deal.findAll({
@@ -62,7 +69,7 @@ const getDealsByUserPreferences = async (req, res) => {
           { model: User, as: "targetCompany" },
         ],
       });
-      return res.status(200).json({ status: true, message:"" });
+      return res.status(200).json({ status: true, message: "" });
     }
 
     const deals = await Deal.findAll({
@@ -276,16 +283,26 @@ const deleteDeal = async (req, res) => {
 
     if (!deal) {
       return res
-        .status(404)
+        .status(200)
         .json({ status: false, message: "Deal not found." });
     }
+
+    // Delete related records
+    await Task.destroy({ where: { deal_id: deal.deal_id } });
+    await Document.destroy({ where: { deal_id: deal.deal_id } });
+    await Transaction.destroy({ where: { deal_id: deal.deal_id } });
+    await InvestorsDeals.destroy({ where: { deal_id: deal.deal_id } });
+    await DealMeetings.destroy({ where: { deal_id: deal.deal_id } });
+    await Milestone.destroy({ where: { deal_id: deal.deal_id } });
+    await DealAccessInvite.destroy({ where: { deal_id: deal.deal_id } });
+    await SignatureRecord.destroy({ where: { deal_id: deal.deal_id } });
 
     await deal.destroy();
     res
       .status(200)
       .json({ status: true, message: "Deal deleted successfully." });
   } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
+    res.status(200).json({ status: false, message: error.message });
   }
 };
 
