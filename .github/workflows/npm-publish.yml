@@ -42,6 +42,9 @@ jobs:
       - name: Set SSH key permissions
         run: chmod 600 ec2_key.pem
 
+      - name: Disable strict host key checking
+        run: echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
       - name: Deploy to EC2
         run: |
           scp -i ec2_key.pem project.zip ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
