@@ -30,6 +30,8 @@ const getMilestonesByDealId = async (req, res) => {
       order: [["createdAt", "ASC"]],
     });
 
+    
+
     res.status(200).json({ status: true, milestones });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -46,7 +48,7 @@ const updateMilestone = async (req, res) => {
         .json({ status: false, message: "Milestone not found." });
     }
 
-    
+
 
     await milestone.update(req.body);
     res.status(200).json({ status: true, milestone });
