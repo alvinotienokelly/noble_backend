@@ -16,10 +16,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install
+
+      - name: Run tests
+        run: npm test
 
       - name: Archive project files
         run: zip -r project.zip . -x '*.git*' 'node_modules/*' 'coverage/*'
@@ -45,8 +48,8 @@ jobs:
         run: |
           scp -i ec2_key.pem project.zip ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
           ssh -i ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            unzip -o project.zip -d project
-            cd project
-            npm install --production
-            pm2 restart all || pm2 start index.js --name "noblestride"
+            sudo unzip -o /home/${{ secrets.EC2_USER }}/project.zip -d /var/www/html/noblestride_node_backend
+            cd /var/www/html/noblestride_node_backend
+            sudo npm install --production
+            sudo systemctl restart nginx
           EOF
