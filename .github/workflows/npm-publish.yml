@@ -1,33 +1,55 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-
-name: Node.js Package
+name: Deploy to AWS EC2
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm test
 
-  publish-npm:
-    needs: build
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          node-version: "16"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Archive project files
+        run: zip -r project.zip . -x '*.git*' 'node_modules/*' 'coverage/*'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: project
+          path: project.zip
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: project
+          path: .
+
+      - name: Copy SSH key
+        run: echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
+      - name: Set SSH key permissions
+        run: chmod 600 ec2_key.pem
+
+      - name: Deploy to EC2
+        run: |
+          scp -i ec2_key.pem project.zip ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
+          ssh -i ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            unzip -o project.zip -d project
+            cd project
+            npm install --production
+            pm2 restart all || pm2 start index.js --name "noblestride"
+          EOF
