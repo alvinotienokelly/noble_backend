@@ -27,4 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
+            pm2 stop all || true
+            pm2 delete all || true
+            pm2 start index.js --name "noblestride"
     
