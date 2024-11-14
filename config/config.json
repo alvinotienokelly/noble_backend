@@ -1,7 +1,7 @@
 {
     "development": {
         "username": "postgres",
-        "password": "postgres",
+        "password": "@@7389",
         "database": "noblestride",
         "host": "127.0.0.1",
         "dialect": "postgres"
