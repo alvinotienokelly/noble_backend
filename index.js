@@ -18,6 +18,8 @@ const milestoneRoutes = require("./Routes/milestoneRoutes");
 const dealAccessInviteRoutes = require("./Routes/dealAccessInviteRoutes");
 const { sendTaskReminders } = require("./Controllers/taskController");
 const commissionRoutes = require("./Routes/commissionRoutes");
+const folderRoutes = require("./Routes/folderRoutes");
+
 const docusignWebhookRoutes = require("./Routes/docusignWebhookRoutes");
 const { sendPredictiveNotifications } = require("./Controllers/notificationController");
 
@@ -49,6 +51,7 @@ app.use("/api/milestones", milestoneRoutes);
 app.use("/api/deal-access-invites", dealAccessInviteRoutes);
 app.use("/api/docusign", docusignWebhookRoutes);
 app.use("/api/commissions", commissionRoutes);
+app.use("/api/folders", folderRoutes);
 
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));

@@ -38,6 +38,7 @@ db.milestones = require("./milestoneModel")(sequelize, DataTypes);
 db.deal_access_invite = require("./dealAccessInviteModel")(sequelize, DataTypes);
 db.signature_record = require("./signatureRecordModel")(sequelize, DataTypes);
 db.invoices = require("./invoiceModel")(sequelize, DataTypes);
+db.folders = require("./folderModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -128,6 +129,14 @@ db.deals.hasMany(db.invoices, { foreignKey: "deal_id", as: "dealInvoices", onDel
 db.milestones.hasMany(db.invoices, { foreignKey: "milestone_id", as: "milestoneInvoices", onDelete: "CASCADE" });
 db.invoices.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 db.invoices.belongsTo(db.milestones, { foreignKey: "milestone_id", as: "milestone" });
+
+
+// Define associations
+db.users.hasMany(db.folders, { foreignKey: "created_by", as: "createdFolders" });
+db.folders.belongsTo(db.users, { foreignKey: "created_by", as: "creator" });
+
+db.folders.hasMany(db.documents, { foreignKey: "folder_id", as: "folderDocuments" });
+db.documents.belongsTo(db.folders, { foreignKey: "folder_id", as: "folder" });
 
 
 //exporting the module
