@@ -6,7 +6,7 @@ on:
 
 jobs:
   migrate:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -44,6 +44,7 @@ jobs:
           echo "Waiting for Postgres..."
           sleep 1
         done
+
 
     - name: Run migrations
       env:
