@@ -3,6 +3,7 @@ const db = require("../Models");
 const Deal = db.deals;
 const graphClient = require("../Middlewares/graphClient");
 const axios = require("axios");
+const { Op } = require("sequelize");
 
 const scheduleDealMeeting = async (req, res) => {
   try {
@@ -87,6 +88,46 @@ const recordDealMeeting = async (req, res) => {
   }
 };
 
+const filterDealMeetings = async (req, res) => {
+  try {
+    const { startDate, endDate, subject, attendee } = req.query;
+    const whereClause = {};
+
+    if (startDate) {
+      whereClause.start = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+      whereClause.end = { [Op.lte]: new Date(endDate) };
+    }
+
+    if (subject) {
+      whereClause.subject = { [Op.like]: `%${subject}%` };
+    }
+
+    if (attendee) {
+      whereClause.attendees = { [Op.contains]: [attendee] };
+    }
+
+    const meetings = await dealMeetings.findAll({
+      where: whereClause,
+      order: [["start", "ASC"]],
+    });
+
+    if (!meetings || meetings.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No meetings found for the specified criteria.",
+      });
+    }
+
+    res.status(200).json({ status: true, meetings });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
+
 const getMeetingsByDealId = async (req, res) => {
   try {
     const { dealId } = req.params;
@@ -115,4 +156,5 @@ module.exports = {
   scheduleDealMeeting,
   recordDealMeeting,
   getMeetingsByDealId,
+  filterDealMeetings,
 };
