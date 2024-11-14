@@ -45,6 +45,7 @@ jobs:
           sleep 1
         done
 
+
     - name: Run migrations
       env:
         NODE_ENV: test
