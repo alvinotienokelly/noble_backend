@@ -1,5 +1,6 @@
 const db = require("../Models");
 const Document = db.documents;
+const { Op } = require("sequelize");
 const Deal = db.deals;
 const User = db.users; // Assuming User model is available in db
 const {
@@ -35,6 +36,57 @@ const createDocument = async (req, res) => {
     }
 
     res.status(200).json({ status: true, document });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
+
+const documentsFilter = async (req, res) => {
+  try {
+    const { deal_id, uploaded_by, file_type, startDate, endDate } = req.query;
+    const whereClause = {};
+
+    if (deal_id) {
+      whereClause.deal_id = deal_id;
+    }
+
+    if (uploaded_by) {
+      whereClause.uploaded_by = uploaded_by;
+    }
+
+    if (file_type) {
+      whereClause.file_type = file_type;
+    }
+
+    if (startDate) {
+      whereClause.upload_date = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+      if (whereClause.upload_date) {
+        whereClause.upload_date[Op.lte] = new Date(endDate);
+      } else {
+        whereClause.upload_date = { [Op.lte]: new Date(endDate) };
+      }
+    }
+
+    const documents = await Document.findAll({
+      where: whereClause,
+      include: [
+        { model: User, as: "uploader" },
+        { model: Deal, as: "deal" },
+      ],
+    });
+
+    if (!documents || documents.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No documents found for the specified criteria.",
+      });
+    }
+
+    res.status(200).json({ status: true, documents });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
   }
@@ -163,5 +215,6 @@ module.exports = {
   getDocumentById,
   updateDocument,
   deleteDocument,
-  getDocumentsByUserDeals
+  getDocumentsByUserDeals,
+  documentsFilter
 };
