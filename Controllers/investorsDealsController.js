@@ -1,5 +1,8 @@
 // controllers/investorsDealsController.js
 const { InvestorsDeals } = require("../Models");
+const db = require("../Models");
+const Deal = db.deals;
+const User = db.users; // A
 
 const createInvestment = async (req, res) => {
   try {
@@ -12,6 +15,33 @@ const createInvestment = async (req, res) => {
     res.status(201).json(newInvestment);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+
+const trackInvestorBehavior = async (investorId, dealId) => {
+  try {
+    const investor = await User.findByPk(investorId);
+    const deal = await Deal.findByPk(dealId);
+
+    if (!investor || !deal) {
+      throw new Error("Investor or Deal not found.");
+    }
+
+    // Update investor preferences based on the deal they invested in
+    investor.preference_sector = investor.preference_sector || [];
+    if (!investor.preference_sector.includes(deal.sector)) {
+      investor.preference_sector.push(deal.sector);
+    }
+
+    investor.preference_region = investor.preference_region || [];
+    if (!investor.preference_region.includes(deal.region)) {
+      investor.preference_region.push(deal.region);
+    }
+
+    await investor.save();
+  } catch (error) {
+    console.error("Error tracking investor behavior:", error);
   }
 };
 
@@ -77,4 +107,5 @@ module.exports = {
   getInvestmentById,
   updateInvestment,
   deleteInvestment,
+  trackInvestorBehavior
 };
