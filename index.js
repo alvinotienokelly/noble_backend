@@ -19,6 +19,7 @@ const dealAccessInviteRoutes = require("./Routes/dealAccessInviteRoutes");
 const { sendTaskReminders } = require("./Controllers/taskController");
 const commissionRoutes = require("./Routes/commissionRoutes");
 const docusignWebhookRoutes = require("./Routes/docusignWebhookRoutes");
+const { sendPredictiveNotifications } = require("./Controllers/notificationController");
 
 const cron = require("node-cron");
 
@@ -55,4 +56,9 @@ app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));
 // Schedule task reminders to be sent every day at 8 AM
 cron.schedule("0 8 * * *", () => {
   sendTaskReminders();
+});
+
+
+cron.schedule("0 9 * * *", () => {
+  sendPredictiveNotifications();
 });
