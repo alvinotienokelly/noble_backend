@@ -87,7 +87,32 @@ const recordDealMeeting = async (req, res) => {
   }
 };
 
+const getMeetingsByDealId = async (req, res) => {
+  try {
+    const { dealId } = req.params;
+
+    const meetings = await dealMeetings.findAll({
+      where: { deal_id: dealId },
+      order: [["start", "ASC"]],
+    });
+
+    if (!meetings || meetings.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No meetings found for this deal.",
+      });
+    }
+
+    res.status(200).json({ status: true, meetings: meetings });
+  } catch (error) {
+    res
+      .status(200)
+      .json({ status: false, message: "Error fetching meetings." });
+  }
+};
+
 module.exports = {
   scheduleDealMeeting,
   recordDealMeeting,
+  getMeetingsByDealId,
 };

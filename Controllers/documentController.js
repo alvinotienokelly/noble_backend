@@ -54,6 +54,26 @@ const getAllDocuments = async (req, res) => {
   }
 };
 
+const getDocumentsByUserDeals = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const deals = await Deal.findAll({ where: { target_company_id: userId } });
+    const dealIds = deals.map((deal) => deal.deal_id);
+
+    const documents = await Document.findAll({
+      where: { deal_id: dealIds },
+      include: [
+        { model: User, as: "uploader" },
+        { model: Deal, as: "deal" },
+      ],
+    });
+
+    res.status(200).json({ status: true, documents });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 const getDocumentById = async (req, res) => {
   try {
     const document = await Document.findOne({
@@ -70,11 +90,10 @@ const getDocumentById = async (req, res) => {
     }
     // Check if the document requires a signature
     if (document.requires_signature) {
-      const userId= req.user.id;
+      const userId = req.user.id;
       const user = await User.findByPk(userId);
       const email = user.email;
       const name = user.name;
-
 
       const returnUrl = "http://localhost:8080"; // Replace with your return URL
 
@@ -144,4 +163,5 @@ module.exports = {
   getDocumentById,
   updateDocument,
   deleteDocument,
+  getDocumentsByUserDeals
 };
