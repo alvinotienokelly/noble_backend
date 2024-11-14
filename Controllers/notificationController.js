@@ -2,6 +2,8 @@
 const db = require("../Models");
 const Notification = db.notifications;
 const User = db.users;
+const { recommendDeals } = require("./dealController");
+const { sendEmail } = require("../Middlewares/emailService");
 
 // Create a new notification
 const createNotification = async (userId, title, message) => {
@@ -54,8 +56,30 @@ const markNotificationAsRead = async (req, res) => {
   }
 };
 
+const sendPredictiveNotifications = async () => {
+  try {
+    const investors = await User.findAll();
+
+    for (const investor of investors) {
+      const recommendedDeals = await recommendDeals(investor.id);
+
+      if (recommendedDeals.length > 0) {
+        const emailSubject = "Recommended Deals for You";
+        const emailBody = `Hello ${investor.name},\n\nBased on your preferences and behavior, we have found some deals that might interest you:\n\n${recommendedDeals
+          .map((deal) => `- ${deal.title} (${deal.sector}, ${deal.region})`)
+          .join("\n")}\n\nBest regards,\nYour Team`;
+
+        await sendEmail(investor.email, emailSubject, emailBody);
+      }
+    }
+  } catch (error) {
+    console.error("Error sending predictive notifications:", error);
+  }
+};
+
 module.exports = {
   createNotification,
   getUserNotifications,
   markNotificationAsRead,
+  sendPredictiveNotifications,
 };

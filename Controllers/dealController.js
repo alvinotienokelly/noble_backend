@@ -13,6 +13,7 @@ const DealMeetings = db.dealMeetings;
 const Milestone = db.milestones;
 const DealAccessInvite = db.deal_access_invite;
 const SignatureRecord = db.signature_record;
+const { trackInvestorBehavior } = require("./investorsDealsController");
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -340,6 +341,10 @@ const getDealById = async (req, res) => {
         .status(404)
         .json({ status: "false", message: "Deal not found." });
     }
+    const created_by = req.user.id;
+
+    await trackInvestorBehavior(created_by, deal.deal_id);
+
     res.status(200).json({ status: true, deal });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -491,6 +496,37 @@ const filterDeals = async (req, res) => {
   }
 };
 
+
+const recommendDeals = async (investorId) => {
+  try {
+    const investor = await User.findByPk(investorId);
+
+    if (!investor) {
+      throw new Error("Investor not found.");
+    }
+
+    const recommendedDeals = await Deal.findAll({
+      where: {
+        sector: {
+          [Op.in]: investor.preference_sector,
+        },
+        region: {
+          [Op.in]: investor.preference_region,
+        },
+      },
+      include: [
+        { model: User, as: "createdBy" },
+        { model: User, as: "targetCompany" },
+      ],
+    });
+
+    return recommendedDeals;
+  } catch (error) {
+    console.error("Error recommending deals:", error);
+    return [];
+  }
+};
+
 // Delete a deal by ID
 const deleteDeal = async (req, res) => {
   try {
@@ -530,4 +566,5 @@ module.exports = {
   getDealsByUserPreferences,
   getTargetCompanyDeals,
   filterDeals,
+  recommendDeals
 };
