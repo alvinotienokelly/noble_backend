@@ -384,6 +384,113 @@ const updateDeal = async (req, res) => {
   }
 };
 
+// Filter deals based on columns in the Deal model
+const filterDeals = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      sector,
+      region,
+      deal_stage,
+      deal_size_min,
+      deal_size_max,
+      target_company_id,
+      key_investors,
+      status,
+      visibility,
+      created_by,
+      startDate,
+      endDate,
+    } = req.query;
+
+    const whereClause = {};
+
+    if (title) {
+      whereClause.title = { [Op.iLike]: `%${title}%` }; // Case-insensitive search
+    }
+
+    if (description) {
+      whereClause.description = { [Op.iLike]: `%${description}%` }; // Case-insensitive search
+    }
+
+    if (sector) {
+      whereClause.sector = sector;
+    }
+
+    if (region) {
+      whereClause.region = region;
+    }
+
+    if (deal_stage) {
+      whereClause.deal_stage = deal_stage;
+    }
+
+    if (deal_size_min) {
+      whereClause.deal_size = { [Op.gte]: parseFloat(deal_size_min) };
+    }
+
+    if (deal_size_max) {
+      if (whereClause.deal_size) {
+        whereClause.deal_size[Op.lte] = parseFloat(deal_size_max);
+      } else {
+        whereClause.deal_size = { [Op.lte]: parseFloat(deal_size_max) };
+      }
+    }
+
+    if (target_company_id) {
+      whereClause.target_company_id = target_company_id;
+    }
+
+    if (key_investors) {
+      whereClause.key_investors = { [Op.iLike]: `%${key_investors}%` }; // Case-insensitive search
+    }
+
+    if (status) {
+      whereClause.status = status;
+    }
+
+    if (visibility) {
+      whereClause.visibility = visibility;
+    }
+
+    if (created_by) {
+      whereClause.created_by = created_by;
+    }
+
+    if (startDate) {
+      whereClause.createdAt = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+      if (whereClause.createdAt) {
+        whereClause.createdAt[Op.lte] = new Date(endDate);
+      } else {
+        whereClause.createdAt = { [Op.lte]: new Date(endDate) };
+      }
+    }
+
+    const deals = await Deal.findAll({
+      where: whereClause,
+      include: [
+        { model: User, as: "createdBy" },
+        { model: User, as: "targetCompany" },
+      ],
+    });
+
+    if (!deals || deals.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No deals found for the specified criteria.",
+      });
+    }
+
+    res.status(200).json({ status: true, deals });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 // Delete a deal by ID
 const deleteDeal = async (req, res) => {
   try {
@@ -422,4 +529,5 @@ module.exports = {
   deleteDeal,
   getDealsByUserPreferences,
   getTargetCompanyDeals,
+  filterDeals,
 };
