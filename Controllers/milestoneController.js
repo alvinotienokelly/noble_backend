@@ -3,6 +3,7 @@ const db = require("../Models");
 const Milestone = db.milestones;
 const Deal = db.deals;
 const { Op } = require("sequelize");
+const { updateMilestoneStatus } = require("./commissionController");
 
 // Create a new milestone
 const createMilestone = async (req, res) => {
@@ -51,6 +52,7 @@ const updateMilestone = async (req, res) => {
 
 
     await milestone.update(req.body);
+    await updateMilestoneStatus(req, res);
     res.status(200).json({ status: true, milestone });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
