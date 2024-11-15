@@ -215,7 +215,7 @@ const getTargetCompanyDeals = async (req, res) => {
         .json({ status: false, message: "User not found." });
     }
 
-    if (user.role !== "Target Company") {
+    if (user.role == "Administrator" || user.role=="Investor") {
       return res.status(200).json({ status: false, message: "Access denied." });
     }
     const deals = await Deal.findAll({
