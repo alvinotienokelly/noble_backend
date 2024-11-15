@@ -32,6 +32,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      folder_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "folders",
+          key: "folder_id",
+        },
+      },
       file_type: {
         type: DataTypes.ENUM,
         values: ["pdf", "docx", "xlsx"],

@@ -50,14 +50,6 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Due Diligence", "Term Sheet", "Closed"],
         allowNull: false,
       },
-      folder_id: {
-        type: DataTypes.UUID,
-        allowNull: true,
-        references: {
-          model: "folders",
-          key: "folder_id",
-        },
-      },
       status: {
         type: DataTypes.ENUM,
         values: ["Active", "Pending", "Inactive"],
