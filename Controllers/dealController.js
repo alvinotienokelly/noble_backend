@@ -216,9 +216,9 @@ const getTargetCompanyDeals = async (req, res) => {
     }
     
 
-    if (user.role == "Administrator" || user.role=="Investor") {
-      return res.status(200).json({ status: false, message: "Access denied." });
-    }
+    // if (user.role == "Administrator" || user.role=="Investor") {
+    //   return res.status(200).json({ status: false, message: "Access denied." });
+    // }
     const deals = await Deal.findAll({
       where: {
         [Op.or]: [{ created_by: userId }, { target_company_id: userId }],
