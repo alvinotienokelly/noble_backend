@@ -98,7 +98,7 @@ const forgotPassword = async (req, res) => {
 
     res
       .status(200)
-      .json({ status: true, message: "Verification code sent to email." });
+      .json({ status: true, message: "Verification code sent to email." + code });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
   }
@@ -283,7 +283,7 @@ const login = async (req, res) => {
         //send user data
         return res.status(200).json({
           status: true,
-          message: "Veritication code sent to " + maskedEmail,
+          message: "Veritication code sent to " + maskedEmail +" "+ verificationCode,
         });
       } else {
         return res

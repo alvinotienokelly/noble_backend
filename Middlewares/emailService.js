@@ -1,12 +1,12 @@
 // Middlewares/emailService.js
 // const nodemailer = require("nodemailer");
 const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey("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");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendTaskReminder = async (email, task) => {
   const msg = {
     to: email,
-    from: "info@skillsasa.com", // Your verified sender email
+    from: process.env.EMAIL_USER, // Your verified sender email
     subject: `Reminder: Task "${task.title}" is due soon`,
     text: `Hello,\n\nThis is a reminder that the task "${task.title}" is due on ${task.due_date}.\n\nDescription: ${task.description}\n\nPlease make sure to complete it on time.\n\nBest regards,\nYour Team`,
   };
@@ -23,7 +23,7 @@ const sendTaskReminder = async (email, task) => {
 const sendEmail = async (to, subject, text) => {
   const msg = {
     to,
-    from: "info@skillsasa.com", // Your verified sender email
+    from: process.env.EMAIL_USER, // Your verified sender email
     subject,
     text,
   };
@@ -39,7 +39,7 @@ const sendEmail = async (to, subject, text) => {
 const sendVerificationCode = async (email, code) => {
   const msg = {
     to: email,
-    from: "info@skillsasa.com", // Your verified sender email
+    from: process.env.EMAIL_USER, // Your verified sender email
     subject: "Your Verification Code",
     text: `Your verification code is: ${code}`,
   };
