@@ -5,7 +5,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride_user:mEDMyLwHloVL28Bp4JyM0LdDiOGNKdwm@dpg-cstf0f3tq21c73aa4o00-a/noblestride",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -40,6 +40,7 @@ db.signature_record = require("./signatureRecordModel")(sequelize, DataTypes);
 db.invoices = require("./invoiceModel")(sequelize, DataTypes);
 db.folders = require("./folderModel")(sequelize, DataTypes);
 db.social_account_types = require("./socialAccountTypeModel")(sequelize, DataTypes);
+db.user_reviews = require("./userReviewModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -138,6 +139,11 @@ db.folders.belongsTo(db.users, { foreignKey: "created_by", as: "creator" });
 
 db.folders.hasMany(db.documents, { foreignKey: "folder_id", as: "folderDocuments" });
 db.documents.belongsTo(db.folders, { foreignKey: "folder_id", as: "folder" });
+
+
+// Define user review associations
+db.users.hasMany(db.user_reviews, { foreignKey: "user_id", as: "userReviews" });
+db.user_reviews.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
 
 
 //exporting the module
