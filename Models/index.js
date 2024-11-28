@@ -5,7 +5,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride_user:mEDMyLwHloVL28Bp4JyM0LdDiOGNKdwm@dpg-cstf0f3tq21c73aa4o00-a/noblestride",
+  "postgresql://noblestride:mEDMyLwHloVL28Bp4JyM0LdDiOGNKdwm@dpg-cstf0f3tq21c73aa4o00-a/noblestride",
   { dialect: "postgres" }
 );
 
@@ -39,6 +39,7 @@ db.deal_access_invite = require("./dealAccessInviteModel")(sequelize, DataTypes)
 db.signature_record = require("./signatureRecordModel")(sequelize, DataTypes);
 db.invoices = require("./invoiceModel")(sequelize, DataTypes);
 db.folders = require("./folderModel")(sequelize, DataTypes);
+db.social_account_types = require("./socialAccountTypeModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
