@@ -158,7 +158,6 @@ module.exports = {
     ];
 
     const users = companies.map((company, index) => ({
-      id: index + 1,
       name: company,
       email: `${company.toLowerCase().replace(/[^a-z0-9]/g, '')}@example.com`,
       profile_image: `https://example.com/images/${company.toLowerCase().replace(/[^a-z0-9]/g, '')}.jpg`,
