@@ -9,6 +9,7 @@ const sequelize = new Sequelize(
   { dialect: "postgres" }
 );
 
+
 //checking if connection is done
 sequelize
   .authenticate()
