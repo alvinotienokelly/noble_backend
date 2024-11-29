@@ -1,5 +1,6 @@
 // server.js
 const express = require("express");
+const { exec } = require("child_process");
 const { Sequelize } = require("sequelize");
 const cors = require("cors");
 const dotenv = require("dotenv").config();
@@ -29,22 +30,6 @@ const PORT = process.env.PORT || 8080;
 
 const app = express();
 
-// Route to run the seeder
-app.get("/run-seeder", (req, res) => {
-  exec("npx sequelize-cli db:seed:all", (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error executing seeder: ${error.message}`);
-      return res.status(500).send(`Error executing seeder: ${error.message}`);
-    }
-    if (stderr) {
-      console.error(`Seeder stderr: ${stderr}`);
-      return res.status(500).send(`Seeder stderr: ${stderr}`);
-    }
-    console.log(`Seeder stdout: ${stdout}`);
-    res.send(`Seeder executed successfully: ${stdout}`);
-  });
-});
-
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -69,6 +54,21 @@ app.use("/api/docusign", docusignWebhookRoutes);
 app.use("/api/commissions", commissionRoutes);
 app.use("/api/folders", folderRoutes);
 app.use("/api/social-account-types", socialAccountTypeRoutes);
+// Route to run the seeder
+app.get("/run-seeder", (req, res) => {
+  exec("npx sequelize-cli db:seed:all", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing seeder: ${error.message}`);
+      return res.status(500).send(`Error executing seeder: ${error.message}`);
+    }
+    if (stderr) {
+      console.error(`Seeder stderr: ${stderr}`);
+      return res.status(500).send(`Seeder stderr: ${stderr}`);
+    }
+    console.log(`Seeder stdout: ${stdout}`);
+    res.send(`Seeder executed successfully: ${stdout}`);
+  });
+});
 
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));
