@@ -23,8 +23,8 @@ const folderRoutes = require("./Routes/folderRoutes");
 const socialAccountTypeRoutes = require("./Routes/socialAccountTypeRoutes");
 const docusignWebhookRoutes = require("./Routes/docusignWebhookRoutes");
 const { sendPredictiveNotifications } = require("./Controllers/notificationController");
-
 const cron = require("node-cron");
+const userReviewRoutes = require("./Routes/userReviewRoutes");
 
 require('dotenv').config();
 
@@ -60,6 +60,8 @@ app.use("/api/docusign", docusignWebhookRoutes);
 app.use("/api/commissions", commissionRoutes);
 app.use("/api/folders", folderRoutes);
 app.use("/api/social-account-types", socialAccountTypeRoutes);
+app.use("/api/user-reviews", userReviewRoutes);
+
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
   exec("npx sequelize-cli db:seed:all", { env: { ...process.env } }, (error, stdout, stderr) => {
