@@ -26,6 +26,12 @@ const { sendPredictiveNotifications } = require("./Controllers/notificationContr
 
 const cron = require("node-cron");
 
+require('dotenv').config();
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: "postgres",
+});
+
 const PORT = process.env.PORT || 8080;
 
 const app = express();
@@ -56,7 +62,7 @@ app.use("/api/folders", folderRoutes);
 app.use("/api/social-account-types", socialAccountTypeRoutes);
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
-  exec("npx sequelize-cli db:seed:all", (error, stdout, stderr) => {
+  exec("npx sequelize-cli db:seed:all", { env: { ...process.env } }, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing seeder: ${error.message}`);
       return res.status(500).send(`Error executing seeder: ${error.message}`);
