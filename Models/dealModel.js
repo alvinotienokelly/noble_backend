@@ -90,6 +90,11 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Equity", "Debt", "Equity and Debt"],
         allowNull: true,
       },
+      maximum_selling_stake: {
+        type: DataTypes.ENUM,
+        values: ["Minority", "Majority"],
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
