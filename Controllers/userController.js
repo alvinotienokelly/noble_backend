@@ -300,6 +300,31 @@ const login = async (req, res) => {
   }
 };
 
+const bulkUploadUsers = async (req, res) => {
+  try {
+    const { companies } = req.body;
+    const hashedPassword = await bcrypt.hash('password123', 10);
+
+    const users = companies.map((company) => ({
+      name: company,
+      email: `${company.toLowerCase().replace(/[^a-z0-9]/g, '')}@example.com`,
+      profile_image: `https://example.com/images/${company.toLowerCase().replace(/[^a-z0-9]/g, '')}.jpg`,
+      kyc_status: 'Verified',
+      preference_sector: JSON.stringify(['Tech', 'Finance']),
+      preference_region: JSON.stringify(['North America', 'Europe']),
+      password: hashedPassword,
+      role: 'Target Company',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+
+    await User.bulkCreate(users);
+    res.status(200).json({ status: true, message: "Users uploaded successfully." });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -308,4 +333,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getUsersByType,
+  bulkUploadUsers,
 };
