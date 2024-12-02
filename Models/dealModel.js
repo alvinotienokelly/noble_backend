@@ -85,6 +85,11 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Public", "Private"],
         defaultValue: "Public",
       },
+      deal_type: {
+        type: DataTypes.ENUM,
+        values: ["Equity", "Debt", "Equity and Debt"],
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
