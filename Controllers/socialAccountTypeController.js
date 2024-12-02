@@ -2,6 +2,25 @@
 const db = require("../Models");
 const SocialAccountType = db.social_account_types;
 
+
+
+const bulkUploadSocialAccountTypes = async (req, res) => {
+  try {
+    const { socialAccountTypes } = req.body;
+
+    const socialAccountTypesData = socialAccountTypes.map((type) => ({
+      name: type,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+
+    await SocialAccountType.bulkCreate(socialAccountTypesData);
+    res.status(200).json({ status: true, message: "Social account types uploaded successfully." });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 const createSocialAccountType = async (req, res) => {
   try {
     const { name } = req.body;
@@ -65,4 +84,5 @@ module.exports = {
   getSocialAccountTypeById,
   updateSocialAccountType,
   deleteSocialAccountType,
+  bulkUploadSocialAccountTypes
 };
