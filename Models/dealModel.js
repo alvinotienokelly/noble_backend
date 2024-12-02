@@ -95,6 +95,12 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Minority", "Majority"],
         allowNull: true,
       },
+      teaser: {
+        type: DataTypes.ENUM,
+        values: ["Yes", "No"],
+        allowNull: false,
+        defaultValue: "Yes",
+      },
     },
     {
       timestamps: true,
