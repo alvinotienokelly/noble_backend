@@ -1,18 +1,21 @@
 import pandas as pd
-import pyperclip
+import json
 from tkinter import Tk, filedialog
 
 def select_file():
     """Open a file dialog to select a file."""
-    root = Tk()
-    root.withdraw()  # Hide the main window
-    file_path = filedialog.askopenfilename(
+    from tkinter import Tk
+    from tkinter.filedialog import askopenfilename
+
+    Tk().withdraw()  # We don't want a full GUI, so keep the root window from appearing
+    file_path = askopenfilename(
+        title="Select a file",
         filetypes=[("Excel files", "*.xls *.xlsx"), ("CSV files", "*.csv")]
     )
     return file_path
 
-def extract_company_names(file_path):
-    """Extract the 'Company Name' column from the file."""
+def extract_data(file_path):
+    """Extract the 'Company Name', 'Quantity', 'Price', and 'Unit Price' columns from the file."""
     try:
         if file_path.endswith((".xls", ".xlsx")):
             data = pd.read_excel(file_path)
@@ -22,36 +25,39 @@ def extract_company_names(file_path):
             print("Unsupported file type.")
             return None
 
-        if "Company Name" in data.columns:
-            company_names = data["Company Name"].dropna().tolist()
-            return company_names
+        required_columns = ["Name", "Quantity", "Price", "UnitPrice"]
+        if all(column in data.columns for column in required_columns):
+            extracted_data = data[required_columns].dropna().to_dict(orient="records")
+            return json.dumps(extracted_data, indent=4)
         else:
-            print("The column 'Company Name' was not found in the file.")
+            missing_columns = [column for column in required_columns if column not in data.columns]
+            print(f"The following required columns were not found in the file: {', '.join(missing_columns)}")
             return None
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
 
 def copy_to_clipboard(data):
-    """Copy data to clipboard."""
-    try:
-        pyperclip.copy("\n".join(data))
-        print("Data copied to clipboard successfully!")
-    except Exception as e:
-        print(f"Failed to copy to clipboard: {e}")
+    """Copy the given data to the clipboard."""
+    from tkinter import Tk
 
-def main():
-    print("Select a file to upload...")
-    file_path = select_file()
-    if not file_path:
-        print("No file selected.")
-        return
-
-    print("Processing the file...")
-    company_names = extract_company_names(file_path)
-    if company_names:
-        print(f"Extracted {len(company_names)} company names.")
-        copy_to_clipboard(company_names)
+    r = Tk()
+    r.withdraw()
+    r.clipboard_clear()
+    r.clipboard_append(data)
+    r.update()  # now it stays on the clipboard after the window is closed
+    r.destroy()
 
 if __name__ == "__main__":
-    main()
+    file_path = select_file()
+    if file_path:
+        extracted_data = extract_data(file_path)
+        if extracted_data:
+            print("Extracted Data in JSON format:")
+            print(extracted_data)
+            copy_to_clipboard(extracted_data)
+            print("Data copied to clipboard.")
+        else:
+            print("Failed to extract data.")
+    else:
+        print("No file selected.")
