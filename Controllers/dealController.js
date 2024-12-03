@@ -29,7 +29,11 @@ const createDeal = async (req, res) => {
       key_investors,
       deal_type,
       teaser,
-      maximum_selling_stake
+      maximum_selling_stake,
+      ticket_size,
+      deal_lead,
+      project,
+      model
     } = req.body;
     const created_by = req.user.id; // Assuming the user ID is available in req.user
 
@@ -46,6 +50,10 @@ const createDeal = async (req, res) => {
       teaser,
       maximum_selling_stake,
       created_by,
+      ticket_size,
+      deal_lead,
+      project,
+      model
 
     });
 
@@ -373,7 +381,11 @@ const updateDeal = async (req, res) => {
       key_investors,
       deal_type,
       teaser,
-      maximum_selling_stake
+      maximum_selling_stake,
+      ticket_size,
+      deal_lead,
+      project,
+      model
     } = req.body;
     const deal = await Deal.findByPk(req.params.id);
 
@@ -394,7 +406,11 @@ const updateDeal = async (req, res) => {
       key_investors,
       deal_type,
       teaser,
-      maximum_selling_stake
+      maximum_selling_stake,
+      ticket_size,
+      deal_lead,
+      project,
+      model
     });
 
     res.status(200).json({ status: true, deal });
