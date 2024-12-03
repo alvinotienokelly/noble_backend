@@ -27,6 +27,9 @@ const createDeal = async (req, res) => {
       deal_size,
       target_company_id,
       key_investors,
+      deal_type,
+      teaser,
+      maximum_selling_stake
     } = req.body;
     const created_by = req.user.id; // Assuming the user ID is available in req.user
 
@@ -39,7 +42,11 @@ const createDeal = async (req, res) => {
       deal_size,
       target_company_id,
       key_investors,
+      deal_type,
+      teaser,
+      maximum_selling_stake,
       created_by,
+
     });
 
     res.status(201).json({ status: true, deal: newDeal });
@@ -214,7 +221,7 @@ const getTargetCompanyDeals = async (req, res) => {
         .status(200)
         .json({ status: false, message: "User not found." });
     }
-    
+
 
     // if (user.role == "Administrator" || user.role=="Investor") {
     //   return res.status(200).json({ status: false, message: "Access denied." });
@@ -364,6 +371,9 @@ const updateDeal = async (req, res) => {
       deal_size,
       target_company_id,
       key_investors,
+      deal_type,
+      teaser,
+      maximum_selling_stake
     } = req.body;
     const deal = await Deal.findByPk(req.params.id);
 
@@ -382,6 +392,9 @@ const updateDeal = async (req, res) => {
       deal_size,
       target_company_id,
       key_investors,
+      deal_type,
+      teaser,
+      maximum_selling_stake
     });
 
     res.status(200).json({ status: true, deal });

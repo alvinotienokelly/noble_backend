@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      project: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      deal_lead: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       description: {
         type: DataTypes.TEXT,
         allowNull: false,
@@ -55,6 +63,10 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Active", "Pending", "Inactive"],
         allowNull: false,
         defaultValue: "Active",
+      },
+      ticket_size: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       deal_size: {
         type: DataTypes.DECIMAL,
@@ -100,6 +112,12 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Yes", "No"],
         allowNull: false,
         defaultValue: "Yes",
+      },
+      model: {
+        type: DataTypes.ENUM,
+        values: ["Yes", "No"],
+        allowNull: true,
+        defaultValue: "No",
       },
     },
     {
