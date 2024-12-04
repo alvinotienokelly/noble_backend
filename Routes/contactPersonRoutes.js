@@ -7,6 +7,7 @@ const {
   getContactPersonById,
   updateContactPerson,
   deleteContactPerson,
+  getContactPersonsByUser
 } = contactPersonController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 
@@ -17,5 +18,6 @@ router.get("/", authMiddleware, getContactPersons);
 router.get("/:id", authMiddleware, getContactPersonById);
 router.put("/:id", authMiddleware, updateContactPerson);
 router.delete("/:id", authMiddleware, deleteContactPerson);
+router.get("/user/contacts", authMiddleware, getContactPersonsByUser);
 
 module.exports = router;

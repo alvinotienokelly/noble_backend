@@ -59,10 +59,21 @@ const deleteContactPerson = async (req, res) => {
   }
 };
 
+ const getContactPersonsByUser = async (req, res) => {
+    try {
+      const userId = req.user.id; // Assuming the user ID is available in req.user
+      const contactPersons = await ContactPerson.findAll({ where: { user_id: userId } });
+      res.status(200).json({ status: true, contactPersons });
+    } catch (error) {
+      res.status(500).json({ status: false, message: error.message });
+    }
+  };
+
 module.exports = {
   createContactPerson,
   getContactPersons,
   getContactPersonById,
   updateContactPerson,
   deleteContactPerson,
+  getContactPersonsByUser,
 };
