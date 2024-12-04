@@ -4,7 +4,9 @@ const ContactPerson = db.contact_persons;
 
 const createContactPerson = async (req, res) => {
   try {
-    const { user_id, name, email, phone, position } = req.body;
+    const { name, email, phone, position } = req.body;
+    const user_id = req.user.id; // Assuming the user ID is available in req.user
+
     const contactPerson = await ContactPerson.create({ user_id, name, email, phone, position });
     res.status(201).json({ status: true, contactPerson });
   } catch (error) {
