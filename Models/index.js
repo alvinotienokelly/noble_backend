@@ -42,6 +42,7 @@ db.invoices = require("./invoiceModel")(sequelize, DataTypes);
 db.folders = require("./folderModel")(sequelize, DataTypes);
 db.social_account_types = require("./socialAccountTypeModel")(sequelize, DataTypes);
 db.user_reviews = require("./userReviewModel")(sequelize, DataTypes);
+db.contact_persons = require("./contactPersonModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -145,6 +146,10 @@ db.documents.belongsTo(db.folders, { foreignKey: "folder_id", as: "folder" });
 // Define user review associations
 db.users.hasMany(db.user_reviews, { foreignKey: "user_id", as: "userReviews" });
 db.user_reviews.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
+
+// Define contact person associations
+db.users.hasMany(db.contact_persons, { foreignKey: "user_id", as: "contactPersons" });
+db.contact_persons.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
 
 
 //exporting the module
