@@ -20,9 +20,27 @@ const createFolder = async (req, res) => {
 const getFoldersByUser = async (req, res) => {
   try {
     const userId = req.user.id;
-    const folders = await Folder.findAll({ where: { created_by: userId } });
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
 
-    res.status(200).json({ status: true, folders });
+    const offset = (page - 1) * limit;
+
+    const { count: totalFolders, rows: folders } = await Folder.findAndCountAll(
+      {
+        where: { created_by: userId },
+        offset,
+        limit: parseInt(limit),
+      }
+    );
+
+    const totalPages = Math.ceil(totalFolders / limit);
+
+    res.status(200).json({
+      status: true,
+      totalFolders,
+      totalPages,
+      currentPage: parseInt(page),
+      folders,
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
