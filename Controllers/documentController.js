@@ -41,10 +41,19 @@ const createDocument = async (req, res) => {
   }
 };
 
-
 const documentsFilter = async (req, res) => {
   try {
-    const { deal_id, uploaded_by, file_type, startDate, endDate } = req.query;
+    const {
+      deal_id,
+      uploaded_by,
+      file_type,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 10,
+    } = req.query;
+    const offset = (page - 1) * limit;
+
     const whereClause = {};
 
     if (deal_id) {
@@ -71,13 +80,18 @@ const documentsFilter = async (req, res) => {
       }
     }
 
-    const documents = await Document.findAll({
-      where: whereClause,
-      include: [
-        { model: User, as: "uploader" },
-        { model: Deal, as: "deal" },
-      ],
-    });
+    const { count: totalDocuments, rows: documents } =
+      await Document.findAndCountAll({
+        where: whereClause,
+        include: [
+          { model: User, as: "uploader" },
+          { model: Deal, as: "deal" },
+        ],
+        offset,
+        limit: parseInt(limit),
+      });
+
+    const totalPages = Math.ceil(totalDocuments / limit);
 
     if (!documents || documents.length === 0) {
       return res.status(200).json({
@@ -86,21 +100,43 @@ const documentsFilter = async (req, res) => {
       });
     }
 
-    res.status(200).json({ status: true, documents });
+    res.status(200).json({
+      status: true,
+      totalDocuments,
+      totalPages,
+      currentPage: parseInt(page),
+      documents,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
 const getAllDocuments = async (req, res) => {
   try {
-    const documents = await Document.findAll({
-      include: [
-        { model: User, as: "uploader" },
-        { model: Deal, as: "deal" },
-      ],
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    const { count: totalDocuments, rows: documents } =
+      await Document.findAndCountAll({
+        include: [
+          { model: User, as: "uploader" },
+          { model: Deal, as: "deal" },
+        ],
+        offset,
+        limit: parseInt(limit),
+      });
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    res.status(200).json({
+      status: true,
+      totalDocuments,
+      totalPages,
+      currentPage: parseInt(page),
+      documents,
     });
-    res.status(200).json({ status: true, documents });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
@@ -216,5 +252,5 @@ module.exports = {
   updateDocument,
   deleteDocument,
   getDocumentsByUserDeals,
-  documentsFilter
+  documentsFilter,
 };
