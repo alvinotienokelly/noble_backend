@@ -445,7 +445,11 @@ const filterDeals = async (req, res) => {
       created_by,
       startDate,
       endDate,
+      page = 1,
+      limit = 10,
     } = req.query;
+
+    const offset = (page - 1) * limit;
 
     const whereClause = {};
 
@@ -513,13 +517,17 @@ const filterDeals = async (req, res) => {
       }
     }
 
-    const deals = await Deal.findAll({
+    const { count: totalDeals, rows: deals } = await Deal.findAndCountAll({
       where: whereClause,
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
+
+    const totalPages = Math.ceil(totalDeals / limit);
 
     if (!deals || deals.length === 0) {
       return res.status(200).json({
@@ -528,9 +536,15 @@ const filterDeals = async (req, res) => {
       });
     }
 
-    res.status(200).json({ status: true, deals });
+    res.status(200).json({
+      status: true,
+      totalDeals,
+      totalPages,
+      currentPage: parseInt(page),
+      deals,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
