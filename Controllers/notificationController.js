@@ -24,12 +24,27 @@ const createNotification = async (userId, title, message) => {
 // Get all notifications for a user
 const getUserNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.findAll({
-      where: { user_id: req.user.id },
-      order: [["createdAt", "DESC"]],
-    });
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
 
-    res.status(200).json({ status: "true", notifications });
+    const offset = (page - 1) * limit;
+
+    const { count: totalNotifications, rows: notifications } =
+      await Notification.findAndCountAll({
+        where: { user_id: req.user.id },
+        order: [["createdAt", "DESC"]],
+        offset,
+        limit: parseInt(limit),
+      });
+
+    const totalPages = Math.ceil(totalNotifications / limit);
+
+    res.status(200).json({
+      status: "true",
+      totalNotifications,
+      totalPages,
+      currentPage: parseInt(page),
+      notifications,
+    });
   } catch (error) {
     res.status(500).json({ status: "false", message: error.message });
   }
@@ -40,11 +55,15 @@ const markNotificationAsRead = async (req, res) => {
   try {
     const notification = await Notification.findByPk(req.params.id);
     if (!notification) {
-      return res.status(404).json({ status: "false", message: "Notification not found." });
+      return res
+        .status(404)
+        .json({ status: "false", message: "Notification not found." });
     }
 
     if (notification.user_id !== req.user.id) {
-      return res.status(403).json({ status: "false", message: "Access denied." });
+      return res
+        .status(403)
+        .json({ status: "false", message: "Access denied." });
     }
 
     notification.read = true;
@@ -65,7 +84,9 @@ const sendPredictiveNotifications = async () => {
 
       if (recommendedDeals.length > 0) {
         const emailSubject = "Recommended Deals for You";
-        const emailBody = `Hello ${investor.name},\n\nBased on your preferences and behavior, we have found some deals that might interest you:\n\n${recommendedDeals
+        const emailBody = `Hello ${
+          investor.name
+        },\n\nBased on your preferences and behavior, we have found some deals that might interest you:\n\n${recommendedDeals
           .map((deal) => `- ${deal.title} (${deal.sector}, ${deal.region})`)
           .join("\n")}\n\nBest regards,\nYour Team`;
 
