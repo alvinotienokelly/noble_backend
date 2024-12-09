@@ -31,16 +31,31 @@ const createTask = async (req, res) => {
 // Get all tasks
 const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.findAll({
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    const { count: totalTasks, rows: tasks } = await Task.findAndCountAll({
       include: [
         { model: User, as: "assignee" },
         { model: User, as: "creator" },
         { model: Deal, as: "deal" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
-    res.status(200).json({ status: true, tasks });
+
+    const totalPages = Math.ceil(totalTasks / limit);
+
+    res.status(200).json({
+      status: true,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+      tasks,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -85,51 +100,86 @@ const updateTask = async (req, res) => {
 // Get tasks assigned to a specific user
 const getTasksByUserId = async (req, res) => {
   try {
-    const tasks = await Task.findAll({
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    const { count: totalTasks, rows: tasks } = await Task.findAndCountAll({
       where: { assigned_to: req.params.userId },
       include: [
         { model: User, as: "assignee" },
         { model: User, as: "creator" },
         { model: Deal, as: "deal" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
+
+    const totalPages = Math.ceil(totalTasks / limit);
+
     if (!tasks || tasks.length === 0) {
       return res
         .status(200)
         .json({ status: false, message: "No tasks found for this user." });
     }
-    res.status(200).json({ status: true, tasks });
+
+    res.status(200).json({
+      status: true,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+      tasks,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
 // Get tasks by deal ID
 const getTaskByDealId = async (req, res) => {
   try {
-    const tasks = await Task.findAll({
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    const { count: totalTasks, rows: tasks } = await Task.findAndCountAll({
       where: { deal_id: req.params.dealId },
       include: [
         { model: User, as: "assignee" },
         { model: User, as: "creator" },
         { model: Deal, as: "deal" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
+
+    const totalPages = Math.ceil(totalTasks / limit);
+
     if (!tasks || tasks.length === 0) {
       return res
         .status(200)
         .json({ status: false, message: "No tasks found for this deal." });
     }
-    res.status(200).json({ status: true, tasks });
+
+    res.status(200).json({
+      status: true,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+      tasks,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: "nn" });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
 // Get tasks by date range
 const getTasksByDueDateRange = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
     const whereClause = {};
 
     if (startDate) {
@@ -144,14 +194,18 @@ const getTasksByDueDateRange = async (req, res) => {
       }
     }
 
-    const tasks = await Task.findAll({
+    const { count: totalTasks, rows: tasks } = await Task.findAndCountAll({
       where: whereClause,
       include: [
         { model: User, as: "assignee" },
         { model: User, as: "creator" },
         { model: Deal, as: "deal" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
+
+    const totalPages = Math.ceil(totalTasks / limit);
 
     if (!tasks || tasks.length === 0) {
       return res.status(200).json({
@@ -160,9 +214,15 @@ const getTasksByDueDateRange = async (req, res) => {
       });
     }
 
-    res.status(200).json({ status: true, tasks });
+    res.status(200).json({
+      status: true,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+      tasks,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -247,7 +307,12 @@ const filterTasks = async (req, res) => {
       deal_id,
       startDate,
       endDate,
+      page = 1,
+      limit = 10,
     } = req.query;
+
+    const offset = (page - 1) * limit;
+
     const whereClause = {};
 
     if (title) {
@@ -282,14 +347,18 @@ const filterTasks = async (req, res) => {
       }
     }
 
-    const tasks = await Task.findAll({
+    const { count: totalTasks, rows: tasks } = await Task.findAndCountAll({
       where: whereClause,
       include: [
         { model: User, as: "assignee" },
         { model: User, as: "creator" },
         { model: Deal, as: "deal" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
+
+    const totalPages = Math.ceil(totalTasks / limit);
 
     if (!tasks || tasks.length === 0) {
       return res.status(200).json({
@@ -298,9 +367,15 @@ const filterTasks = async (req, res) => {
       });
     }
 
-    res.status(200).json({ status: true, tasks });
+    res.status(200).json({
+      status: true,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+      tasks,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -308,27 +383,42 @@ const filterTasks = async (req, res) => {
 const getTasksForUserDeals = async (req, res) => {
   try {
     const userId = req.user.id;
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
     const deals = await Deal.findAll({ where: { target_company_id: userId } });
     const dealIds = deals.map((deal) => deal.deal_id);
 
-    const tasks = await Task.findAll({
+    const { count: totalTasks, rows: tasks } = await Task.findAndCountAll({
       where: { deal_id: { [Op.in]: dealIds } },
       include: [
         { model: User, as: "assignee" },
         { model: User, as: "creator" },
         { model: Deal, as: "deal" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
 
+    const totalPages = Math.ceil(totalTasks / limit);
+
     if (!tasks || tasks.length === 0) {
-      return res
-        .status(200)
-        .json({ status: false, message: "No tasks found for your deals." });
+      return res.status(200).json({
+        status: false,
+        message: "No tasks found for your deals.",
+      });
     }
 
-    res.status(200).json({ status: true, tasks });
+    res.status(200).json({
+      status: true,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+      tasks,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
