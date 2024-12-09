@@ -90,7 +90,17 @@ const recordDealMeeting = async (req, res) => {
 
 const filterDealMeetings = async (req, res) => {
   try {
-    const { startDate, endDate, subject, attendee } = req.query;
+    const {
+      startDate,
+      endDate,
+      subject,
+      attendee,
+      page = 1,
+      limit = 10,
+    } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
     const whereClause = {};
 
     if (startDate) {
@@ -109,10 +119,15 @@ const filterDealMeetings = async (req, res) => {
       whereClause.attendees = { [Op.contains]: [attendee] };
     }
 
-    const meetings = await dealMeetings.findAll({
-      where: whereClause,
-      order: [["start", "ASC"]],
-    });
+    const { count: totalMeetings, rows: meetings } =
+      await dealMeetings.findAndCountAll({
+        where: whereClause,
+        order: [["start", "ASC"]],
+        offset,
+        limit: parseInt(limit),
+      });
+
+    const totalPages = Math.ceil(totalMeetings / limit);
 
     if (!meetings || meetings.length === 0) {
       return res.status(200).json({
@@ -121,12 +136,17 @@ const filterDealMeetings = async (req, res) => {
       });
     }
 
-    res.status(200).json({ status: true, meetings });
+    res.status(200).json({
+      status: true,
+      totalMeetings,
+      totalPages,
+      currentPage: parseInt(page),
+      meetings,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
-
 
 const getMeetingsByDealId = async (req, res) => {
   try {
