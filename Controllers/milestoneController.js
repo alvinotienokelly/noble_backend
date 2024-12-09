@@ -31,8 +31,6 @@ const getMilestonesByDealId = async (req, res) => {
       order: [["createdAt", "ASC"]],
     });
 
-    
-
     res.status(200).json({ status: true, milestones });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -49,8 +47,6 @@ const updateMilestone = async (req, res) => {
         .json({ status: false, message: "Milestone not found." });
     }
 
-
-
     await milestone.update(req.body);
     await updateMilestoneStatus(req, res);
     res.status(200).json({ status: true, milestone });
@@ -62,7 +58,17 @@ const updateMilestone = async (req, res) => {
 // Filter milestones by various criteria
 const filterMilestones = async (req, res) => {
   try {
-    const { title, status, deal_id, startDate, endDate } = req.query;
+    const {
+      title,
+      status,
+      deal_id,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 10,
+    } = req.query;
+    const offset = (page - 1) * limit;
+
     const whereClause = {};
 
     if (title) {
@@ -89,10 +95,15 @@ const filterMilestones = async (req, res) => {
       }
     }
 
-    const milestones = await Milestone.findAll({
-      where: whereClause,
-      order: [["createdAt", "ASC"]],
-    });
+    const { count: totalMilestones, rows: milestones } =
+      await Milestone.findAndCountAll({
+        where: whereClause,
+        order: [["createdAt", "ASC"]],
+        offset,
+        limit: parseInt(limit),
+      });
+
+    const totalPages = Math.ceil(totalMilestones / limit);
 
     if (!milestones || milestones.length === 0) {
       return res.status(404).json({
@@ -101,7 +112,13 @@ const filterMilestones = async (req, res) => {
       });
     }
 
-    res.status(200).json({ status: true, milestones });
+    res.status(200).json({
+      status: true,
+      totalMilestones,
+      totalPages,
+      currentPage: parseInt(page),
+      milestones,
+    });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
   }
@@ -111,6 +128,9 @@ const filterMilestones = async (req, res) => {
 const getMilestonesForUser = async (req, res) => {
   try {
     const userId = req.user.id; // Assuming req.user contains the logged-in user's information
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
 
     const deals = await Deal.findAll({
       where: { target_company_id: userId },
@@ -119,15 +139,32 @@ const getMilestonesForUser = async (req, res) => {
 
     const dealIds = deals.map((deal) => deal.deal_id);
 
-    const milestones = await Milestone.findAll({
-      where: { deal_id: { [Op.in]: dealIds } },
-      order: [["createdAt", "ASC"]],
-      include: [{ model: Deal, as: "deal" }],
-    });
+    const { count: totalMilestones, rows: milestones } =
+      await Milestone.findAndCountAll({
+        where: { deal_id: { [Op.in]: dealIds } },
+        order: [["createdAt", "ASC"]],
+        offset,
+        limit: parseInt(limit),
+      });
 
-    res.status(200).json({ status: true, milestones });
+    const totalPages = Math.ceil(totalMilestones / limit);
+
+    if (!milestones || milestones.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No milestones found for your deals.",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      totalMilestones,
+      totalPages,
+      currentPage: parseInt(page),
+      milestones,
+    });
   } catch (error) {
-    res.status(200).json({ status: false, message: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
