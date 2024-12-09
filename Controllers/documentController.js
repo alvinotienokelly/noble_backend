@@ -41,7 +41,6 @@ const createDocument = async (req, res) => {
   }
 };
 
-
 const documentsFilter = async (req, res) => {
   try {
     const { deal_id, uploaded_by, file_type, startDate, endDate } = req.query;
@@ -94,13 +93,29 @@ const documentsFilter = async (req, res) => {
 
 const getAllDocuments = async (req, res) => {
   try {
-    const documents = await Document.findAll({
-      include: [
-        { model: User, as: "uploader" },
-        { model: Deal, as: "deal" },
-      ],
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    const { count: totalDocuments, rows: documents } =
+      await Document.findAndCountAll({
+        include: [
+          { model: User, as: "uploader" },
+          { model: Deal, as: "deal" },
+        ],
+        offset,
+        limit: parseInt(limit),
+      });
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    res.status(200).json({
+      status: true,
+      totalDocuments,
+      totalPages,
+      currentPage: parseInt(page),
+      documents,
     });
-    res.status(200).json({ status: true, documents });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
@@ -216,5 +231,5 @@ module.exports = {
   updateDocument,
   deleteDocument,
   getDocumentsByUserDeals,
-  documentsFilter
+  documentsFilter,
 };
