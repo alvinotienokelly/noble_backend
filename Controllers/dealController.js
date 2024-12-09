@@ -33,7 +33,7 @@ const createDeal = async (req, res) => {
       ticket_size,
       deal_lead,
       project,
-      model
+      model,
     } = req.body;
     const created_by = req.user.id; // Assuming the user ID is available in req.user
 
@@ -53,8 +53,7 @@ const createDeal = async (req, res) => {
       ticket_size,
       deal_lead,
       project,
-      model
-
+      model,
     });
 
     res.status(201).json({ status: true, deal: newDeal });
@@ -113,13 +112,19 @@ const getDealsByUserPreferences = async (req, res) => {
 // Get all deals
 const getAllDeals = async (req, res) => {
   try {
-    const deals = await Deal.findAll({
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    const { count: totalDeals, rows: deals } = await Deal.findAndCountAll({
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
-    const totalDeals = deals.length;
+
     const activeDeals = deals.filter((deal) => deal.status === "Active").length;
     const inactiveDeals = deals.filter(
       (deal) => deal.status === "Inactive"
@@ -179,7 +184,6 @@ const getAllDeals = async (req, res) => {
       .subtract(1, "years")
       .startOf("year")
       .toDate();
-
     const endOfLastYear = moment().subtract(1, "years").endOf("year").toDate();
 
     const lastYearTotalDealSize = deals
@@ -201,6 +205,9 @@ const getAllDeals = async (req, res) => {
     } else if (currentYearTotalDealSize > 0) {
       totalDealSizePercentageChange = 100;
     }
+
+    const totalPages = Math.ceil(totalDeals / limit);
+
     res.status(200).json({
       status: true,
       totalDealSize: totalDealSize,
@@ -210,6 +217,8 @@ const getAllDeals = async (req, res) => {
       dealsPercentageChange: dealsPercentageChange,
       activeDealsPercentageChange: activeDealsPercentageChange,
       totalDealSizePercentageChange: totalDealSizePercentageChange,
+      currentPage: parseInt(page),
+      totalPages: totalPages,
       deals,
     });
   } catch (error) {
@@ -229,7 +238,6 @@ const getTargetCompanyDeals = async (req, res) => {
         .status(200)
         .json({ status: false, message: "User not found." });
     }
-
 
     // if (user.role == "Administrator" || user.role=="Investor") {
     //   return res.status(200).json({ status: false, message: "Access denied." });
@@ -385,7 +393,7 @@ const updateDeal = async (req, res) => {
       ticket_size,
       deal_lead,
       project,
-      model
+      model,
     } = req.body;
     const deal = await Deal.findByPk(req.params.id);
 
@@ -410,7 +418,7 @@ const updateDeal = async (req, res) => {
       ticket_size,
       deal_lead,
       project,
-      model
+      model,
     });
 
     res.status(200).json({ status: true, deal });
@@ -526,7 +534,6 @@ const filterDeals = async (req, res) => {
   }
 };
 
-
 const recommendDeals = async (investorId) => {
   try {
     const investor = await User.findByPk(investorId);
@@ -596,5 +603,5 @@ module.exports = {
   getDealsByUserPreferences,
   getTargetCompanyDeals,
   filterDeals,
-  recommendDeals
+  recommendDeals,
 };

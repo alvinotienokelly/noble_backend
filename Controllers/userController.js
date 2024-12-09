@@ -102,7 +102,10 @@ const forgotPassword = async (req, res) => {
 
     res
       .status(200)
-      .json({ status: true, message: "Verification code sent to email." + code });
+      .json({
+        status: true,
+        message: "Verification code sent to email." + code,
+      });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
   }
@@ -287,7 +290,8 @@ const login = async (req, res) => {
         //send user data
         return res.status(200).json({
           status: true,
-          message: "Veritication code sent to " + maskedEmail +" "+ verificationCode,
+          message:
+            "Veritication code sent to " + maskedEmail + " " + verificationCode,
         });
       } else {
         return res
@@ -307,23 +311,27 @@ const login = async (req, res) => {
 const bulkUploadUsers = async (req, res) => {
   try {
     const { companies } = req.body;
-    const hashedPassword = await bcrypt.hash('password123', 10);
+    const hashedPassword = await bcrypt.hash("password123", 10);
 
     const users = companies.map((company) => ({
       name: company,
-      email: `${company.toLowerCase().replace(/[^a-z0-9]/g, '')}@example.com`,
-      profile_image: `https://example.com/images/${company.toLowerCase().replace(/[^a-z0-9]/g, '')}.jpg`,
-      kyc_status: 'Verified',
-      preference_sector: JSON.stringify(['Tech', 'Finance']),
-      preference_region: JSON.stringify(['North America', 'Europe']),
+      email: `${company.toLowerCase().replace(/[^a-z0-9]/g, "")}@example.com`,
+      profile_image: `https://example.com/images/${company
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "")}.jpg`,
+      kyc_status: "Verified",
+      preference_sector: JSON.stringify(["Tech", "Finance"]),
+      preference_region: JSON.stringify(["North America", "Europe"]),
       password: hashedPassword,
-      role: 'Target Company',
+      role: "Target Company",
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
 
     await User.bulkCreate(users);
-    res.status(200).json({ status: true, message: "Users uploaded successfully." });
+    res
+      .status(200)
+      .json({ status: true, message: "Users uploaded successfully." });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
