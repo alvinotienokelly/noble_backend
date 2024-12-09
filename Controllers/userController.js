@@ -26,17 +26,17 @@ const logout = (req, res) => {
 const getUsersByType = async (req, res) => {
   try {
     const { type } = req.params;
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
 
-    // Find users by their type
-    const users = await User.findAll({
+    const offset = (page - 1) * limit;
+
+    // Find users by their type with pagination
+    const { count: totalUsersCount, rows: users } = await User.findAndCountAll({
       where: {
         role: type,
       },
-    });
-    const totalUsersCount = await User.count({
-      where: {
-        role: type,
-      },
+      offset,
+      limit: parseInt(limit),
     });
 
     const kycStatusCounts = await User.findAll({
@@ -56,10 +56,14 @@ const getUsersByType = async (req, res) => {
       counts[item.kyc_status] = parseInt(item.dataValues.count, 10);
     });
 
+    const totalPages = Math.ceil(totalUsersCount / limit);
+
     if (users.length > 0) {
       return res.status(200).json({
         status: true,
-        totalUsersCount: totalUsersCount,
+        totalUsersCount,
+        totalPages,
+        currentPage: parseInt(page),
         activeUsersCount: counts.Verified,
         rejectedUsersCount: counts.Rejected,
         users,
