@@ -239,10 +239,10 @@ const getTargetCompanyDeals = async (req, res) => {
         .json({ status: false, message: "User not found." });
     }
 
-    // if (user.role == "Administrator" || user.role=="Investor") {
-    //   return res.status(200).json({ status: false, message: "Access denied." });
-    // }
-    const deals = await Deal.findAll({
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+    const offset = (page - 1) * limit;
+
+    const { count: totalDeals, rows: deals } = await Deal.findAndCountAll({
       where: {
         [Op.or]: [{ created_by: userId }, { target_company_id: userId }],
       },
@@ -250,9 +250,10 @@ const getTargetCompanyDeals = async (req, res) => {
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
       ],
+      offset,
+      limit: parseInt(limit),
     });
 
-    const totalDeals = deals.length;
     const activeDeals = deals.filter((deal) => deal.status === "Active").length;
     const inactiveDeals = deals.filter(
       (deal) => deal.status === "Inactive"
@@ -312,7 +313,6 @@ const getTargetCompanyDeals = async (req, res) => {
       .subtract(1, "years")
       .startOf("year")
       .toDate();
-
     const endOfLastYear = moment().subtract(1, "years").endOf("year").toDate();
 
     const lastYearTotalDealSize = deals
@@ -334,6 +334,9 @@ const getTargetCompanyDeals = async (req, res) => {
     } else if (currentYearTotalDealSize > 0) {
       totalDealSizePercentageChange = 100;
     }
+
+    const totalPages = Math.ceil(totalDeals / limit);
+
     res.status(200).json({
       status: true,
       totalDealSize: totalDealSize,
@@ -343,6 +346,8 @@ const getTargetCompanyDeals = async (req, res) => {
       dealsPercentageChange: dealsPercentageChange,
       activeDealsPercentageChange: activeDealsPercentageChange,
       totalDealSizePercentageChange: totalDealSizePercentageChange,
+      currentPage: parseInt(page),
+      totalPages: totalPages,
       deals,
     });
   } catch (error) {
