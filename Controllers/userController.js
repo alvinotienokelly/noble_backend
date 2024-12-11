@@ -100,12 +100,10 @@ const forgotPassword = async (req, res) => {
 
     await sendVerificationCode(email, code);
 
-    res
-      .status(200)
-      .json({
-        status: true,
-        message: "Verification code sent to email." + code,
-      });
+    res.status(200).json({
+      status: true,
+      message: "Verification code sent to email." + code,
+    });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
   }
@@ -241,6 +239,24 @@ const verifyCode = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id, {
+      attributes: { exclude: ["password"] }, // Exclude the password field from the response
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 //login authentication
 
 const login = async (req, res) => {
@@ -346,4 +362,5 @@ module.exports = {
   resetPassword,
   getUsersByType,
   bulkUploadUsers,
+  getUserById, 
 };

@@ -9,7 +9,8 @@ const {
   forgotPassword,
   resetPassword,
   getUsersByType,
-  bulkUploadUsers
+  bulkUploadUsers,
+  getUserById,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -44,7 +45,7 @@ router.post("/reset-password", resetPassword);
 //bulk-upload
 
 router.post("/bulk-upload", authMiddleware, bulkUploadUsers);
-
+router.get("/user/:id", authMiddleware, getUserById); // Add this line
 
 router.get("/profile", authMiddleware, async (req, res) => {
   try {
