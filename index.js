@@ -27,6 +27,7 @@ const cron = require("node-cron");
 const userReviewRoutes = require("./Routes/userReviewRoutes");
 const contactPersonRoutes = require("./Routes/contactPersonRoutes");
 const dealStageRoutes = require("./Routes/dealStageRoutes");
+const investorDealStagesRoutes = require("./Routes/investorDealStagesRoutes");
 
 require('dotenv').config();
 
@@ -65,6 +66,7 @@ app.use("/api/social-account-types", socialAccountTypeRoutes);
 app.use("/api/user-reviews", userReviewRoutes);
 app.use("/api/contact-persons", contactPersonRoutes);
 app.use("/api/deal-stages", dealStageRoutes);
+app.use("/api/investor-deal-stages", investorDealStagesRoutes);
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
