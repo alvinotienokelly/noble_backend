@@ -10,6 +10,7 @@ const {
 const logger = require("../Middlewares/logger");
 const createDocument = async (req, res) => {
   try {
+    const { folder_id } = req.body;
     const uploaded_by = req.user.id;
     req.body.uploaded_by = uploaded_by;
     const { originalname, path } = req.file;
@@ -26,6 +27,7 @@ const createDocument = async (req, res) => {
       uploaded_by: uploaded_by,
       file_name: originalname,
       file_path: path,
+      folder_id: folder_id,
       requires_signature: req.body.requires_signature || false,
     });
 
@@ -202,6 +204,7 @@ const getDocumentById = async (req, res) => {
 
 const updateDocument = async (req, res) => {
   try {
+    const { folder_id } = req.body;
     const uploaded_by = req.user.id;
     req.body.uploaded_by = uploaded_by;
 
