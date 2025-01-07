@@ -22,14 +22,17 @@ const commissionRoutes = require("./Routes/commissionRoutes");
 const folderRoutes = require("./Routes/folderRoutes");
 const socialAccountTypeRoutes = require("./Routes/socialAccountTypeRoutes");
 const docusignWebhookRoutes = require("./Routes/docusignWebhookRoutes");
-const { sendPredictiveNotifications } = require("./Controllers/notificationController");
+const {
+  sendPredictiveNotifications,
+} = require("./Controllers/notificationController");
 const cron = require("node-cron");
 const userReviewRoutes = require("./Routes/userReviewRoutes");
 const contactPersonRoutes = require("./Routes/contactPersonRoutes");
 const dealStageRoutes = require("./Routes/dealStageRoutes");
 const investorDealStagesRoutes = require("./Routes/investorDealStagesRoutes");
+const countryRoutes = require("./Routes/countryRoutes"); // Add this line
 
-require('dotenv').config();
+require("dotenv").config();
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
@@ -67,23 +70,27 @@ app.use("/api/user-reviews", userReviewRoutes);
 app.use("/api/contact-persons", contactPersonRoutes);
 app.use("/api/deal-stages", dealStageRoutes);
 app.use("/api/investor-deal-stages", investorDealStagesRoutes);
+app.use("/api/countries", countryRoutes); // Add this line
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
-  exec("npx sequelize-cli db:seed:all", { env: { ...process.env } }, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error executing seeder: ${error.message}`);
-      return res.status(500).send(`Error executing seeder: ${error.message}`);
+  exec(
+    "npx sequelize-cli db:seed:all",
+    { env: { ...process.env } },
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing seeder: ${error.message}`);
+        return res.status(500).send(`Error executing seeder: ${error.message}`);
+      }
+      if (stderr) {
+        console.error(`Seeder stderr: ${stderr}`);
+        return res.status(500).send(`Seeder stderr: ${stderr}`);
+      }
+      console.log(`Seeder stdout: ${stdout}`);
+      res.send(`Seeder executed successfully: ${stdout}`);
     }
-    if (stderr) {
-      console.error(`Seeder stderr: ${stderr}`);
-      return res.status(500).send(`Seeder stderr: ${stderr}`);
-    }
-    console.log(`Seeder stdout: ${stdout}`);
-    res.send(`Seeder executed successfully: ${stdout}`);
-  });
+  );
 });
-
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));
 
@@ -91,7 +98,6 @@ app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));
 cron.schedule("0 8 * * *", () => {
   sendTaskReminders();
 });
-
 
 cron.schedule("0 9 * * *", () => {
   sendPredictiveNotifications();
