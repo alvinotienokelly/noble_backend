@@ -245,7 +245,7 @@ db.investor_deal_stages.belongsTo(db.deal_stages, {
 });
 
 // Define role associations
-db.users.belongsTo(db.roles, { foreignKey: "role_id", as: "role" });
+db.users.belongsTo(db.roles, { foreignKey: "role_id", as: "userRole" });
 db.roles.hasMany(db.users, { foreignKey: "role_id", as: "users" });
 
 // Define role permission associations
