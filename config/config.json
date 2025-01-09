@@ -17,7 +17,7 @@
         "username": "noblestride",
         "password": "szcNy266OSYed9vMLf2DGwHsYSiE8qpg",
         "database": "noblestride_be28",
-        "host": "127.0.0.1",
+        "host": "dpg-ctucl01u0jms73f5qtfg-a",
         "dialect": "postgres"
     }
 }
