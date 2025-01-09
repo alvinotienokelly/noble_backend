@@ -241,5 +241,21 @@ db.investor_deal_stages.belongsTo(db.deal_stages, {
   as: "stage",
 });
 
+// Define role associations
+db.users.belongsTo(db.roles, { foreignKey: "role_id", as: "role" });
+db.roles.hasMany(db.users, { foreignKey: "role_id", as: "users" });
+
+// Define role permission associations
+db.roles.belongsToMany(db.permissions, {
+  through: db.role_permissions,
+  foreignKey: "role_id",
+  as: "permissions",
+});
+db.permissions.belongsToMany(db.roles, {
+  through: db.role_permissions,
+  foreignKey: "permission_id",
+  as: "roles",
+});
+
 //exporting the module
 module.exports = db;

@@ -31,6 +31,8 @@ const contactPersonRoutes = require("./Routes/contactPersonRoutes");
 const dealStageRoutes = require("./Routes/dealStageRoutes");
 const investorDealStagesRoutes = require("./Routes/investorDealStagesRoutes");
 const countryRoutes = require("./Routes/countryRoutes"); // Add this line
+const roleRoutes = require("./Routes/roleRoutes"); // Add this line
+const permissionRoutes = require("./Routes/permissionRoutes"); // Add this line
 
 require("dotenv").config();
 
@@ -71,6 +73,8 @@ app.use("/api/contact-persons", contactPersonRoutes);
 app.use("/api/deal-stages", dealStageRoutes);
 app.use("/api/investor-deal-stages", investorDealStagesRoutes);
 app.use("/api/countries", countryRoutes); // Add this line
+app.use("/api/roles", roleRoutes); // Add this line
+app.use("/api/permissions", permissionRoutes); // Add this line
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
