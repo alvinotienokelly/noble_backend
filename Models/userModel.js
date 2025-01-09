@@ -40,6 +40,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: "Investor",
       },
+      role_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: "roles",
+          key: "role_id",
+        },
+      },
     },
     { timestamps: true }
   );
