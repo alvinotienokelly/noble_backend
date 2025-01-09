@@ -76,6 +76,7 @@ app.use("/api/countries", countryRoutes); // Add this line
 app.use("/api/roles", roleRoutes); // Add this line
 app.use("/api/permissions", permissionRoutes); // Add this line
 
+
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
   exec(

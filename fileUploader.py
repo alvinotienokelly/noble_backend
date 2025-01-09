@@ -25,7 +25,7 @@ def extract_data(file_path):
             print("Unsupported file type.")
             return None
 
-        required_columns = ["project"]
+        required_columns = ["Company Name"]
         if all(column in data.columns for column in required_columns):
             extracted_data = data[required_columns].dropna().to_dict(orient="records")
             return json.dumps(extracted_data, indent=4)
