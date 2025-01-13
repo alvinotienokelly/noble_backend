@@ -17,8 +17,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       deal_lead: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: true,
+        references: {
+          model: "users",
+          key: "id",
+        },
       },
       description: {
         type: DataTypes.TEXT,
