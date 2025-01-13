@@ -4,11 +4,11 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Alter the ENUM type to add the new value
-    await queryInterface.sequelize.query(`
-      ALTER TYPE "enum_deals_status" ADD VALUE 'Closed & Reopened';
-      ALTER TYPE "enum_deals_status" ADD VALUE 'Open';
-      ALTER TYPE "enum_deals_status" ADD VALUE 'On Hold';
-    `);
+    // await queryInterface.sequelize.query(`
+    //   ALTER TYPE "enum_deals_status" ADD VALUE 'Closed & Reopened';
+    //   ALTER TYPE "enum_deals_status" ADD VALUE 'Open';
+    //   ALTER TYPE "enum_deals_status" ADD VALUE 'On Hold';
+    // `);
   },
 
   down: async (queryInterface, Sequelize) => {

@@ -4,7 +4,6 @@ from tkinter import Tk, filedialog
 
 def select_file():
     """Open a file dialog to select a file."""
-    from tkinter import Tk
     from tkinter.filedialog import askopenfilename
 
     Tk().withdraw()  # We don't want a full GUI, so keep the root window from appearing
@@ -15,7 +14,7 @@ def select_file():
     return file_path
 
 def extract_data(file_path):
-    """Extract the 'Company Name', 'Quantity', 'Price', and 'Unit Price' columns from the file."""
+    """Extract the required columns from the file and format the output."""
     try:
         if file_path.endswith((".xls", ".xlsx")):
             data = pd.read_excel(file_path)
@@ -25,9 +24,24 @@ def extract_data(file_path):
             print("Unsupported file type.")
             return None
 
-        required_columns = ["Company Name"]
+        required_columns = [
+            "project", "ticket_size", "status", "deal_type", "sector",
+            "description", "maximum_selling_stake", "deal_lead", "teaser",
+            "model"
+        ]
+
         if all(column in data.columns for column in required_columns):
             extracted_data = data[required_columns].dropna().to_dict(orient="records")
+            
+            # Add additional fields to each object
+            for item in extracted_data:
+                item["title"] = item["description"][:100]  # First 100 letters of description
+                item["region"] = "Africa"
+                item["deal_stage"] = "Due Diligence"
+                item["key_investors"] = "Financiers"
+                item["deal_size"] = 14.0
+                item["target_company_id"] = 1
+
             return json.dumps(extracted_data, indent=4)
         else:
             missing_columns = [column for column in required_columns if column not in data.columns]
