@@ -57,6 +57,7 @@ db.country = require("./countryModel")(sequelize, DataTypes);
 db.roles = require("./roleModel")(sequelize, DataTypes);
 db.permissions = require("./permissionModel")(sequelize, DataTypes);
 db.role_permissions = require("./rolePermissionModel")(sequelize, DataTypes);
+db.sectors = require("./sectorModel")(sequelize, DataTypes); // Add this line
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
