@@ -87,6 +87,14 @@ module.exports = (sequelize, DataTypes) => {
           key: "sector_id",
         },
       },
+      subsector_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "subsectors",
+          key: "subsector_id",
+        },
+      },
       target_company_id: {
         type: DataTypes.INTEGER,
         allowNull: false,

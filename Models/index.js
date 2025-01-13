@@ -267,9 +267,10 @@ db.deals.belongsTo(db.sectors, { foreignKey: "sector_id", as: "dealSector" });
 db.sectors.hasMany(db.deals, { foreignKey: "sector_id", as: "deals" });
 
 // Define subsector associations
+db.deals.belongsTo(db.subsectors, { foreignKey: "subsector_id", as: "dealSubsector" });
+db.subsectors.hasMany(db.deals, { foreignKey: "subsector_id", as: "deals" });
 db.sectors.hasMany(db.subsectors, { foreignKey: "sector_id", as: "subsectors" });
 db.subsectors.belongsTo(db.sectors, { foreignKey: "sector_id", as: "sector" });
-
 
 //exporting the module
 module.exports = db;
