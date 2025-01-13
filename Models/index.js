@@ -5,7 +5,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -57,6 +57,8 @@ db.country = require("./countryModel")(sequelize, DataTypes);
 db.roles = require("./roleModel")(sequelize, DataTypes);
 db.permissions = require("./permissionModel")(sequelize, DataTypes);
 db.role_permissions = require("./rolePermissionModel")(sequelize, DataTypes);
+db.sectors = require("./sectorModel")(sequelize, DataTypes); // Add this line
+db.subsectors = require("./subsectorModel")(sequelize, DataTypes); // Add this line
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -259,6 +261,16 @@ db.permissions.belongsToMany(db.roles, {
   foreignKey: "permission_id",
   as: "roles",
 });
+
+// Define sector associations
+db.deals.belongsTo(db.sectors, { foreignKey: "sector_id", as: "dealSector" });
+db.sectors.hasMany(db.deals, { foreignKey: "sector_id", as: "deals" });
+
+// Define subsector associations
+db.deals.belongsTo(db.subsectors, { foreignKey: "subsector_id", as: "dealSubsector" });
+db.subsectors.hasMany(db.deals, { foreignKey: "subsector_id", as: "deals" });
+db.sectors.hasMany(db.subsectors, { foreignKey: "sector_id", as: "subsectors" });
+db.subsectors.belongsTo(db.sectors, { foreignKey: "sector_id", as: "sector" });
 
 //exporting the module
 module.exports = db;

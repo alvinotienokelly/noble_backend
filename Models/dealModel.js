@@ -60,7 +60,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       status: {
         type: DataTypes.ENUM,
-        values: ["Active", "Pending","Open","On Hold", "Inactive", "Closed & Reopened"],
+        values: [
+          "Active",
+          "Pending",
+          "Open",
+          "On Hold",
+          "Inactive",
+          "Closed & Reopened",
+        ],
         allowNull: false,
         defaultValue: "Active",
       },
@@ -71,6 +78,22 @@ module.exports = (sequelize, DataTypes) => {
       deal_size: {
         type: DataTypes.DECIMAL,
         allowNull: false,
+      },
+      sector_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "sectors",
+          key: "sector_id",
+        },
+      },
+      subsector_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "subsectors",
+          key: "subsector_id",
+        },
       },
       target_company_id: {
         type: DataTypes.INTEGER,
