@@ -261,5 +261,10 @@ db.permissions.belongsToMany(db.roles, {
   as: "roles",
 });
 
+// Define sector associations
+db.deals.belongsTo(db.sectors, { foreignKey: "sector_id", as: "dealSector" });
+db.sectors.hasMany(db.deals, { foreignKey: "sector_id", as: "deals" });
+
+
 //exporting the module
 module.exports = db;
