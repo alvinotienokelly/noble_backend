@@ -58,6 +58,7 @@ db.roles = require("./roleModel")(sequelize, DataTypes);
 db.permissions = require("./permissionModel")(sequelize, DataTypes);
 db.role_permissions = require("./rolePermissionModel")(sequelize, DataTypes);
 db.sectors = require("./sectorModel")(sequelize, DataTypes); // Add this line
+db.subsectors = require("./subsectorModel")(sequelize, DataTypes); // Add this line
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -264,6 +265,10 @@ db.permissions.belongsToMany(db.roles, {
 // Define sector associations
 db.deals.belongsTo(db.sectors, { foreignKey: "sector_id", as: "dealSector" });
 db.sectors.hasMany(db.deals, { foreignKey: "sector_id", as: "deals" });
+
+// Define subsector associations
+db.sectors.hasMany(db.subsectors, { foreignKey: "sector_id", as: "subsectors" });
+db.subsectors.belongsTo(db.sectors, { foreignKey: "sector_id", as: "sector" });
 
 
 //exporting the module
