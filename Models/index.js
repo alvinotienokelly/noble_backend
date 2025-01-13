@@ -72,6 +72,11 @@ db.deals.belongsTo(db.users, {
   as: "targetCompany",
 });
 
+db.deals.belongsTo(db.users, {
+  foreignKey: "deal_lead",
+  as: "dealLead",
+});
+
 db.users.hasMany(db.documents, {
   foreignKey: "uploaded_by",
   as: "uploadedDocuments",
