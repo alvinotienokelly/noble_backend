@@ -20,6 +20,14 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
+      created_for: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
     },
     { timestamps: true }
   );
