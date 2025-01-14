@@ -100,6 +100,28 @@ app.get("/run-seeder", (req, res) => {
   );
 });
 
+// Route to run the migrations
+app.get("/run-migrations", (req, res) => {
+  exec(
+    "npx sequelize-cli db:migrate",
+    { env: { ...process.env } },
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing migrations: ${error.message}`);
+        return res
+          .status(500)
+          .send(`Error executing migrations: ${error.message}`);
+      }
+      if (stderr) {
+        console.error(`Migrations stderr: ${stderr}`);
+        return res.status(500).send(`Migrations stderr: ${stderr}`);
+      }
+      console.log(`Migrations stdout: ${stdout}`);
+      res.send(`Migrations executed successfully: ${stdout}`);
+    }
+  );
+});
+
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));
 
 // Schedule task reminders to be sent every day at 8 AM
