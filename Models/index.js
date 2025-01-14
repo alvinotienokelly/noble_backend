@@ -42,6 +42,10 @@ db.deal_access_invite = require("./dealAccessInviteModel")(
 db.signature_record = require("./signatureRecordModel")(sequelize, DataTypes);
 db.invoices = require("./invoiceModel")(sequelize, DataTypes);
 db.folders = require("./folderModel")(sequelize, DataTypes);
+db.folder_access_invite = require("./folderAccessInviteModel")(
+  sequelize,
+  DataTypes
+);
 db.social_account_types = require("./socialAccountTypeModel")(
   sequelize,
   DataTypes
@@ -204,12 +208,22 @@ db.users.hasMany(db.folders, {
 });
 db.folders.belongsTo(db.users, { foreignKey: "created_by", as: "creator" });
 db.folders.belongsTo(db.users, { foreignKey: "created_for", as: "createdFor" });
+db.folders.hasMany(db.folder_access_invite, {
+  foreignKey: "folder_id",
+  as: "accessInvites",
+});
 
 db.folders.hasMany(db.documents, {
   foreignKey: "folder_id",
   as: "folderDocuments",
 });
 db.documents.belongsTo(db.folders, { foreignKey: "folder_id", as: "folder" });
+
+// Define folder access invite associations
+db.folder_access_invite.belongsTo(db.folders, {
+  foreignKey: "folder_id",
+  as: "folder",
+});
 
 // Define user review associations
 db.users.hasMany(db.user_reviews, { foreignKey: "user_id", as: "userReviews" });

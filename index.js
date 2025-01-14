@@ -20,6 +20,7 @@ const dealAccessInviteRoutes = require("./Routes/dealAccessInviteRoutes");
 const { sendTaskReminders } = require("./Controllers/taskController");
 const commissionRoutes = require("./Routes/commissionRoutes");
 const folderRoutes = require("./Routes/folderRoutes");
+const folderAccessInviteRoutes = require("./Routes/folderAccessInviteRoutes");
 const socialAccountTypeRoutes = require("./Routes/socialAccountTypeRoutes");
 const docusignWebhookRoutes = require("./Routes/docusignWebhookRoutes");
 const {
@@ -69,6 +70,7 @@ app.use("/api/deal-access-invites", dealAccessInviteRoutes);
 app.use("/api/docusign", docusignWebhookRoutes);
 app.use("/api/commissions", commissionRoutes);
 app.use("/api/folders", folderRoutes);
+app.use("/api/folder-access-invites", folderAccessInviteRoutes);
 app.use("/api/social-account-types", socialAccountTypeRoutes);
 app.use("/api/user-reviews", userReviewRoutes);
 app.use("/api/contact-persons", contactPersonRoutes);
