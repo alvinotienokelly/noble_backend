@@ -70,6 +70,7 @@ module.exports = (sequelize, DataTypes) => {
           "Open",
           "On Hold",
           "Inactive",
+          "Closed",
           "Closed & Reopened",
         ],
         allowNull: false,
@@ -145,6 +146,20 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Yes", "No"],
         allowNull: true,
         defaultValue: "No",
+      },
+      has_information_memorandum: {
+        type: DataTypes.ENUM,
+        values: ["Yes", "No"],
+        allowNull: true,
+      },
+      has_vdr: {
+        type: DataTypes.ENUM,
+        values: ["Yes", "No"],
+        allowNull: true,
+      },
+      consultant_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     {
