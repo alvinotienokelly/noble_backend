@@ -232,8 +232,93 @@ const getDashboardDealSectorData = async (req, res) => {
     res.status(500).json({ status: false, message: error.message });
   }
 };
+
+const getDashboardDealSizeData = async (req, res) => {
+  try {
+    // Define deal size ranges
+    const dealSizeRanges = [
+      { label: "$0 - $1Mn", min: 0, max: 1_000_000 },
+      { label: "$1.1 - $5Mn", min: 1_100_000, max: 5_000_000 },
+      { label: "$5.1 - $10Mn", min: 5_100_000, max: 10_000_000 },
+      { label: "$10.1 - $100Mn", min: 10_100_000, max: 100_000_000 },
+    ];
+
+    // Fetch deals grouped by team member and deal size range
+    const dealsByTeamMemberAndSize = await Deal.findAll({
+      attributes: [
+        "deal_lead",
+        "deal_size",
+        [db.sequelize.fn("COUNT", db.sequelize.col("deal_id")), "count"],
+      ],
+      group: ["deal_lead", "deal_size", "dealLead.id", "dealLead.name"],
+      include: [{ model: User, as: "dealLead", attributes: ["id", "name"] }],
+    });
+
+    // Fetch total deals
+    const totalDeals = await Deal.count();
+
+    // Calculate counts and percentages for each deal_lead and deal_size range
+    const dealsByTeamMemberAndSizeSummary = dealsByTeamMemberAndSize.reduce(
+      (acc, deal) => {
+        const dealLeadId = deal.deal_lead;
+        const dealSize = deal.deal_size;
+        const count = deal.get("count");
+
+        // Determine the deal size range
+        const dealSizeRange = dealSizeRanges.find(
+          (range) => dealSize >= range.min && dealSize <= range.max
+        );
+
+        if (!dealSizeRange) return acc;
+
+        if (!acc[dealLeadId]) {
+          acc[dealLeadId] = {
+            deal_lead: dealLeadId,
+            dealLead: deal.dealLead,
+            sizes: {},
+            total: 0,
+          };
+        }
+
+        if (!acc[dealLeadId].sizes[dealSizeRange.label]) {
+          acc[dealLeadId].sizes[dealSizeRange.label] = {
+            count: 0,
+            percentage: 0,
+          };
+        }
+
+        acc[dealLeadId].sizes[dealSizeRange.label].count += count;
+        acc[dealLeadId].sizes[dealSizeRange.label].percentage = (
+          (acc[dealLeadId].sizes[dealSizeRange.label].count / totalDeals) *
+          100
+        ).toFixed(2);
+        acc[dealLeadId].total += count;
+
+        return acc;
+      },
+      {}
+    );
+
+    // Convert the result to an array
+    const dealsByTeamMemberAndSizeArray = Object.values(
+      dealsByTeamMemberAndSizeSummary
+    );
+
+    res.status(200).json({
+      status: true,
+      data: {
+        dealsByTeamMemberAndSize: dealsByTeamMemberAndSizeArray,
+        totalDeals,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   getDashboardDealStatusData,
   getDashboardDealTypeData,
   getDashboardDealSectorData,
+  getDashboardDealSizeData,
 };

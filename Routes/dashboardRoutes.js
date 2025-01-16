@@ -5,6 +5,7 @@ const {
   getDashboardDealStatusData,
   getDashboardDealTypeData,
   getDashboardDealSectorData,
+  getDashboardDealSizeData,
 } = dashboardController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 
@@ -13,5 +14,6 @@ const router = express.Router();
 router.get("/dashboard", authMiddleware, getDashboardDealStatusData);
 router.get("/type", authMiddleware, getDashboardDealTypeData);
 router.get("/sector", authMiddleware, getDashboardDealSectorData);
+router.get("/size", authMiddleware, getDashboardDealSizeData);
 
 module.exports = router;
