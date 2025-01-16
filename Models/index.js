@@ -355,6 +355,7 @@ db.primary_location_preferences.belongsTo(db.users, {
   foreignKey: "user_id",
   as: "user",
 });
+
 db.primary_location_preferences.belongsTo(db.country, {
   foreignKey: "country_id",
   as: "country",
