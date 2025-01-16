@@ -2,6 +2,8 @@
 const db = require("../Models");
 const Deal = db.deals;
 const User = db.users;
+const Sector = db.sectors;
+
 const { Op } = require("sequelize");
 
 const getDashboardDealStatusData = async (req, res) => {
@@ -147,7 +149,91 @@ const getDashboardDealTypeData = async (req, res) => {
   }
 };
 
+const getDashboardDealSectorData = async (req, res) => {
+  try {
+    // Fetch deals grouped by sector
+    const dealsBySector = await Deal.findAll({
+      attributes: [
+        "sector_id",
+        [db.sequelize.fn("COUNT", db.sequelize.col("deal_id")), "count"],
+      ],
+      group: ["sector_id"],
+      include: [
+        { model: Sector, as: "dealSector", attributes: ["sector_id", "name"] },
+      ],
+    });
+
+    // Fetch deals grouped by team member and sector
+    const dealsByTeamMemberAndSector = await Deal.findAll({
+      attributes: [
+        "deal_lead",
+        "sector_id",
+        [db.sequelize.fn("COUNT", db.sequelize.col("deal_id")), "count"],
+      ],
+      group: [
+        "deal_lead",
+        "sector_id",
+        "dealLead.id",
+        "dealLead.name",
+        "dealSector.sector_id",
+        "dealSector.name",
+      ],
+      include: [
+        { model: User, as: "dealLead", attributes: ["id", "name"] },
+        { model: Sector, as: "dealSector", attributes: ["sector_id", "name"] },
+      ],
+    });
+
+    // Fetch total deals
+    const totalDeals = await Deal.count();
+
+    // Calculate counts and percentages for each deal_lead and sector
+    const dealsByTeamMemberAndSectorSummary = dealsByTeamMemberAndSector.reduce(
+      (acc, deal) => {
+        const dealLeadId = deal.deal_lead;
+        const sectorId = deal.sector_id;
+        const sectorName = deal.dealSector.name;
+        const count = deal.get("count");
+
+        if (!acc[dealLeadId]) {
+          acc[dealLeadId] = {
+            deal_lead: dealLeadId,
+            dealLead: deal.dealLead,
+            sectors: {},
+            total: 0,
+          };
+        }
+
+        acc[dealLeadId].sectors[sectorName] = {
+          count,
+          percentage: ((count / totalDeals) * 100).toFixed(2),
+        };
+        acc[dealLeadId].total += count;
+
+        return acc;
+      },
+      {}
+    );
+
+    // Convert the result to an array
+    const dealsByTeamMemberAndSectorArray = Object.values(
+      dealsByTeamMemberAndSectorSummary
+    );
+
+    res.status(200).json({
+      status: true,
+      data: {
+        dealsBySector,
+        dealsByTeamMemberAndSector: dealsByTeamMemberAndSectorArray,
+        totalDeals,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
 module.exports = {
   getDashboardDealStatusData,
   getDashboardDealTypeData,
+  getDashboardDealSectorData,
 };
