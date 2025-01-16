@@ -73,6 +73,11 @@ db.deal_type_preferences = require("./dealTypePreferencesModel")(
   DataTypes
 );
 
+db.primary_location_preferences = require("./primaryLocationPreferencesModel")(
+  sequelize,
+  DataTypes
+);
+
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
 db.users.hasMany(db.deals, {
@@ -336,6 +341,25 @@ db.users.hasMany(db.deal_type_preferences, {
 db.deal_type_preferences.belongsTo(db.users, {
   foreignKey: "user_id",
   as: "user",
+});
+
+// Define primary location preference associations
+db.users.hasMany(db.primary_location_preferences, {
+  foreignKey: "user_id",
+  as: "primaryLocationPreferences",
+});
+db.country.hasMany(db.primary_location_preferences, {
+  foreignKey: "country_id",
+  as: "primaryCountryPreferences",
+});
+db.primary_location_preferences.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+db.primary_location_preferences.belongsTo(db.country, {
+  foreignKey: "country_id",
+  as: "country",
 });
 
 //exporting the module
