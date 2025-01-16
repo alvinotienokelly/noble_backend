@@ -5,7 +5,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -63,6 +63,8 @@ db.permissions = require("./permissionModel")(sequelize, DataTypes);
 db.role_permissions = require("./rolePermissionModel")(sequelize, DataTypes);
 db.sectors = require("./sectorModel")(sequelize, DataTypes); // Add this line
 db.subsectors = require("./subsectorModel")(sequelize, DataTypes); // Add this line
+db.user_preferences = require("./userPreferencesModel")(sequelize, DataTypes);
+
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -297,6 +299,12 @@ db.sectors.hasMany(db.subsectors, {
   as: "subsectors",
 });
 db.subsectors.belongsTo(db.sectors, { foreignKey: "sector_id", as: "sector" });
+
+// Define user preferences associations
+db.users.hasMany(db.user_preferences, { foreignKey: "user_id", as: "userPreferences" });
+db.user_preferences.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
+db.user_preferences.belongsTo(db.sectors, { foreignKey: "sector_id", as: "sector" });
+
 
 //exporting the module
 module.exports = db;
