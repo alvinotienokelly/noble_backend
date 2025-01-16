@@ -37,6 +37,8 @@ const permissionRoutes = require("./Routes/permissionRoutes"); // Add this line
 const sectorRoutes = require("./Routes/sectorRoutes");
 const subsectorRoutes = require("./Routes/subsectorRoutes"); // Add this line
 const dashboardRoutes = require("./Routes/dashboardRoutes");
+const userPreferencesRoutes = require("./Routes/userPreferencesRoutes");
+
 
 require("dotenv").config();
 
@@ -83,6 +85,7 @@ app.use("/api/permissions", permissionRoutes); // Add this line
 app.use("/api/sectors", sectorRoutes);
 app.use("/api/subsectors", subsectorRoutes); // Add this line
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/user-preferences", userPreferencesRoutes);
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
