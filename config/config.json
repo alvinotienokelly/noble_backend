@@ -1,9 +1,11 @@
+
+
 {
     "development": {
-        "username": "postgres",
-        "password": "@@7389",
-        "database": "noblestride",
-        "host": "127.0.0.1",
+        "username": "noblestride",
+        "password": "szcNy266OSYed9vMLf2DGwHsYSiE8qpg",
+        "database": "noblestride_be28",
+        "host": "dpg-ctucl01u0jms73f5qtfg-a",
         "dialect": "postgres"
     },
     "test": {
@@ -14,10 +16,11 @@
         "dialect": "postgres"
     },
     "production": {
-        "username": "postgres",
-        "password": "postgres",
-        "database": "noblestride",
-        "host": "127.0.0.1",
+        "username": "noblestride",
+        "password": "szcNy266OSYed9vMLf2DGwHsYSiE8qpg",
+        "database": "noblestride_be28",
+        "host": "dpg-ctucl01u0jms73f5qtfg-a",
         "dialect": "postgres"
     }
 }
+
