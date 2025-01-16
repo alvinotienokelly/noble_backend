@@ -5,7 +5,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -65,6 +65,10 @@ db.sectors = require("./sectorModel")(sequelize, DataTypes); // Add this line
 db.subsectors = require("./subsectorModel")(sequelize, DataTypes); // Add this line
 db.user_preferences = require("./userPreferencesModel")(sequelize, DataTypes);
 db.user_ticket_preferences = require("./userTicketPreferencesModel")(
+  sequelize,
+  DataTypes
+);
+db.deal_type_preferences = require("./dealTypePreferencesModel")(
   sequelize,
   DataTypes
 );
@@ -320,6 +324,16 @@ db.users.hasOne(db.user_ticket_preferences, {
   as: "ticketPreferences",
 });
 db.user_ticket_preferences.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+// Define deal type preference associations
+db.users.hasMany(db.deal_type_preferences, {
+  foreignKey: "user_id",
+  as: "dealTypePreferences",
+});
+db.deal_type_preferences.belongsTo(db.users, {
   foreignKey: "user_id",
   as: "user",
 });
