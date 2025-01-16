@@ -316,9 +316,78 @@ const getDashboardDealSizeData = async (req, res) => {
   }
 };
 
+const getDashboardDealConsultantStatusData = async (req, res) => {
+  try {
+    // Fetch deals grouped by status
+    const dealsByStatus = await Deal.findAll({
+      attributes: [
+        "status",
+        [db.sequelize.fn("COUNT", db.sequelize.col("deal_id")), "count"],
+      ],
+      group: ["status"],
+    });
+
+    // Fetch deals grouped by consultant name and status
+    const dealsByConsultantAndStatus = await Deal.findAll({
+      attributes: [
+        "consultant_name",
+        "status",
+        [db.sequelize.fn("COUNT", db.sequelize.col("deal_id")), "count"],
+      ],
+      group: ["consultant_name", "status"],
+    });
+
+    // Fetch total deals
+    const totalDeals = await Deal.count();
+
+    // Calculate counts and percentages for each consultant_name and status
+    const dealsByConsultantAndStatusSummary = dealsByConsultantAndStatus.reduce(
+      (acc, deal) => {
+        const consultantName = deal.consultant_name || "Unallocated";
+        const status = deal.status;
+        const count = deal.get("count");
+
+        if (!acc[consultantName]) {
+          acc[consultantName] = {
+            consultant_name: consultantName,
+            statuses: {},
+            total: 0,
+          };
+        }
+
+        acc[consultantName].statuses[status] = {
+          count,
+          percentage: ((count / totalDeals) * 100).toFixed(2),
+        };
+        acc[consultantName].total += count;
+
+        return acc;
+      },
+      {}
+    );
+
+    // Convert the result to an array
+    const dealsByConsultantAndStatusArray = Object.values(
+      dealsByConsultantAndStatusSummary
+    );
+
+    res.status(200).json({
+      status: true,
+      data: {
+        dealsByStatus,
+        dealsByConsultantAndStatus: dealsByConsultantAndStatusArray,
+        totalDeals,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   getDashboardDealStatusData,
   getDashboardDealTypeData,
   getDashboardDealSectorData,
   getDashboardDealSizeData,
+  getDashboardDealConsultantStatusData,
 };
