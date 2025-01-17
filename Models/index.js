@@ -1,3 +1,42 @@
+/**
+ * @fileoverview This module sets up the Sequelize ORM with PostgreSQL and defines the models and their associations for the application.
+ *
+ * @requires sequelize
+ * @requires ./userModel
+ * @requires ./dealModel
+ * @requires ./documentModel
+ * @requires ./transaction
+ * @requires ./auditLogModel
+ * @requires ./investorsDealsModel
+ * @requires ./verificationCodeModel
+ * @requires ./dealMeetings
+ * @requires ./taskModel
+ * @requires ./notificationModel
+ * @requires ./milestoneModel
+ * @requires ./dealAccessInviteModel
+ * @requires ./signatureRecordModel
+ * @requires ./invoiceModel
+ * @requires ./folderModel
+ * @requires ./folderAccessInviteModel
+ * @requires ./socialAccountTypeModel
+ * @requires ./userReviewModel
+ * @requires ./contactPersonModel
+ * @requires ./dealStageModel
+ * @requires ./investorDealStagesModel
+ * @requires ./countryModel
+ * @requires ./roleModel
+ * @requires ./permissionModel
+ * @requires ./rolePermissionModel
+ * @requires ./sectorModel
+ * @requires ./subsectorModel
+ * @requires ./userPreferencesModel
+ * @requires ./userTicketPreferencesModel
+ * @requires ./dealTypePreferencesModel
+ * @requires ./primaryLocationPreferencesModel
+ * @requires ./documentShareModel
+ *
+ * @description This module initializes the Sequelize instance with PostgreSQL and sets up the database connection. It imports all the models and defines their associations, including one-to-many, many-to-many, and belongs-to relationships. The models include users, deals, documents, transactions, audit logs, investors deals, verification codes, deal meetings, tasks, notifications, milestones, deal access invites, signature records, invoices, folders, folder access invites, social account types, user reviews, contact persons, deal stages, investor deal stages, countries, roles, permissions, role permissions, sectors, subsectors, user preferences, user ticket preferences, deal type preferences, primary location preferences, and document shares.
+ */
 //importing modules
 const { Sequelize, DataTypes } = require("sequelize");
 
@@ -5,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -77,6 +116,8 @@ db.primary_location_preferences = require("./primaryLocationPreferencesModel")(
   sequelize,
   DataTypes
 );
+
+db.document_shares = require("./documentShareModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -360,6 +401,25 @@ db.primary_location_preferences.belongsTo(db.users, {
 db.primary_location_preferences.belongsTo(db.country, {
   foreignKey: "country_id",
   as: "country",
+});
+
+// Define document share associations
+db.documents.hasMany(db.document_shares, {
+  foreignKey: "document_id",
+  as: "documentShares",
+  onDelete: "CASCADE",
+});
+db.document_shares.belongsTo(db.documents, {
+  foreignKey: "document_id",
+  as: "document",
+});
+db.users.hasMany(db.document_shares, {
+  foreignKey: "shared_by",
+  as: "sharedDocuments",
+});
+db.document_shares.belongsTo(db.users, {
+  foreignKey: "shared_by",
+  as: "sharer",
 });
 
 //exporting the module
