@@ -44,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -472,6 +472,48 @@ db.country.belongsToMany(db.deals, {
   foreignKey: "country_id",
   as: "deals",
 });
+
+// Define country associations
+db.country.hasMany(db.deal_countries, {
+  foreignKey: "country_id",
+  as: "dealCountries",
+});
+db.deal_countries.belongsTo(db.country, {
+  foreignKey: "country_id",
+  as: "country",
+});
+db.deals.hasMany(db.deal_countries, {
+  foreignKey: "deal_id",
+  as: "dealCountries",
+});
+db.deal_countries.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+
+// Define region associations
+db.regions.hasMany(db.deal_regions, {
+  foreignKey: "region_id",
+  as: "dealRegions",
+});
+db.deal_regions.belongsTo(db.regions, {
+  foreignKey: "region_id",
+  as: "region",
+});
+db.deals.hasMany(db.deal_regions, { foreignKey: "deal_id", as: "dealRegions" });
+db.deal_regions.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+
+// Define continent associations
+db.continents.hasMany(db.deal_continents, {
+  foreignKey: "continent_id",
+  as: "dealContinents",
+});
+db.deal_continents.belongsTo(db.continents, {
+  foreignKey: "continent_id",
+  as: "continent",
+});
+db.deals.hasMany(db.deal_continents, {
+  foreignKey: "deal_id",
+  as: "dealContinents",
+});
+db.deal_continents.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
 
 //exporting the module
 module.exports = db;

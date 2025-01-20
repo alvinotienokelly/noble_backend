@@ -14,7 +14,11 @@ const Milestone = db.milestones;
 const DealAccessInvite = db.deal_access_invite;
 const SignatureRecord = db.signature_record;
 const { trackInvestorBehavior } = require("./investorsDealsController");
-
+const DealContinent = db.deal_continents;
+const DealRegion = db.deal_regions;
+const DealCountry = db.deal_countries;
+const Country = db.country;
+const Region = db.regions;
 // Create a new deal
 const createDeal = async (req, res) => {
   try {
@@ -39,6 +43,9 @@ const createDeal = async (req, res) => {
       deal_lead,
       project,
       model,
+      continent_ids, // Expecting array of continent IDs
+      region_ids,
+      country_ids,
     } = req.body;
     const created_by = req.user.id; // Assuming the user ID is available in req.user
 
@@ -63,6 +70,36 @@ const createDeal = async (req, res) => {
       project,
       model,
     });
+
+    // Loop through continent_ids and create entries in DealContinent
+    if (continent_ids && continent_ids.length > 0) {
+      for (const continent_id of continent_ids) {
+        await DealContinent.create({
+          deal_id: newDeal.deal_id,
+          continent_id,
+        });
+      }
+    }
+
+    // Loop through region_ids and create entries in DealRegion
+    if (region_ids && region_ids.length > 0) {
+      for (const region_id of region_ids) {
+        await DealRegion.create({
+          deal_id: newDeal.deal_id,
+          region_id,
+        });
+      }
+    }
+
+    // Loop through country_ids and create entries in DealCountry
+    if (country_ids && country_ids.length > 0) {
+      for (const country_id of country_ids) {
+        await DealCountry.create({
+          deal_id: newDeal.deal_id,
+          country_id,
+        });
+      }
+    }
 
     res.status(201).json({ status: true, deal: newDeal });
   } catch (error) {
@@ -91,6 +128,21 @@ const getDealsByUserPreferences = async (req, res) => {
         include: [
           { model: User, as: "createdBy" },
           { model: User, as: "targetCompany" },
+          {
+            model: DealCountry,
+            as: "dealCountries",
+            include: [{ model: Country, as: "country" }],
+          },
+          {
+            model: DealRegion,
+            as: "dealRegions",
+            include: [{ model: Region, as: "region" }],
+          },
+          {
+            model: DealContinent,
+            as: "dealContinents",
+            include: ["continent"],
+          },
         ],
       });
       return res.status(200).json({ status: true, message: "" });
@@ -108,6 +160,17 @@ const getDealsByUserPreferences = async (req, res) => {
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
+        {
+          model: DealCountry,
+          as: "dealCountries",
+          include: [{ model: Country, as: "country" }],
+        },
+        {
+          model: DealRegion,
+          as: "dealRegions",
+          include: [{ model: Region, as: "region" }],
+        },
+        { model: DealContinent, as: "dealContinents", include: ["continent"] },
       ],
     });
 
@@ -128,6 +191,17 @@ const getAllDeals = async (req, res) => {
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
+        {
+          model: DealCountry,
+          as: "dealCountries",
+          include: [{ model: Country, as: "country" }],
+        },
+        {
+          model: DealRegion,
+          as: "dealRegions",
+          include: [{ model: Region, as: "region" }],
+        },
+        { model: DealContinent, as: "dealContinents", include: ["continent"] },
       ],
       offset,
       limit: parseInt(limit),
@@ -371,6 +445,17 @@ const getDealById = async (req, res) => {
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
+        {
+          model: DealCountry,
+          as: "dealCountries",
+          include: [{ model: Country, as: "country" }],
+        },
+        {
+          model: DealRegion,
+          as: "dealRegions",
+          include: [{ model: Region, as: "region" }],
+        },
+        { model: DealContinent, as: "dealContinents", include: ["continent"] },
       ],
     });
     if (!deal) {
@@ -412,8 +497,12 @@ const updateDeal = async (req, res) => {
       deal_lead,
       project,
       model,
+      continent_ids, // Expecting array of continent IDs
+      region_ids, // Expecting array of region IDs
+      country_ids, // Expecting array of country IDs
     } = req.body;
     const deal = await Deal.findByPk(req.params.id);
+    const id = deal.deal_id;
 
     if (!deal) {
       return res
@@ -441,6 +530,39 @@ const updateDeal = async (req, res) => {
       project,
       model,
     });
+
+    // Update DealContinent entries
+    if (continent_ids) {
+      await DealContinent.destroy({ where: { deal_id: id } });
+      for (const continent_id of continent_ids) {
+        await DealContinent.create({
+          deal_id: id,
+          continent_id,
+        });
+      }
+    }
+
+    // Update DealRegion entries
+    if (region_ids) {
+      await DealRegion.destroy({ where: { deal_id: id } });
+      for (const region_id of region_ids) {
+        await DealRegion.create({
+          deal_id: id,
+          region_id,
+        });
+      }
+    }
+
+    // Update DealCountry entries
+    if (country_ids) {
+      await DealCountry.destroy({ where: { deal_id: id } });
+      for (const country_id of country_ids) {
+        await DealCountry.create({
+          deal_id: id,
+          country_id,
+        });
+      }
+    }
 
     res.status(200).json({ status: true, deal });
   } catch (error) {
@@ -545,6 +667,17 @@ const filterDeals = async (req, res) => {
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
+        {
+          model: DealCountry,
+          as: "dealCountries",
+          include: [{ model: Country, as: "country" }],
+        },
+        {
+          model: DealRegion,
+          as: "dealRegions",
+          include: [{ model: Region, as: "region" }],
+        },
+        { model: DealContinent, as: "dealContinents", include: ["continent"] },
       ],
       offset,
       limit: parseInt(limit),
@@ -591,6 +724,17 @@ const recommendDeals = async (investorId) => {
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
+        {
+          model: DealCountry,
+          as: "dealCountries",
+          include: [{ model: Country, as: "country" }],
+        },
+        {
+          model: DealRegion,
+          as: "dealRegions",
+          include: [{ model: Region, as: "region" }],
+        },
+        { model: DealContinent, as: "dealContinents", include: ["continent"] },
       ],
     });
 
