@@ -122,6 +122,7 @@ db.continents = require("./continentModel")(sequelize, DataTypes);
 db.deal_continents = require("./dealContinentModel")(sequelize, DataTypes);
 db.regions = require("./regionModel")(sequelize, DataTypes);
 db.deal_regions = require("./dealRegionModel")(sequelize, DataTypes);
+db.deal_countries = require("./dealCountryModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -457,6 +458,18 @@ db.deals.belongsToMany(db.regions, {
 db.regions.belongsToMany(db.deals, {
   through: db.deal_regions,
   foreignKey: "region_id",
+  as: "deals",
+});
+
+// Define deal country associations
+db.deals.belongsToMany(db.country, {
+  through: db.deal_countries,
+  foreignKey: "deal_id",
+  as: "countries",
+});
+db.country.belongsToMany(db.deals, {
+  through: db.deal_countries,
+  foreignKey: "country_id",
   as: "deals",
 });
 
