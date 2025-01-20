@@ -120,6 +120,7 @@ db.primary_location_preferences = require("./primaryLocationPreferencesModel")(
 db.document_shares = require("./documentShareModel")(sequelize, DataTypes);
 db.continents = require("./continentModel")(sequelize, DataTypes);
 db.deal_continents = require("./dealContinentModel")(sequelize, DataTypes);
+db.regions = require("./regionModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -434,6 +435,16 @@ db.continents.belongsToMany(db.deals, {
   through: db.deal_continents,
   foreignKey: "continent_id",
   as: "deals",
+});
+
+// Define region associations
+db.continents.hasMany(db.regions, {
+  foreignKey: "continent_id",
+  as: "regions",
+});
+db.regions.belongsTo(db.continents, {
+  foreignKey: "continent_id",
+  as: "continent",
 });
 
 //exporting the module
