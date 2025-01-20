@@ -45,6 +45,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //database name is discover
 const sequelize = new Sequelize(
   "postgres://postgres:@@7389@localhost:5432/noblestride",
+
   { dialect: "postgres" }
 );
 
@@ -118,6 +119,7 @@ db.primary_location_preferences = require("./primaryLocationPreferencesModel")(
 );
 
 db.document_shares = require("./documentShareModel")(sequelize, DataTypes);
+db.continents = require("./continentModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
