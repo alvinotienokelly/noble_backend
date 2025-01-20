@@ -43,6 +43,7 @@ const dealTypePreferencesRoutes = require("./Routes/dealTypePreferencesRoutes");
 const primaryLocationPreferencesRoutes = require("./Routes/primaryLocationPreferencesRoutes");
 const documentShareRoutes = require("./Routes/documentShareRoutes");
 const continentRoutes = require("./Routes/continentRoutes");
+const dealContinentRoutes = require("./Routes/dealContinentRoutes");
 
 require("dotenv").config();
 
@@ -95,6 +96,7 @@ app.use("/api/deal-type-preferences", dealTypePreferencesRoutes);
 app.use("/api/primary-location-preferences", primaryLocationPreferencesRoutes);
 app.use("/api/document-share", documentShareRoutes);
 app.use("/api/continents", continentRoutes);
+app.use("/api/deal-continents", dealContinentRoutes);
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
