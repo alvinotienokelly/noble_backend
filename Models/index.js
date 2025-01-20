@@ -119,6 +119,7 @@ db.primary_location_preferences = require("./primaryLocationPreferencesModel")(
 
 db.document_shares = require("./documentShareModel")(sequelize, DataTypes);
 db.continents = require("./continentModel")(sequelize, DataTypes);
+db.deal_continents = require("./dealContinentModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
@@ -421,6 +422,18 @@ db.users.hasMany(db.document_shares, {
 db.document_shares.belongsTo(db.users, {
   foreignKey: "shared_by",
   as: "sharer",
+});
+
+// Define many-to-many relationships
+db.deals.belongsToMany(db.continents, {
+  through: db.deal_continents,
+  foreignKey: "deal_id",
+  as: "continents",
+});
+db.continents.belongsToMany(db.deals, {
+  through: db.deal_continents,
+  foreignKey: "continent_id",
+  as: "deals",
 });
 
 //exporting the module
