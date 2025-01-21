@@ -554,5 +554,14 @@ db.users.hasMany(db.subfolders, {
   as: "createdForSubfolders",
 });
 
+db.subfolders.hasMany(db.documents, {
+  foreignKey: "subfolder_id",
+  as: "subfolderDocuments",
+});
+db.documents.belongsTo(db.subfolders, {
+  foreignKey: "subfolder_id",
+  as: "subfolder",
+});
+
 //exporting the module
 module.exports = db;

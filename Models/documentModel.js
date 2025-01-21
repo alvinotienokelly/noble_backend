@@ -40,6 +40,14 @@ module.exports = (sequelize, DataTypes) => {
           key: "folder_id",
         },
       },
+      subfolder_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "subfolders",
+          key: "subfolder_id",
+        },
+      },
       file_type: {
         type: DataTypes.ENUM,
         values: ["pdf", "docx", "xlsx"],

@@ -2,6 +2,8 @@ const db = require("../Models");
 const Document = db.documents;
 const { Op } = require("sequelize");
 const Deal = db.deals;
+const Folder = db.folders;
+const Subfolder = db.subfolders;
 const User = db.users; // Assuming User model is available in db
 const {
   createEnvelope,
@@ -10,7 +12,7 @@ const {
 const logger = require("../Middlewares/logger");
 const createDocument = async (req, res) => {
   try {
-    const { folder_id } = req.body;
+    const { folder_id, subfolder_id } = req.body;
     const uploaded_by = req.user.id;
     req.body.uploaded_by = uploaded_by;
     const { originalname, path } = req.file;
@@ -22,20 +24,41 @@ const createDocument = async (req, res) => {
         .json({ status: false, message: "Deal not found." });
     }
 
+    // Check if the folder exists
+    if (folder_id) {
+      const folder = await Folder.findByPk(folder_id);
+      if (!folder) {
+        return res
+          .status(404)
+          .json({ status: false, message: "Folder not found." });
+      }
+    }
+
+    // Check if the subfolder exists
+    if (subfolder_id) {
+      const subfolder = await Subfolder.findByPk(subfolder_id);
+      if (!subfolder) {
+        return res
+          .status(404)
+          .json({ status: false, message: "Subfolder not found." });
+      }
+    }
+
     const document = await Document.create({
       deal_id: req.body.deal_id,
       uploaded_by: uploaded_by,
       file_name: originalname,
       file_path: path,
       folder_id: folder_id,
+      subfolder_id: subfolder_id,
       requires_signature: req.body.requires_signature || false,
     });
 
-    if (document.requires_signature) {
-      const envelopeId = await createEnvelope(document);
-      document.docusign_envelope_id = envelopeId;
-      await document.save();
-    }
+    // if (document.requires_signature) {
+    //   const envelopeId = await createEnvelope(document);
+    //   document.docusign_envelope_id = envelopeId;
+    //   await document.save();
+    // }
 
     res.status(200).json({ status: true, document });
   } catch (error) {
@@ -204,7 +227,7 @@ const getDocumentById = async (req, res) => {
 
 const updateDocument = async (req, res) => {
   try {
-    const { folder_id } = req.body;
+    const { folder_id, subfolder_id } = req.body;
     const uploaded_by = req.user.id;
     req.body.uploaded_by = uploaded_by;
 
@@ -213,6 +236,26 @@ const updateDocument = async (req, res) => {
       return res
         .status(200)
         .json({ status: false, message: "Document not found." });
+    }
+
+    // Check if the folder exists
+    if (folder_id) {
+      const folder = await Folder.findByPk(folder_id);
+      if (!folder) {
+        return res
+          .status(404)
+          .json({ status: false, message: "Folder not found." });
+      }
+    }
+
+    // Check if the subfolder exists
+    if (subfolder_id) {
+      const subfolder = await Subfolder.findByPk(subfolder_id);
+      if (!subfolder) {
+        return res
+          .status(404)
+          .json({ status: false, message: "Subfolder not found." });
+      }
     }
 
     // Handle file upload
