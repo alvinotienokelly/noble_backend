@@ -2,6 +2,7 @@ const db = require("../Models");
 const Folder = db.folders;
 const User = db.users;
 const Document = db.documents;
+const Subfolder = db.subfolders;
 
 const createFolder = async (req, res) => {
   try {
@@ -39,6 +40,7 @@ const getFolderById = async (req, res) => {
         { model: User, as: "creator", attributes: ["id", "name", "email"] },
         { model: User, as: "createdFor", attributes: ["id", "name", "email"] },
         { model: Document, as: "folderDocuments" }, // Include documents
+        { model: Subfolder, as: "subfolders" }, // Include subfolders
       ],
     });
 
