@@ -191,6 +191,14 @@ db.tasks.belongsTo(db.deals, {
   as: "deal",
   onDelete: "CASCADE",
 });
+db.tasks.belongsTo(db.deal_stages, {
+  foreignKey: "deal_stage_id",
+  as: "dealStage",
+});
+db.deal_stages.hasMany(db.tasks, {
+  foreignKey: "deal_stage_id",
+  as: "tasks",
+});
 
 // Define notification associations
 db.users.hasMany(db.notifications, {
