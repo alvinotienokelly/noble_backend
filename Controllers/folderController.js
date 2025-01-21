@@ -1,6 +1,7 @@
 const db = require("../Models");
 const Folder = db.folders;
 const User = db.users;
+const Document = db.documents;
 
 const createFolder = async (req, res) => {
   try {
@@ -26,6 +27,30 @@ const createFolder = async (req, res) => {
     res.status(200).json({ status: true, folder });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
+  }
+};
+
+// Get a folder by ID
+const getFolderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const folder = await Folder.findByPk(id, {
+      include: [
+        { model: User, as: "creator", attributes: ["id", "name", "email"] },
+        { model: User, as: "createdFor", attributes: ["id", "name", "email"] },
+        { model: Document, as: "folderDocuments" }, // Include documents
+      ],
+    });
+
+    if (!folder) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Folder not found." });
+    }
+
+    res.status(200).json({ status: true, folder });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -78,4 +103,5 @@ module.exports = {
   createFolder,
   getFoldersByUser,
   getAllFolders,
+  getFolderById,
 };
