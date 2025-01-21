@@ -46,6 +46,7 @@ const continentRoutes = require("./Routes/continentRoutes");
 const dealContinentRoutes = require("./Routes/dealContinentRoutes");
 const regionRoutes = require("./Routes/regionRoutes");
 const dealRegionRoutes = require("./Routes/dealRegionRoutes");
+const subfolderRoutes = require("./Routes/subfolderRoutes");
 
 require("dotenv").config();
 
@@ -101,6 +102,7 @@ app.use("/api/continents", continentRoutes);
 app.use("/api/deal-continents", dealContinentRoutes);
 app.use("/api/regions", regionRoutes);
 app.use("/api/deal-regions", dealRegionRoutes);
+app.use("/api/subfolders", subfolderRoutes);
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
