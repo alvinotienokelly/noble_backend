@@ -44,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -81,6 +81,7 @@ db.deal_access_invite = require("./dealAccessInviteModel")(
 db.signature_record = require("./signatureRecordModel")(sequelize, DataTypes);
 db.invoices = require("./invoiceModel")(sequelize, DataTypes);
 db.folders = require("./folderModel")(sequelize, DataTypes);
+db.subfolders = require("./subfolderModel")(sequelize, DataTypes);
 db.folder_access_invite = require("./folderAccessInviteModel")(
   sequelize,
   DataTypes
@@ -522,6 +523,36 @@ db.deals.hasMany(db.deal_continents, {
   as: "dealContinents",
 });
 db.deal_continents.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+
+// Define subfolder associations
+db.folders.hasMany(db.subfolders, {
+  foreignKey: "parent_folder_id",
+  as: "subfolders",
+});
+db.subfolders.belongsTo(db.folders, {
+  foreignKey: "parent_folder_id",
+  as: "parentFolder",
+});
+
+db.subfolders.belongsTo(db.users, {
+  foreignKey: "created_by",
+  as: "creator",
+});
+
+db.subfolders.belongsTo(db.users, {
+  foreignKey: "created_for",
+  as: "createdFor",
+});
+
+db.users.hasMany(db.subfolders, {
+  foreignKey: "created_by",
+  as: "createdSubfolders",
+});
+
+db.users.hasMany(db.subfolders, {
+  foreignKey: "created_for",
+  as: "createdForSubfolders",
+});
 
 //exporting the module
 module.exports = db;
