@@ -44,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -205,6 +205,10 @@ db.deals.hasMany(db.milestones, {
   onDelete: "CASCADE",
 });
 db.milestones.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+db.milestones.belongsTo(db.deal_stages, {
+  foreignKey: "deal_stage_id",
+  as: "dealStage",
+});
 
 // Define deal access invite associations
 
@@ -312,6 +316,10 @@ db.deals.hasMany(db.investor_deal_stages, {
 db.deal_stages.hasMany(db.investor_deal_stages, {
   foreignKey: "stage_id",
   as: "stageInvestorStages",
+});
+db.deal_stages.hasMany(db.milestones, {
+  foreignKey: "deal_stage_id",
+  as: "milestones",
 });
 db.investor_deal_stages.belongsTo(db.users, {
   foreignKey: "investor_id",
