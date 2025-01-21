@@ -10,7 +10,14 @@ const { createNotification } = require("./notificationController");
 // Create a new task
 const createTask = async (req, res) => {
   try {
-    const { title, description, assigned_to, due_date, deal_id } = req.body;
+    const {
+      title,
+      description,
+      assigned_to,
+      due_date,
+      deal_id,
+      deal_stage_id,
+    } = req.body;
     const created_by = req.user.id;
 
     const task = await Task.create({
@@ -20,6 +27,7 @@ const createTask = async (req, res) => {
       created_by,
       due_date,
       deal_id,
+      deal_stage_id,
     });
 
     res.status(200).json({ status: true, task });
