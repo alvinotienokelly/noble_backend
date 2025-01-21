@@ -2,17 +2,19 @@
 const db = require("../Models");
 const Milestone = db.milestones;
 const Deal = db.deals;
+const DealStage = db.deal_stages;
 const { Op } = require("sequelize");
 const { updateMilestoneStatus } = require("./commissionController");
 
 // Create a new milestone
 const createMilestone = async (req, res) => {
   try {
-    const { deal_id, title, description, due_date } = req.body;
+    const { deal_id, title, description, due_date, deal_stage_id } = req.body;
 
     const milestone = await Milestone.create({
       deal_id,
       title,
+      deal_stage_id,
       description,
       due_date,
     });
@@ -29,6 +31,17 @@ const getMilestonesByDealId = async (req, res) => {
     const milestones = await Milestone.findAll({
       where: { deal_id: req.params.dealId },
       order: [["createdAt", "ASC"]],
+      include: [
+        {
+          model: Deal,
+          as: "deal",
+    
+        },
+        {
+          model: DealStage,
+          as: "dealStage",
+        }
+      ],
     });
 
     res.status(200).json({ status: true, milestones });
@@ -63,6 +76,7 @@ const filterMilestones = async (req, res) => {
       status,
       deal_id,
       startDate,
+      deal_stage_id,
       endDate,
       page = 1,
       limit = 10,
@@ -78,7 +92,9 @@ const filterMilestones = async (req, res) => {
     if (status) {
       whereClause.status = status;
     }
-
+    if (deal_stage_id) {
+      whereClause.deal_stage_id = deal_stage_id;
+    }
     if (deal_id) {
       whereClause.deal_id = deal_id;
     }

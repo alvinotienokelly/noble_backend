@@ -41,6 +41,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      deal_stage_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "deal_stages",
+          key: "stage_id",
+        },
+      },
     },
     { timestamps: true }
   );
