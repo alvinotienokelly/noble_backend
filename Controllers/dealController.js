@@ -19,6 +19,8 @@ const DealRegion = db.deal_regions;
 const DealCountry = db.deal_countries;
 const Country = db.country;
 const Region = db.regions;
+const DealStage = db.deal_stages;
+
 // Create a new deal
 const createDeal = async (req, res) => {
   try {
@@ -465,9 +467,25 @@ const getDealById = async (req, res) => {
     }
     const created_by = req.user.id;
 
+    // Fetch milestones and group them by deal stages
+    const milestones = await Milestone.findAll({
+      where: { deal_id: deal.deal_id },
+      include: [{ model: DealStage, as: "dealStage" }],
+      order: [["createdAt", "ASC"]],
+    });
+
+    const groupedMilestones = milestones.reduce((acc, milestone) => {
+      const stageName = milestone.dealStage.name; // Assuming dealStage has a 'name' field
+      if (!acc[stageName]) {
+        acc[stageName] = [];
+      }
+      acc[stageName].push(milestone);
+      return acc;
+    }, {});
+
     await trackInvestorBehavior(created_by, deal.deal_id);
 
-    res.status(200).json({ status: true, deal });
+    res.status(200).json({ status: true, deal, dealStages: groupedMilestones });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
