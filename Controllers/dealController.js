@@ -4,7 +4,6 @@ const { Op } = require("sequelize");
 const moment = require("moment");
 const Deal = db.deals;
 const User = db.users; // Assuming User model is available in db
-const Task = db.tasks;
 const Document = db.documents;
 const Transaction = db.Transaction;
 const AuditLog = db.AuditLog;
@@ -20,6 +19,7 @@ const DealCountry = db.deal_countries;
 const Country = db.country;
 const Region = db.regions;
 const DealStage = db.deal_stages;
+const Task = db.tasks;
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -483,9 +483,32 @@ const getDealById = async (req, res) => {
       return acc;
     }, {});
 
+    // Fetch tasks and group them by deal stages
+    const tasks = await Task.findAll({
+      where: { deal_id: deal.deal_id },
+      include: [{ model: DealStage, as: "dealStage" }],
+      order: [["createdAt", "ASC"]],
+    });
+
+    const groupedTasks = tasks.reduce((acc, task) => {
+      const stageName = task.dealStage.name; // Assuming dealStage has a 'name' field
+      if (!acc[stageName]) {
+        acc[stageName] = [];
+      }
+      acc[stageName].push(task);
+      return acc;
+    }, {});
+
     await trackInvestorBehavior(created_by, deal.deal_id);
 
-    res.status(200).json({ status: true, deal, dealStages: groupedMilestones });
+    res
+      .status(200)
+      .json({
+        status: true,
+        deal,
+        dealStages: groupedMilestones,
+        tasks: groupedTasks,
+      });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
