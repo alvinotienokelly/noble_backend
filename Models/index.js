@@ -126,6 +126,7 @@ db.deal_regions = require("./dealRegionModel")(sequelize, DataTypes);
 db.deal_countries = require("./dealCountryModel")(sequelize, DataTypes);
 db.pipelines = require("./pipelineModel")(sequelize, DataTypes); // Add this line
 db.pipeline_stages = require("./pipelineStageModel")(sequelize, DataTypes); // Add this line
+db.stage_cards = require("./stageCardModel")(sequelize, DataTypes); // Add this line
 
 // Define pipelines associations
 db.pipelines.hasMany(db.pipeline_stages, {
@@ -136,6 +137,11 @@ db.pipeline_stages.belongsTo(db.pipelines, {
   foreignKey: "pipeline_id",
   as: "pipeline",
 });
+
+db.pipeline_stages.hasMany(db.stage_cards, { foreignKey: "pipeline_stage_id", as: "cards" });
+db.stage_cards.belongsTo(db.pipeline_stages, { foreignKey: "pipeline_stage_id", as: "pipelineStage" });
+db.stage_cards.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
+db.users.hasMany(db.stage_cards, { foreignKey: "user_id", as: "stageCards" });
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
