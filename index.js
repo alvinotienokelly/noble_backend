@@ -49,6 +49,7 @@ const dealRegionRoutes = require("./Routes/dealRegionRoutes");
 const subfolderRoutes = require("./Routes/subfolderRoutes");
 const pipelineRoutes = require("./Routes/pipelineRoutes");
 const pipelineStageRoutes = require("./Routes/pipelineStageRoutes");
+const stageCardRoutes = require("./Routes/stageCardRoutes");
 
 require("dotenv").config();
 
@@ -107,6 +108,7 @@ app.use("/api/deal-regions", dealRegionRoutes);
 app.use("/api/subfolders", subfolderRoutes);
 app.use("/api/pipelines", pipelineRoutes);
 app.use("/api/pipeline-stages", pipelineStageRoutes);
+app.use("/api/stage-cards", stageCardRoutes);
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
