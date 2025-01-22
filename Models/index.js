@@ -44,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgres://postgres:@@7389@localhost:5432/noblestride",
+  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
   { dialect: "postgres" }
 );
 
@@ -138,8 +138,14 @@ db.pipeline_stages.belongsTo(db.pipelines, {
   as: "pipeline",
 });
 
-db.pipeline_stages.hasMany(db.stage_cards, { foreignKey: "pipeline_stage_id", as: "cards" });
-db.stage_cards.belongsTo(db.pipeline_stages, { foreignKey: "pipeline_stage_id", as: "pipelineStage" });
+db.pipeline_stages.hasMany(db.stage_cards, {
+  foreignKey: "pipeline_stage_id",
+  as: "cards",
+});
+db.stage_cards.belongsTo(db.pipeline_stages, {
+  foreignKey: "pipeline_stage_id",
+  as: "pipelineStage",
+});
 db.stage_cards.belongsTo(db.users, { foreignKey: "user_id", as: "user" });
 db.users.hasMany(db.stage_cards, { foreignKey: "user_id", as: "stageCards" });
 
