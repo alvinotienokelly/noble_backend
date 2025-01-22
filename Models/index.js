@@ -44,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgres://postgres:@@7389@localhost:5432/noblestride",
+  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
   { dialect: "postgres" }
 );
 
@@ -127,12 +127,15 @@ db.deal_countries = require("./dealCountryModel")(sequelize, DataTypes);
 db.pipelines = require("./pipelineModel")(sequelize, DataTypes); // Add this line
 db.pipeline_stages = require("./pipelineStageModel")(sequelize, DataTypes); // Add this line
 
-
-
-
 // Define pipelines associations
-db.pipelines.hasMany(db.pipeline_stages, { foreignKey: "pipeline_id", as: "stages" });
-db.pipeline_stages.belongsTo(db.pipelines, { foreignKey: "pipeline_id", as: "pipeline" });
+db.pipelines.hasMany(db.pipeline_stages, {
+  foreignKey: "pipeline_id",
+  as: "stages",
+});
+db.pipeline_stages.belongsTo(db.pipelines, {
+  foreignKey: "pipeline_id",
+  as: "pipeline",
+});
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
