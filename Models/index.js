@@ -124,6 +124,7 @@ db.deal_continents = require("./dealContinentModel")(sequelize, DataTypes);
 db.regions = require("./regionModel")(sequelize, DataTypes);
 db.deal_regions = require("./dealRegionModel")(sequelize, DataTypes);
 db.deal_countries = require("./dealCountryModel")(sequelize, DataTypes);
+db.pipelines = require("./pipelineModel")(sequelize, DataTypes); // Add this line
 
 // Define associations
 db.users.hasMany(db.deals, { foreignKey: "created_by", as: "createdDeals" });
