@@ -1,7 +1,8 @@
 // Controllers/pipelineController.js
 const db = require("../Models");
 const Pipeline = db.pipelines;
-
+const PipelineStage = db.pipeline_stages;
+const StageCard = db.stage_cards;
 // Create a new pipeline
 const createPipeline = async (req, res) => {
   try {
@@ -18,7 +19,20 @@ const createPipeline = async (req, res) => {
 // Get all pipelines
 const getAllPipelines = async (req, res) => {
   try {
-    const pipelines = await Pipeline.findAll();
+    const pipelines = await Pipeline.findAll({
+      include: [
+        {
+          model: PipelineStage,
+          as: "stages",
+          include: [
+            {
+              model: StageCard,
+              as: "cards",
+            },
+          ],
+        },
+      ],
+    });
     res.status(200).json({ status: true, pipelines });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -30,7 +44,9 @@ const getPipelineById = async (req, res) => {
   try {
     const pipeline = await Pipeline.findByPk(req.params.id);
     if (!pipeline) {
-      return res.status(404).json({ status: false, message: "Pipeline not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Pipeline not found." });
     }
     res.status(200).json({ status: true, pipeline });
   } catch (error) {
@@ -43,7 +59,9 @@ const updatePipeline = async (req, res) => {
   try {
     const pipeline = await Pipeline.findByPk(req.params.id);
     if (!pipeline) {
-      return res.status(404).json({ status: false, message: "Pipeline not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Pipeline not found." });
     }
     await pipeline.update(req.body);
     res.status(200).json({ status: true, pipeline });
@@ -57,10 +75,14 @@ const deletePipeline = async (req, res) => {
   try {
     const pipeline = await Pipeline.findByPk(req.params.id);
     if (!pipeline) {
-      return res.status(404).json({ status: false, message: "Pipeline not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Pipeline not found." });
     }
     await pipeline.destroy();
-    res.status(200).json({ status: true, message: "Pipeline deleted successfully." });
+    res
+      .status(200)
+      .json({ status: true, message: "Pipeline deleted successfully." });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
