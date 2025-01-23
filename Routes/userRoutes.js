@@ -11,6 +11,7 @@ const {
   getUsersByType,
   bulkUploadUsers,
   getUserById,
+  getProfile,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -46,25 +47,7 @@ router.post("/reset-password", resetPassword);
 
 router.post("/bulk-upload", authMiddleware, bulkUploadUsers);
 router.get("/user/:id", authMiddleware, getUserById); // Add this line
+router.get("/profile", authMiddleware, getProfile); // Add this line
 
-router.get("/profile", authMiddleware, async (req, res) => {
-  try {
-    const user = await User.findByPk(req.user.id);
-    //find a user by their email
-    // const user = await User.findOne({
-    //   where: {
-    //     id: req.user.id,
-    //   },
-    // });
-    if (!user) {
-      return res
-        .status(404)
-        .json({ status: "false", message: "User not found." });
-    }
-    res.json({ status: "true", user });
-  } catch (error) {
-    res.status(500).json({ status: "false", message: error.message });
-  }
-});
 
 module.exports = router;
