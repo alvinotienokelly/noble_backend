@@ -4,6 +4,12 @@ const db = require("../Models");
 const jwt = require("jsonwebtoken");
 const { VerificationCode } = require("../Models");
 const { sendVerificationCode } = require("../Middlewares/emailService");
+const UserPreferences = db.user_preferences;
+const UserTicketPreferences = db.user_ticket_preferences;
+const DealTypePreferences = db.deal_type_preferences;
+const PrimaryLocationPreferences = db.primary_location_preferences;
+const Sector = db.sectors;
+const ContactPerson = db.contact_persons;
 
 // Assigning users to the variable User
 const User = db.users;
@@ -355,6 +361,34 @@ const bulkUploadUsers = async (req, res) => {
   }
 };
 
+// Get profile of the logged-in user
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: { exclude: ["password"] }, // Exclude the password field from the response
+      include: [
+        {
+          model: UserPreferences,
+          as: "userPreferences",
+          include: [{ model: Sector, as: "sector" }], // Include sector within user preferences
+        },
+        { model: UserTicketPreferences, as: "ticketPreferences" }, // Include user ticket preferences
+        { model: DealTypePreferences, as: "dealTypePreferences" }, // Include deal type preferences
+        { model: PrimaryLocationPreferences, as: "primaryLocationPreferences" }, // Include primary location preferences
+        { model: ContactPerson, as: "contactPersons" }, // Include contact persons
+      ], // Include user preferences
+    });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -364,5 +398,6 @@ module.exports = {
   resetPassword,
   getUsersByType,
   bulkUploadUsers,
-  getUserById, 
+  getUserById,
+  getProfile,
 };
