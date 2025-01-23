@@ -3,6 +3,8 @@ const db = require("../Models");
 const Pipeline = db.pipelines;
 const PipelineStage = db.pipeline_stages;
 const StageCard = db.stage_cards;
+const User = db.users;
+
 // Create a new pipeline
 const createPipeline = async (req, res) => {
   try {
@@ -28,6 +30,13 @@ const getAllPipelines = async (req, res) => {
             {
               model: StageCard,
               as: "cards",
+              include: [
+                {
+                  model: User,
+                  as: "user",
+                  attributes: ["id", "name", "email"], // Include specific user attributes
+                },
+              ],
             },
           ],
         },
