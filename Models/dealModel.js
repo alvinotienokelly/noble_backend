@@ -161,12 +161,19 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      retainer_amount: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      access_fee_amount: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
     }
   );
-  
 
   return Deal;
 };
