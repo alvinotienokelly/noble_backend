@@ -48,6 +48,8 @@ const createDeal = async (req, res) => {
       continent_ids, // Expecting array of continent IDs
       region_ids,
       country_ids,
+      retainer_amount,
+      access_fee_amount,
     } = req.body;
     const created_by = req.user.id; // Assuming the user ID is available in req.user
 
@@ -71,6 +73,8 @@ const createDeal = async (req, res) => {
       deal_lead,
       project,
       model,
+      retainer_amount, // Include retainer_amount
+      access_fee_amount, // Include access_fee_amount
     });
 
     // Loop through continent_ids and create entries in DealContinent
@@ -501,14 +505,12 @@ const getDealById = async (req, res) => {
 
     await trackInvestorBehavior(created_by, deal.deal_id);
 
-    res
-      .status(200)
-      .json({
-        status: true,
-        deal,
-        dealStages: groupedMilestones,
-        tasks: groupedTasks,
-      });
+    res.status(200).json({
+      status: true,
+      deal,
+      dealStages: groupedMilestones,
+      tasks: groupedTasks,
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
@@ -541,6 +543,8 @@ const updateDeal = async (req, res) => {
       continent_ids, // Expecting array of continent IDs
       region_ids, // Expecting array of region IDs
       country_ids, // Expecting array of country IDs
+      retainer_amount, // Add retainer_amount
+      access_fee_amount, // Add access_fee_amount
     } = req.body;
     const deal = await Deal.findByPk(req.params.id);
     const id = deal.deal_id;
@@ -570,6 +574,8 @@ const updateDeal = async (req, res) => {
       deal_lead,
       project,
       model,
+      retainer_amount, // Include retainer_amount
+      access_fee_amount, // Include access_fee_amount
     });
 
     // Update DealContinent entries
