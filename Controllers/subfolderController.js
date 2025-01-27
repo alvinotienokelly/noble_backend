@@ -8,23 +8,36 @@ const Document = db.documents;
 // Create a new subfolder
 const createSubfolder = async (req, res) => {
   try {
-    const { name, created_for, parent_folder_id } = req.body;
+    const { name, created_for, parent_folder_id, parent_subfolder_id } =
+      req.body;
     const created_by = req.user.id;
 
     // Check if the parent folder exists
-    const parentFolder = await Folder.findByPk(parent_folder_id);
-    if (!parentFolder) {
-      return res
-        .status(404)
-        .json({ status: false, message: "Parent folder not found." });
+    if (parent_folder_id) {
+      const parentFolder = await Folder.findByPk(parent_folder_id);
+      if (!parentFolder) {
+        return res
+          .status(200)
+          .json({ status: false, message: "Parent folder not found." });
+      }
     }
 
-    // Check if the user exists for created_for
+    // Check if the parent subfolder exists (if provided)
+    if (parent_subfolder_id) {
+      const parentSubfolder = await Subfolder.findByPk(parent_subfolder_id);
+      if (!parentSubfolder) {
+        return res
+          .status(200)
+          .json({ status: false, message: "Parent subfolder not found." });
+      }
+    }
+
+    // Check if the user exists for created_for (if provided)
     if (created_for) {
       const user = await User.findByPk(created_for);
       if (!user) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: false, message: "User not found." });
       }
     }
@@ -34,11 +47,12 @@ const createSubfolder = async (req, res) => {
       created_by,
       created_for,
       parent_folder_id,
+      parent_subfolder_id,
     });
 
     res.status(200).json({ status: true, subfolder });
   } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
+    res.status(200).json({ status: false, message: error.message });
   }
 };
 
@@ -50,6 +64,7 @@ const getSubfolderById = async (req, res) => {
       include: [
         { model: User, as: "creator", attributes: ["id", "name", "email"] },
         { model: User, as: "createdFor", attributes: ["id", "name", "email"] },
+        { model: Subfolder, as: "childSubfolders" },
         // { model: Document, as: "subfolderDocuments" }, // Include documents
       ],
     });
@@ -111,7 +126,8 @@ const deleteSubfolder = async (req, res) => {
 const updateSubfolder = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, created_for } = req.body;
+    const { name, created_for, parent_folder_id, parent_subfolder_id } =
+      req.body;
 
     const subfolder = await Subfolder.findByPk(id);
     if (!subfolder) {
@@ -120,7 +136,27 @@ const updateSubfolder = async (req, res) => {
         .json({ status: false, message: "Subfolder not found." });
     }
 
-    // Check if the user exists for created_for
+    // Check if the parent folder exists
+    if (parent_folder_id) {
+      const parentFolder = await Folder.findByPk(parent_folder_id);
+      if (!parentFolder) {
+        return res
+          .status(404)
+          .json({ status: false, message: "Parent folder not found." });
+      }
+    }
+
+    // Check if the parent subfolder exists (if provided)
+    if (parent_subfolder_id) {
+      const parentSubfolder = await Subfolder.findByPk(parent_subfolder_id);
+      if (!parentSubfolder) {
+        return res
+          .status(404)
+          .json({ status: false, message: "Parent subfolder not found." });
+      }
+    }
+
+    // Check if the user exists for created_for (if provided)
     if (created_for) {
       const user = await User.findByPk(created_for);
       if (!user) {
@@ -130,7 +166,12 @@ const updateSubfolder = async (req, res) => {
       }
     }
 
-    await subfolder.update({ name, created_for });
+    await subfolder.update({
+      name,
+      created_for,
+      parent_folder_id,
+      parent_subfolder_id,
+    });
 
     res.status(200).json({ status: true, subfolder });
   } catch (error) {

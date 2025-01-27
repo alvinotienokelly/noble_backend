@@ -590,9 +590,19 @@ db.subfolders.hasMany(db.documents, {
   foreignKey: "subfolder_id",
   as: "subfolderDocuments",
 });
+
 db.documents.belongsTo(db.subfolders, {
   foreignKey: "subfolder_id",
   as: "subfolder",
+});
+
+db.subfolders.belongsTo(db.subfolders, {
+  foreignKey: "parent_subfolder_id",
+  as: "parentSubfolder",
+});
+db.subfolders.hasMany(db.subfolders, {
+  foreignKey: "parent_subfolder_id",
+  as: "childSubfolders",
 });
 
 //exporting the module

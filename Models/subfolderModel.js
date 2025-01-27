@@ -36,6 +36,14 @@ module.exports = (sequelize, DataTypes) => {
           key: "folder_id",
         },
       },
+      parent_subfolder_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "subfolders",
+          key: "subfolder_id",
+        },
+      },
     },
     { timestamps: true }
   );
