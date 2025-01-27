@@ -10,7 +10,7 @@ const DealTypePreferences = db.deal_type_preferences;
 const PrimaryLocationPreferences = db.primary_location_preferences;
 const Sector = db.sectors;
 const ContactPerson = db.contact_persons;
-
+const Role = db.roles;
 // Assigning users to the variable User
 const User = db.users;
 
@@ -389,6 +389,39 @@ const getProfile = async (req, res) => {
   }
 };
 
+// Get users with the role Employee or their role_id is that of Employee
+const getEmployees = async (req, res) => {
+  try {
+    // Find the role_id for the Employee role
+    const employeeRole = await Role.findOne({ where: { name: "Employee" } });
+
+    if (!employeeRole) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Employee role not found." });
+    }
+
+    const employees = await User.findAll({
+      where: {
+        [db.Sequelize.Op.or]: [
+          // { role: "Employee" },
+          { role_id: employeeRole.role_id },
+        ],
+      },
+    });
+
+    if (employees.length === 0) {
+      return res
+        .status(404)
+        .json({ status: false, message: "No employees found." });
+    }
+
+    res.status(200).json({ status: true, employees });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -400,4 +433,5 @@ module.exports = {
   bulkUploadUsers,
   getUserById,
   getProfile,
+  getEmployees,
 };

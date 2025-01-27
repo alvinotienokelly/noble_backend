@@ -12,6 +12,7 @@ const {
   bulkUploadUsers,
   getUserById,
   getProfile,
+  getEmployees,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -49,5 +50,6 @@ router.post("/bulk-upload", authMiddleware, bulkUploadUsers);
 router.get("/user/:id", authMiddleware, getUserById); // Add this line
 router.get("/profile", authMiddleware, getProfile); // Add this line
 
+router.get("/employees", authMiddleware, getEmployees); // Add this line
 
 module.exports = router;
