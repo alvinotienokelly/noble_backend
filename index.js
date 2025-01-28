@@ -50,6 +50,7 @@ const subfolderRoutes = require("./Routes/subfolderRoutes");
 const pipelineRoutes = require("./Routes/pipelineRoutes");
 const pipelineStageRoutes = require("./Routes/pipelineStageRoutes");
 const stageCardRoutes = require("./Routes/stageCardRoutes");
+const subfolderAccessInviteRoutes = require("./Routes/subfolderAccessInviteRoutes");
 
 require("dotenv").config();
 
@@ -109,6 +110,7 @@ app.use("/api/subfolders", subfolderRoutes);
 app.use("/api/pipelines", pipelineRoutes);
 app.use("/api/pipeline-stages", pipelineStageRoutes);
 app.use("/api/stage-cards", stageCardRoutes);
+app.use("/api/subfolder-access-invites", subfolderAccessInviteRoutes);
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
