@@ -65,7 +65,7 @@ const getSubfolderById = async (req, res) => {
         { model: User, as: "creator", attributes: ["id", "name", "email"] },
         { model: User, as: "createdFor", attributes: ["id", "name", "email"] },
         { model: Subfolder, as: "childSubfolders" },
-        // { model: Document, as: "subfolderDocuments" }, // Include documents
+        { model: Document, as: "subfolderDocuments" }, // Include documents
       ],
     });
 
