@@ -127,6 +127,20 @@ db.deal_countries = require("./dealCountryModel")(sequelize, DataTypes);
 db.pipelines = require("./pipelineModel")(sequelize, DataTypes); // Add this line
 db.pipeline_stages = require("./pipelineStageModel")(sequelize, DataTypes); // Add this line
 db.stage_cards = require("./stageCardModel")(sequelize, DataTypes); // Add this line
+db.subfolder_access_invite = require("./subfolderAccessInviteModel")(
+  sequelize,
+  DataTypes
+); // Add this line
+
+// Define subfolders invite associations
+db.subfolders.hasMany(db.subfolder_access_invite, {
+  foreignKey: "subfolder_id",
+  as: "accessInvites",
+});
+db.subfolder_access_invite.belongsTo(db.subfolders, {
+  foreignKey: "subfolder_id",
+  as: "subfolder",
+});
 
 // Define pipelines associations
 db.pipelines.hasMany(db.pipeline_stages, {
