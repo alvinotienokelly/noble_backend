@@ -40,7 +40,12 @@ const getFolderById = async (req, res) => {
         { model: User, as: "creator", attributes: ["id", "name", "email"] },
         { model: User, as: "createdFor", attributes: ["id", "name", "email"] },
         { model: Document, as: "folderDocuments" }, // Include documents
-        { model: Subfolder, as: "subfolders" }, // Include subfolders
+        {
+          model: Subfolder,
+          as: "subfolders",
+          where: { parent_subfolder_id: null }, // Include subfolders whose parent_subfolder_id is null
+          required: false, // Allow folders without subfolders
+        },
       ],
     });
 
