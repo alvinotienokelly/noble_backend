@@ -8,7 +8,8 @@ const {
   deleteDeal,
   getDealsByUserPreferences,
   getTargetCompanyDeals,
-  filterDeals
+  getMilestonesAndTasksByDealAndStage, // Add this line
+  filterDeals,
 } = dealController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
@@ -23,5 +24,10 @@ router.put("/:id", authMiddleware, checkAdmin, updateDeal);
 router.delete("/:id", authMiddleware, deleteDeal);
 router.get("/user/preferences", authMiddleware, getDealsByUserPreferences);
 router.get("/filter/deals", authMiddleware, filterDeals);
+router.get(
+  "/:deal_id/stage/:deal_stage_id",
+  authMiddleware,
+  getMilestonesAndTasksByDealAndStage
+); // Add this line
 
 module.exports = router;

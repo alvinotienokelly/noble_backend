@@ -808,6 +808,42 @@ const deleteDeal = async (req, res) => {
   }
 };
 
+// Get milestones and tasks by deal_id and deal_stage_id
+const getMilestonesAndTasksByDealAndStage = async (req, res) => {
+  try {
+    const { deal_id, deal_stage_id } = req.params;
+
+    // Fetch the deal to ensure it exists
+    const deal = await Deal.findByPk(deal_id, {
+      include: [{ model: DealStage, as: "dealStage" }],
+    });
+
+    if (!deal) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Deal not found." });
+    }
+
+    // Fetch milestones associated with the deal and deal stage
+    const milestones = await Milestone.findAll({
+      where: { deal_id, deal_stage_id },
+      include: [{ model: DealStage, as: "dealStage" }],
+      order: [["createdAt", "ASC"]],
+    });
+
+    // Fetch tasks associated with the deal and deal stage
+    const tasks = await Task.findAll({
+      where: { deal_id, deal_stage_id },
+      include: [{ model: DealStage, as: "dealStage" }],
+      order: [["createdAt", "ASC"]],
+    });
+
+    res.status(200).json({ status: true, milestones, tasks });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createDeal,
   getAllDeals,
@@ -818,4 +854,5 @@ module.exports = {
   getTargetCompanyDeals,
   filterDeals,
   recommendDeals,
+  getMilestonesAndTasksByDealAndStage, // Add this line
 };
