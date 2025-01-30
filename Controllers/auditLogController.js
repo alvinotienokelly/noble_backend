@@ -1,4 +1,5 @@
 const db = require("../Models");
+const User = db.users;
 const AuditLog = db.AuditLog;
 
 // Create a new audit log entry
@@ -14,7 +15,9 @@ const createAuditLog = async (req, res) => {
 // Get all audit logs
 const getAllAuditLogs = async (req, res) => {
   try {
-    const auditLogs = await AuditLog.findAll();
+    const auditLogs = await AuditLog.findAll({
+      include: [{ model: User, as: "user" }],
+    });
     res.status(200).json({ status: "true", auditLogs });
   } catch (error) {
     res.status(500).json({ status: "false", message: error.message });
