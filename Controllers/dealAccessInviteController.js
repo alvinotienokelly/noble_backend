@@ -4,6 +4,7 @@ const DealAccessInvite = db.deal_access_invite;
 const User = db.users;
 const Deal = db.deals;
 const { sendEmail } = require("../Middlewares/emailService");
+const { createAuditLog } = require("./auditLogService");
 
 // Function to send deal access invite
 const sendDealAccessInvite = async (req, res) => {
@@ -28,6 +29,13 @@ const sendDealAccessInvite = async (req, res) => {
     const invite = await DealAccessInvite.create({
       investor_id,
       deal_id,
+    });
+    // Create audit log
+    await createAuditLog({
+      userId: req.user.id,
+      action: "SEND_DEAL_ACCESS_INVITE",
+      details: `Sent deal access invite to investor ${investor_id} for deal ${deal_id}`,
+      ip_address: req.ip,
     });
 
     // Send email to investor
@@ -59,6 +67,12 @@ const expressDealInterest = async (req, res) => {
       deal_id,
     });
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "EXPRESS_DEAL_INTEREST",
+      details: `Investor ${investor_id} expressed interest in deal ${deal_id}`,
+      ip_address: req.ip,
+    });
     // Send email to user
     const emailSubject = "Deal Access Invitation";
     const emailBody = `Hello,\n\nYou have been invited to access the deal "${deal.title}". Please log in to your account to view the details.\n\nBest regards,\nYour Team`;
@@ -79,6 +93,12 @@ const getDealInvites = async (req, res) => {
       where: { deal_id },
       include: [{ model: User, as: "investor" }],
     });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_DEAL_INVITES",
+      details: `Fetched invites for deal ${deal_id}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({ status: true, invites });
   } catch (error) {
@@ -96,6 +116,12 @@ const getInvestorInvites = async (req, res) => {
       include: [{ model: Deal, as: "deal" }],
     });
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_INVESTOR_INVITES",
+      details: `Fetched invites for investor ${investor_id}`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, invites });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -121,6 +147,13 @@ const acceptDealInvite = async (req, res) => {
     invite.status = "Accepted";
     await invite.save();
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "ACCEPT_DEAL_INVITE",
+      details: `Investor ${req.user.id} accepted invite ${invite_id}`,
+      ip_address: req.ip,
+    });
+
     res.status(200).json({ status: true, invite });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -145,6 +178,12 @@ const rejectDealInvite = async (req, res) => {
 
     invite.status = "Rejected";
     await invite.save();
+    await createAuditLog({
+      userId: req.user.id,
+      action: "REJECT_DEAL_INVITE",
+      details: `Investor ${req.user.id} rejected invite ${invite_id}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({ status: true, invite });
   } catch (error) {

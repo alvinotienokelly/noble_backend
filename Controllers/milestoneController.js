@@ -5,6 +5,7 @@ const Deal = db.deals;
 const DealStage = db.deal_stages;
 const { Op } = require("sequelize");
 const { updateMilestoneStatus } = require("./commissionController");
+const { createAuditLog } = require("./auditLogService");
 
 // Create a new milestone
 const createMilestone = async (req, res) => {
@@ -17,6 +18,12 @@ const createMilestone = async (req, res) => {
       deal_stage_id,
       description,
       due_date,
+    });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "CREATE_MILESTONE",
+      ip_address: req.ip,
+      description: `Milestone ${milestone.title} created.`,
     });
 
     res.status(200).json({ status: true, milestone });
@@ -35,13 +42,19 @@ const getMilestonesByDealId = async (req, res) => {
         {
           model: Deal,
           as: "deal",
-    
         },
         {
           model: DealStage,
           as: "dealStage",
-        }
+        },
       ],
+    });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_MILESTONES_BY_DEAL_ID",
+      ip_address: req.ip,
+      description: `Fetched milestones for deal ID ${req.params.dealId}.`,
     });
 
     res.status(200).json({ status: true, milestones });
@@ -61,6 +74,12 @@ const updateMilestone = async (req, res) => {
     }
 
     await milestone.update(req.body);
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_MILESTONE",
+      ip_address: req.ip,
+      description: `Milestone ${milestone.title} updated.`,
+    });
     await updateMilestoneStatus(req, res);
     res.status(200).json({ status: true, milestone });
   } catch (error) {
@@ -172,6 +191,13 @@ const getMilestonesForUser = async (req, res) => {
       });
     }
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_MILESTONES_FOR_USER",
+      ip_address: req.ip,
+      description: `Fetched milestones for user ID ${userId}.`,
+    });
+
     res.status(200).json({
       status: true,
       totalMilestones,
@@ -195,6 +221,12 @@ const deleteMilestone = async (req, res) => {
     }
 
     await milestone.destroy();
+    await createAuditLog({
+      userId: req.user.id,
+      action: "DELETE_MILESTONE",
+      ip_address: req.ip,
+      description: `Milestone ${milestone.title} deleted.`,
+    });
     res
       .status(200)
       .json({ status: true, message: "Milestone deleted successfully." });

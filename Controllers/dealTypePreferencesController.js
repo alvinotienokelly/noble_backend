@@ -2,6 +2,7 @@
 const db = require("../Models");
 const DealTypePreferences = db.deal_type_preferences;
 const User = db.users;
+const { createAuditLog } = require("./auditLogService");
 
 // Create a new deal type preference
 const createDealTypePreference = async (req, res) => {
@@ -12,6 +13,12 @@ const createDealTypePreference = async (req, res) => {
     const dealTypePreference = await DealTypePreferences.create({
       user_id,
       deal_type,
+    });
+    await createAuditLog({
+      userId: req.user.id,
+      ip_address: req.ip,
+      action: "CREATE_DEAL_TYPE_PREFERENCE",
+      details: `Created deal type preference with deal_type: ${deal_type}`,
     });
 
     res.status(201).json({ status: true, dealTypePreference });
@@ -28,6 +35,12 @@ const getDealTypePreferences = async (req, res) => {
       where: { user_id },
       include: [{ model: User, as: "user" }],
     });
+    await createAuditLog({
+      userId: req.user.id,
+      ip_address: req.ip,
+      action: "GET_DEAL_TYPE_PREFERENCES",
+      details: `Fetched deal type preferences for user_id: ${user_id}`,
+    });
     res.status(200).json({ status: true, preferences });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -42,11 +55,20 @@ const updateDealTypePreference = async (req, res) => {
 
     const dealTypePreference = await DealTypePreferences.findByPk(id);
     if (!dealTypePreference) {
-      return res.status(404).json({ status: false, message: "Preference not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Preference not found." });
     }
 
     await dealTypePreference.update({
       deal_type,
+    });
+
+    await createAuditLog({
+      userId: req.user.id,
+      ip_address: req.ip,
+      action: "UPDATE_DEAL_TYPE_PREFERENCE",
+      details: `Updated deal type preference with id: ${id} to deal_type: ${deal_type}`,
     });
 
     res.status(200).json({ status: true, dealTypePreference });
@@ -62,11 +84,15 @@ const deleteDealTypePreference = async (req, res) => {
 
     const dealTypePreference = await DealTypePreferences.findByPk(id);
     if (!dealTypePreference) {
-      return res.status(404).json({ status: false, message: "Preference not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Preference not found." });
     }
 
     await dealTypePreference.destroy();
-    res.status(200).json({ status: true, message: "Preference deleted successfully." });
+    res
+      .status(200)
+      .json({ status: true, message: "Preference deleted successfully." });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }

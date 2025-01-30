@@ -3,6 +3,7 @@ const db = require("../Models");
 const Deal = db.deals;
 const User = db.users;
 const Sector = db.sectors;
+const { createAuditLog } = require("./auditLogService");
 
 const { Op } = require("sequelize");
 
@@ -65,6 +66,14 @@ const getDashboardDealStatusData = async (req, res) => {
     const dealsByTeamMemberArray = Object.values(
       dealsByTeamMemberWithPercentage
     );
+
+    // Call createAuditLog
+    await createAuditLog({
+      userId: req.user.id,
+      action: "FETCH_DASHBOARD_DEAL_STATUS_DATA",
+      details: `User ${req.user.id} fetched dashboard deal status data`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({
       status: true,
@@ -135,6 +144,13 @@ const getDashboardDealTypeData = async (req, res) => {
     const dealsByTeamMemberAndTypeArray = Object.values(
       dealsByTeamMemberAndTypeSummary
     );
+    // Call createAuditLog
+    await createAuditLog({
+      userId: req.user.id,
+      action: "FETCH_DASHBOARD_DEAL_TYPE_DATA",
+      details: `User ${req.user.id} fetched dashboard deal type data`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({
       status: true,
@@ -220,6 +236,12 @@ const getDashboardDealSectorData = async (req, res) => {
       dealsByTeamMemberAndSectorSummary
     );
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "FETCH_DASHBOARD_DEAL_SECTOR_DATA",
+      details: `User ${req.user.id} fetched dashboard deal sector data`,
+      ip_address: req.ip,
+    });
     res.status(200).json({
       status: true,
       data: {
@@ -304,6 +326,12 @@ const getDashboardDealSizeData = async (req, res) => {
       dealsByTeamMemberAndSizeSummary
     );
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "FETCH_DASHBOARD_DEAL_SIZE_DATA",
+      details: `User ${req.user.id} fetched dashboard deal size data`,
+      ip_address: req.ip,
+    });
     res.status(200).json({
       status: true,
       data: {
@@ -370,6 +398,14 @@ const getDashboardDealConsultantStatusData = async (req, res) => {
     const dealsByConsultantAndStatusArray = Object.values(
       dealsByConsultantAndStatusSummary
     );
+    // Call createAuditLog
+    await createAuditLog({
+      userId: req.user.id,
+      action: "FETCH_DASHBOARD_DEAL_CONSULTANT_STATUS_DATA",
+      details: `User ${req.user.id} fetched dashboard deal consultant status data`,
+      ip_address: req.ip,
+
+    });
 
     res.status(200).json({
       status: true,

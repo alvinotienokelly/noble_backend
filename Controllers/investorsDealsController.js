@@ -3,6 +3,7 @@ const { InvestorsDeals } = require("../Models");
 const db = require("../Models");
 const Deal = db.deals;
 const User = db.users; // A
+const { createAuditLog } = require("./auditLogService");
 
 const createInvestment = async (req, res) => {
   try {
@@ -12,12 +13,17 @@ const createInvestment = async (req, res) => {
       deal_id,
       investment_amount,
     });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "CREATE_INVESTMENT",
+      description: "InvestorsDeals",
+      ip_address: req.ip,
+    });
     res.status(201).json(newInvestment);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const trackInvestorBehavior = async (investorId, dealId) => {
   try {
@@ -107,5 +113,5 @@ module.exports = {
   getInvestmentById,
   updateInvestment,
   deleteInvestment,
-  trackInvestorBehavior
+  trackInvestorBehavior,
 };

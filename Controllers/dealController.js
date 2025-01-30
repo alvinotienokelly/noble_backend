@@ -20,6 +20,7 @@ const Country = db.country;
 const Region = db.regions;
 const DealStage = db.deal_stages;
 const Task = db.tasks;
+const { createAuditLog } = require("./auditLogService");
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -101,6 +102,13 @@ const createDeal = async (req, res) => {
         });
       }
     }
+    // Create an audit log entry
+    await createAuditLog({
+      userId: created_by,
+      action: "CREATE_DEAL",
+      details: `Deal ${newDeal.title} created with ID ${newDeal.deal_id}`,
+     ip_address: req.ip,
+    });
 
     res.status(201).json({ status: true, deal: newDeal });
   } catch (error) {
@@ -295,6 +303,13 @@ const getAllDeals = async (req, res) => {
 
     const totalPages = Math.ceil(totalDeals / limit);
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_ALL_DEALS",
+      details: `Fetched all deals with pagination - Page: ${page}, Limit: ${limit}`,
+      ip_address: req.ip,
+    });
+
     res.status(200).json({
       status: true,
       totalDealSize: totalDealSize,
@@ -424,6 +439,13 @@ const getTargetCompanyDeals = async (req, res) => {
 
     const totalPages = Math.ceil(totalDeals / limit);
 
+    await createAuditLog({
+      userId: userId,
+      action: "GET_TARGET_COMPANY_DEALS",
+      details: `Fetched target company deals with pagination - Page: ${page}, Limit: ${limit}`,
+      ip_address: req.ip,
+    });
+
     res.status(200).json({
       status: true,
       totalDealSize: totalDealSize,
@@ -507,6 +529,13 @@ const getDealById = async (req, res) => {
     }, {});
 
     await trackInvestorBehavior(created_by, deal.deal_id);
+
+    await createAuditLog({
+      userId: created_by,
+      action: "VIEW_DEAL",
+      details: `Viewed deal with ID ${deal.deal_id}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({
       status: true,
@@ -609,6 +638,13 @@ const updateDeal = async (req, res) => {
         });
       }
     }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_DEAL",
+      details: `Updated deal with ID ${deal.deal_id}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({ status: true, deal });
   } catch (error) {
@@ -840,6 +876,12 @@ const getMilestonesAndTasksByDealAndStage = async (req, res) => {
       order: [["createdAt", "ASC"]],
     });
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_MILESTONES_AND_TASKS",
+      details: `Fetched milestones and tasks for deal ID ${deal_id} and stage ID ${deal_stage_id}`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, milestones, tasks });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });

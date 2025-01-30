@@ -4,6 +4,7 @@ const Subfolder = db.subfolders;
 const User = db.users;
 const Folder = db.folders;
 const Document = db.documents;
+const { createAuditLog } = require("./auditLogService");
 
 // Create a new subfolder
 const createSubfolder = async (req, res) => {
@@ -50,6 +51,13 @@ const createSubfolder = async (req, res) => {
       parent_subfolder_id,
     });
 
+    await createAuditLog({
+      userId: created_by,
+      action: "CREATE_SUBFOLDER",
+      description: `Subfolder '${name}' created for user ID ${created_for}`,
+      ip_address: req.ip,
+    });
+
     res.status(200).json({ status: true, subfolder });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -74,6 +82,12 @@ const getSubfolderById = async (req, res) => {
         .status(404)
         .json({ status: false, message: "Subfolder not found." });
     }
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_SUBFOLDER",
+      description: `Subfolder with ID ${id} retrieved`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({ status: true, subfolder });
   } catch (error) {
@@ -92,6 +106,13 @@ const getSubfoldersByParentFolderId = async (req, res) => {
         { model: User, as: "createdFor" },
         // { model: Document, as: "subfolderDocuments" }, // Include documents
       ],
+    });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_SUBFOLDERS_BY_PARENT_FOLDER",
+      description: `Subfolders for parent folder ID ${parent_folder_id} retrieved`,
+      ip_address: req.ip,
     });
 
     res.status(200).json({ status: true, subfolders });
@@ -173,6 +194,12 @@ const updateSubfolder = async (req, res) => {
       parent_subfolder_id,
     });
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_SUBFOLDER",
+      description: `Subfolder with ID ${id} updated`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, subfolder });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
