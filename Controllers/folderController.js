@@ -3,6 +3,7 @@ const Folder = db.folders;
 const User = db.users;
 const Document = db.documents;
 const Subfolder = db.subfolders;
+const { createAuditLog } = require("./auditLogService");
 
 const createFolder = async (req, res) => {
   try {
@@ -25,6 +26,12 @@ const createFolder = async (req, res) => {
       created_for,
     });
 
+    await createAuditLog({
+      userId: created_by,
+      action: "CREATE_FOLDER",
+      description: `Folder '${name}' created for user ID ${created_for}`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, folder });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -55,6 +62,12 @@ const getFolderById = async (req, res) => {
         .json({ status: false, message: "Folder not found." });
     }
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_FOLDER",
+      description: `Folder with ID ${id} retrieved`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, folder });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -69,6 +82,12 @@ const getAllFolders = async (req, res) => {
         { model: User, as: "creator" },
         { model: User, as: "createdFor" },
       ],
+    });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_ALL_FOLDERS",
+      description: "All folders retrieved",
+      ip_address: req.ip,
     });
     res.status(200).json({ status: true, folders });
   } catch (error) {
@@ -94,6 +113,12 @@ const getFoldersByUser = async (req, res) => {
 
     const totalPages = Math.ceil(totalFolders / limit);
 
+    await createAuditLog({
+      userId: userId,
+      action: "GET_FOLDERS_BY_USER",
+      description: `Folders retrieved for user ID ${userId}`,
+      ip_address: req.ip,
+    });
     res.status(200).json({
       status: true,
       totalFolders,

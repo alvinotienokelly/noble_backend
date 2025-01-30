@@ -6,6 +6,7 @@ const Deal = db.deals;
 const { Op } = require("sequelize");
 const { sendTaskReminder } = require("../Middlewares/emailService");
 const { createNotification } = require("./notificationController");
+const { createAuditLog } = require("./auditLogService");
 
 // Create a new task
 const createTask = async (req, res) => {
@@ -28,6 +29,13 @@ const createTask = async (req, res) => {
       due_date,
       deal_id,
       deal_stage_id,
+    });
+
+    await createAuditLog({
+      userId: created_by,
+      action: "CREATE_TASK",
+      description: `Task '${title}' created.`,
+      ip_address: req.ip,
     });
 
     res.status(200).json({ status: true, task });
@@ -55,6 +63,12 @@ const getAllTasks = async (req, res) => {
 
     const totalPages = Math.ceil(totalTasks / limit);
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_ALL_TASKS",
+      description: "Fetched all tasks.",
+      ip_address: req.ip,
+    });
     res.status(200).json({
       status: true,
       totalTasks,
@@ -83,6 +97,12 @@ const getTaskById = async (req, res) => {
         .status(200)
         .json({ status: false, message: "Task not found." });
     }
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_TASK_BY_ID",
+      description: `Fetched task with ID ${req.params.id}.`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, task });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -99,6 +119,12 @@ const updateTask = async (req, res) => {
         .json({ status: false, message: "Task not found." });
     }
     await task.update(req.body);
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_TASK",
+      description: `Task '${task.title}' updated.`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, task });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -131,6 +157,12 @@ const getTasksByUserId = async (req, res) => {
         .json({ status: false, message: "No tasks found for this user." });
     }
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_TASKS_BY_USER_ID",
+      description: `Fetched tasks assigned to user with ID ${req.params.userId}.`,
+      ip_address: req.ip,
+    });
     res.status(200).json({
       status: true,
       totalTasks,
@@ -168,6 +200,12 @@ const getTaskByDealId = async (req, res) => {
         .status(200)
         .json({ status: false, message: "No tasks found for this deal." });
     }
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_TASKS_BY_DEAL_ID",
+      description: `Fetched tasks for deal with ID ${req.params.dealId}.`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({
       status: true,
@@ -247,6 +285,12 @@ const changeTaskStatus = async (req, res) => {
     }
 
     await task.update({ status });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "CHANGE_TASK_STATUS",
+      description: `Task '${task.title}' status changed to '${status}'.`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, task });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -266,6 +310,12 @@ const assignTaskToUser = async (req, res) => {
     }
 
     await task.update({ assigned_to: userId });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "ASSIGN_TASK_TO_USER",
+      description: `Task '${task.title}' assigned to user with ID ${userId}.`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, task });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -297,6 +347,13 @@ const sendTaskReminders = async () => {
         `The task "${task.title}" is due on ${task.due_date}.`
       );
     }
+
+    await createAuditLog({
+      userId: null, // System user or null if no user context
+      action: "SEND_TASK_REMINDERS",
+      description: "Sent task reminders for tasks due within the next 24 hours.",
+      ip_address: null, // No IP address in this context
+    });
 
     console.log("Task reminders sent successfully.");
   } catch (error) {
@@ -418,6 +475,12 @@ const getTasksForUserDeals = async (req, res) => {
       });
     }
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_TASKS_FOR_USER_DEALS",
+      description: "Fetched tasks for deals belonging to the logged-in user.",
+      ip_address: req.ip,
+    });
     res.status(200).json({
       status: true,
       totalTasks,

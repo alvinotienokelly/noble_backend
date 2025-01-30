@@ -10,6 +10,9 @@ const {
   createEmbeddedSigningUrl,
 } = require("../Middlewares/docusignService");
 const logger = require("../Middlewares/logger");
+
+const { createAuditLog } = require("./auditLogService");
+
 const createDocument = async (req, res) => {
   try {
     const { folder_id, subfolder_id } = req.body;
@@ -59,6 +62,13 @@ const createDocument = async (req, res) => {
     //   document.docusign_envelope_id = envelopeId;
     //   await document.save();
     // }
+
+    await createAuditLog({
+      userId: uploaded_by,
+      action: "CREATE_DOCUMENT",
+      description: `Document ${document.file_name} created by user ${uploaded_by}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({ status: true, document });
   } catch (error) {
@@ -155,6 +165,12 @@ const getAllDocuments = async (req, res) => {
 
     const totalPages = Math.ceil(totalDocuments / limit);
 
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_ALL_DOCUMENTS",
+      description: `User ${req.user.id} retrieved all documents`,
+      ip_address: req.ip,
+    });
     res.status(200).json({
       status: true,
       totalDocuments,
@@ -181,6 +197,12 @@ const getDocumentsByUserDeals = async (req, res) => {
       ],
     });
 
+    await createAuditLog({
+      userId: userId,
+      action: "GET_DOCUMENTS_BY_USER_DEALS",
+      description: `User ${userId} retrieved documents for their deals`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, documents });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -217,6 +239,12 @@ const getDocumentById = async (req, res) => {
         returnUrl
       );
 
+      await createAuditLog({
+        userId: req.user.id,
+        action: "GET_DOCUMENT_SIGNING_URL",
+        description: `User ${req.user.id} retrieved signing URL for document ${document.document_id}`,
+        ip_address: req.ip,
+      });
       return res.status(200).json({ status: true, signingUrl });
     }
     res.status(200).json({ status: true, document });
@@ -267,6 +295,12 @@ const updateDocument = async (req, res) => {
       req.body.docusign_envelope_id = envelopeId;
     }
 
+    await createAuditLog({
+      userId: uploaded_by,
+      action: "UPDATE_DOCUMENT",
+      description: `Document ${document.file_name} updated by user ${uploaded_by}`,
+      ip_address: req.ip,
+    });
     await document.update(req.body);
     res.status(200).json({ status: true, document });
   } catch (error) {

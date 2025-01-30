@@ -4,6 +4,7 @@ const Notification = db.notifications;
 const User = db.users;
 const { recommendDeals } = require("./dealController");
 const { sendEmail } = require("../Middlewares/emailService");
+const { createAuditLog } = require("./auditLogService");
 
 // Create a new notification
 const createNotification = async (userId, title, message) => {
@@ -14,6 +15,11 @@ const createNotification = async (userId, title, message) => {
       message,
     });
 
+    // await createAuditLog({
+    //   userId,
+    //   action: "CREATE_NOTIFICATION",
+    //   details: `Notification titled "${title}" created for user ID ${userId}`,
+    // });
     return notification;
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -38,6 +44,12 @@ const getUserNotifications = async (req, res) => {
 
     const totalPages = Math.ceil(totalNotifications / limit);
 
+    await createAuditLog({
+      ip_address: req.ip,
+      userId: req.user.id,
+      action: "GET_USER_NOTIFICATIONS",
+      description: `User ID ${req.user.id} retrieved their notifications.`,
+    });
     res.status(200).json({
       status: "true",
       totalNotifications,
@@ -68,6 +80,12 @@ const markNotificationAsRead = async (req, res) => {
 
     notification.read = true;
     await notification.save();
+    await createAuditLog({
+      ip_address: req.ip,
+      userId: req.user.id,
+      action: "MARK_NOTIFICATION_AS_READ",
+      description: `Notification ID ${req.params.id} marked as read by user ID ${req.user.id}.`,
+    });
 
     res.status(200).json({ status: "true", notification });
   } catch (error) {

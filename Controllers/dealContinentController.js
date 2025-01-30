@@ -3,6 +3,7 @@ const db = require("../Models");
 const DealContinent = db.deal_continents;
 const Deal = db.deals;
 const Continent = db.continents;
+const { createAuditLog } = require("./auditLogService");
 
 // Add a continent to a deal
 const addContinentToDeal = async (req, res) => {
@@ -11,17 +12,27 @@ const addContinentToDeal = async (req, res) => {
 
     const deal = await Deal.findByPk(deal_id);
     if (!deal) {
-      return res.status(404).json({ status: false, message: "Deal not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Deal not found." });
     }
 
     const continent = await Continent.findByPk(continent_id);
     if (!continent) {
-      return res.status(404).json({ status: false, message: "Continent not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Continent not found." });
     }
 
     const dealContinent = await DealContinent.create({
       deal_id,
       continent_id,
+    });
+    await createAuditLog({
+      action: "ADD_CONTINENT_TO_DEAL",
+      details: `Continent ${continent_id} added to deal ${deal_id}`,
+      userId: req.user.id,
+      ip_address: req.ip,
     });
 
     res.status(201).json({ status: true, dealContinent });
@@ -40,7 +51,9 @@ const getContinentsForDeal = async (req, res) => {
     });
 
     if (!deal) {
-      return res.status(404).json({ status: false, message: "Deal not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Deal not found." });
     }
 
     res.status(200).json({ status: true, continents: deal.continents });
@@ -59,11 +72,18 @@ const removeContinentFromDeal = async (req, res) => {
     });
 
     if (!dealContinent) {
-      return res.status(404).json({ status: false, message: "Association not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Association not found." });
     }
 
     await dealContinent.destroy();
-    res.status(200).json({ status: true, message: "Continent removed from deal successfully." });
+    res
+      .status(200)
+      .json({
+        status: true,
+        message: "Continent removed from deal successfully.",
+      });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }

@@ -4,6 +4,7 @@ const FolderAccessInvite = db.folder_access_invite;
 const Folder = db.folders;
 const User = db.users;
 const { sendEmail } = require("../Middlewares/emailService");
+const { createAuditLog } = require("./auditLogService");
 
 // Function to send folder access invite
 const sendFolderAccessInvite = async (req, res) => {
@@ -27,6 +28,12 @@ const sendFolderAccessInvite = async (req, res) => {
     const emailBody = `Hello,\n\nYou have been invited to access the folder "${folder.name}". Please log in to your account to view the details.\n\nBest regards,\nYour Team`;
     await sendEmail(user_email, emailSubject, emailBody);
 
+    await createAuditLog({
+      action: "SEND_FOLDER_ACCESS_INVITE",
+      description: `Invite sent to ${user_email} for folder ${folder.name}`,
+      userId: req.user.id,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, invite });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -47,6 +54,13 @@ const acceptFolderAccessInvite = async (req, res) => {
 
     invite.status = "Accepted";
     await invite.save();
+
+    await createAuditLog({
+      action: "ACCEPT_FOLDER_ACCESS_INVITE",
+      description: `Invite accepted by ${req.user.email} for folder ${invite.folder_id}`,
+      userId: req.user.id,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({ status: true, invite });
   } catch (error) {
@@ -69,6 +83,13 @@ const rejectFolderAccessInvite = async (req, res) => {
     invite.status = "Rejected";
     await invite.save();
 
+    await createAuditLog({
+      action: "REJECT_FOLDER_ACCESS_INVITE",
+      description: `Invite rejected by ${req.user.email} for folder ${invite.folder_id}`,
+      userId: req.user.id,
+      ip_address: req.ip,
+    });
+
     res.status(200).json({ status: true, invite });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -84,6 +105,12 @@ const getFolderInvites = async (req, res) => {
       where: { folder_id },
     });
 
+    await createAuditLog({
+      action: "GET_FOLDER_INVITES",
+      description: `Fetched invites for folder ${folder_id}`,
+      userId: req.user.id,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, invites });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });

@@ -3,6 +3,7 @@ const db = require("../Models");
 const DocumentShare = db.document_shares;
 const Document = db.documents;
 const { sendEmail } = require("../Middlewares/emailService");
+const { createAuditLog } = require("./auditLogService");
 
 // Function to share a document
 const shareDocument = async (req, res) => {
@@ -26,6 +27,12 @@ const shareDocument = async (req, res) => {
     const emailBody = `Hello,\n\nYou have been invited to access the document "${document.file_name}". Please log in to your account to view the details.\n\nBest regards,\nYour Team`;
     await sendEmail(user_email, emailSubject, emailBody);
 
+    await createAuditLog({
+      action: "SHARE_DOCUMENT",
+      ip_address: req.ip,
+      userId: req.user.id,
+      description: `Document "${document.file_name}" shared with ${user_email}.`,
+    });
     res.status(200).json({ status: true, share });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -47,6 +54,13 @@ const acceptDocumentShare = async (req, res) => {
     share.status = "Accepted";
     await share.save();
 
+    await createAuditLog({
+      action: "ACCEPT_DOCUMENT_SHARE",
+      ip_address: req.ip,
+      userId: req.user.id,
+      description: `Document share with ID ${share_id} accepted.`,
+    });
+
     res.status(200).json({ status: true, share });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -67,6 +81,12 @@ const rejectDocumentShare = async (req, res) => {
 
     share.status = "Rejected";
     await share.save();
+    await createAuditLog({
+      action: "REJECT_DOCUMENT_SHARE",
+      ip_address: req.ip,
+      userId: req.user.id,
+      description: `Document share with ID ${share_id} rejected.`,
+    });
 
     res.status(200).json({ status: true, share });
   } catch (error) {
@@ -84,6 +104,13 @@ const getDocumentShares = async (req, res) => {
       include: [{ model: Document, as: "document" }],
     });
 
+    await createAuditLog({
+      action: "GET_DOCUMENT_SHARES",
+      ip_address: req.ip,
+      userId: req.user.id,
+      description: `Fetched shares for document ID ${document_id}.`,
+    });
+    
     res.status(200).json({ status: true, shares });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
