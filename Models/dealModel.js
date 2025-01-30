@@ -140,7 +140,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
-      access_fee_amount: {
+      success_fee_percentage: {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
