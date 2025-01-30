@@ -44,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride:szcNy266OSYed9vMLf2DGwHsYSiE8qpg@dpg-ctucl01u0jms73f5qtfg-a/noblestride_be28",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -237,6 +237,14 @@ db.deal_stages.hasMany(db.tasks, {
   foreignKey: "deal_stage_id",
   as: "tasks",
 });
+db.deals.belongsTo(db.deal_stages, {
+  foreignKey: "deal_stage_id",
+  as: "dealStage",
+});
+db.deal_stages.hasMany(db.deals, {
+  foreignKey: "deal_stage_id",
+  as: "deals",
+});
 
 // Define notification associations
 db.users.hasMany(db.notifications, {
@@ -272,7 +280,10 @@ db.deal_access_invite.belongsTo(db.users, {
   foreignKey: "investor_id",
   as: "investor",
 });
-db.deal_access_invite.belongsTo(db.deals, { foreignKey: "deal_id", as: "deal" });
+db.deal_access_invite.belongsTo(db.deals, {
+  foreignKey: "deal_id",
+  as: "deal",
+});
 
 // Define signature record associations
 db.documents.hasMany(db.signature_record, {

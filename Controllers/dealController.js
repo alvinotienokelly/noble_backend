@@ -27,9 +27,7 @@ const createDeal = async (req, res) => {
     const {
       title,
       description,
-      sector,
-      region,
-      deal_stage,
+      deal_stage_id,
       deal_size,
       target_company_id,
       key_investors,
@@ -42,7 +40,6 @@ const createDeal = async (req, res) => {
       teaser,
       maximum_selling_stake,
       ticket_size,
-      deal_lead,
       project,
       model,
       continent_ids, // Expecting array of continent IDs
@@ -56,9 +53,7 @@ const createDeal = async (req, res) => {
     const newDeal = await Deal.create({
       title,
       description,
-      sector,
-      region,
-      deal_stage,
+      deal_stage_id,
       deal_size,
       target_company_id,
       key_investors,
@@ -70,7 +65,6 @@ const createDeal = async (req, res) => {
       maximum_selling_stake,
       created_by,
       ticket_size,
-      deal_lead,
       project,
       model,
       retainer_amount, // Include retainer_amount
@@ -155,14 +149,14 @@ const getDealsByUserPreferences = async (req, res) => {
     }
 
     const deals = await Deal.findAll({
-      where: {
-        sector: {
-          [Op.in]: preferenceSectorArray,
-        },
-        region: {
-          [Op.in]: preferenceRegionArray,
-        },
-      },
+      // where: {
+      //   sector: {
+      //     [Op.in]: preferenceSectorArray,
+      //   },
+      //   region: {
+      //     [Op.in]: preferenceRegionArray,
+      //   },
+      // },
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
@@ -197,6 +191,10 @@ const getAllDeals = async (req, res) => {
       include: [
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
+        {
+          model: DealStage,
+          as: "dealStage",
+        },
         {
           model: DealCountry,
           as: "dealCountries",
@@ -452,6 +450,10 @@ const getDealById = async (req, res) => {
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
         {
+          model: DealStage,
+          as: "dealStage",
+        },
+        {
           model: DealCountry,
           as: "dealCountries",
           include: [{ model: Country, as: "country" }],
@@ -522,9 +524,7 @@ const updateDeal = async (req, res) => {
     const {
       title,
       description,
-      sector,
-      region,
-      deal_stage,
+      deal_stage_id,
       deal_size,
       target_company_id,
       key_investors,
@@ -537,7 +537,6 @@ const updateDeal = async (req, res) => {
       consultant_name,
       maximum_selling_stake,
       ticket_size,
-      deal_lead,
       project,
       model,
       continent_ids, // Expecting array of continent IDs
@@ -558,9 +557,7 @@ const updateDeal = async (req, res) => {
     await deal.update({
       title,
       description,
-      sector,
-      region,
-      deal_stage,
+      deal_stage_id,
       deal_size,
       target_company_id,
       key_investors,
@@ -571,7 +568,7 @@ const updateDeal = async (req, res) => {
       consultant_name,
       maximum_selling_stake,
       ticket_size,
-      deal_lead,
+
       project,
       model,
       retainer_amount, // Include retainer_amount
@@ -623,9 +620,6 @@ const filterDeals = async (req, res) => {
     const {
       title,
       description,
-      sector,
-      region,
-      deal_stage,
       deal_size_min,
       deal_size_max,
       target_company_id,
@@ -651,18 +645,6 @@ const filterDeals = async (req, res) => {
 
     if (description) {
       whereClause.description = { [Op.iLike]: `%${description}%` }; // Case-insensitive search
-    }
-
-    if (sector) {
-      whereClause.sector = sector;
-    }
-
-    if (region) {
-      whereClause.region = region;
-    }
-
-    if (deal_stage) {
-      whereClause.deal_stage = deal_stage;
     }
 
     if (deal_size_min) {
@@ -718,6 +700,10 @@ const filterDeals = async (req, res) => {
           model: DealCountry,
           as: "dealCountries",
           include: [{ model: Country, as: "country" }],
+        },
+        {
+          model: DealStage,
+          as: "dealStage",
         },
         {
           model: DealRegion,

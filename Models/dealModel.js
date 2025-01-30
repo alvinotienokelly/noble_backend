@@ -28,39 +28,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      sector: {
-        type: DataTypes.ENUM,
-        values: [
-          "Tech",
-          "Finance",
-          "Healthcare",
-          "Energy",
-          "Consumer Goods",
-          "Industrial",
-          "Real Estate",
-          "Telecommunications",
-          "Utilities",
-          "Materials",
-        ],
-        allowNull: false,
-      },
-      region: {
-        type: DataTypes.ENUM,
-        values: [
-          "North America",
-          "Africa",
-          "Europe",
-          "Asia",
-          "South America",
-          "Australia",
-          "Antarctica",
-        ],
-        allowNull: false,
-      },
-      deal_stage: {
-        type: DataTypes.ENUM,
-        values: ["Due Diligence", "Term Sheet", "Closed"],
-        allowNull: false,
+
+      deal_stage_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "deal_stages",
+          key: "stage_id",
+        },
       },
       status: {
         type: DataTypes.ENUM,
