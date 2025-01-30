@@ -46,9 +46,10 @@ const createDeal = async (req, res) => {
       region_ids,
       country_ids,
       retainer_amount,
-      access_fee_amount,
+      success_fee,
     } = req.body;
     const created_by = req.user.id; // Assuming the user ID is available in req.user
+    const success_fee_percentage = (success_fee / 100) * deal_size;
 
     const newDeal = await Deal.create({
       title,
@@ -68,7 +69,7 @@ const createDeal = async (req, res) => {
       project,
       model,
       retainer_amount, // Include retainer_amount
-      access_fee_amount, // Include access_fee_amount
+      success_fee_percentage, // Include access_fee_amount
     });
 
     // Loop through continent_ids and create entries in DealContinent
@@ -543,10 +544,11 @@ const updateDeal = async (req, res) => {
       region_ids, // Expecting array of region IDs
       country_ids, // Expecting array of country IDs
       retainer_amount, // Add retainer_amount
-      access_fee_amount, // Add access_fee_amount
+      success_fee, // Add access_fee_amount
     } = req.body;
     const deal = await Deal.findByPk(req.params.id);
     const id = deal.deal_id;
+    const success_fee_percentage = (success_fee / 100) * deal_size;
 
     if (!deal) {
       return res
@@ -572,7 +574,7 @@ const updateDeal = async (req, res) => {
       project,
       model,
       retainer_amount, // Include retainer_amount
-      access_fee_amount, // Include access_fee_amount
+      success_fee_percentage, // Include access_fee_amount
     });
 
     // Update DealContinent entries
