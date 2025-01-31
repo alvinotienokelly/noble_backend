@@ -5,6 +5,7 @@ const {
   getSubfoldersByParentFolderId,
   updateSubfolder,
   deleteSubfolder,
+  archiveSubfolder
 } = require("../Controllers/subfolderController");
 const authMiddleware = require("../Middlewares/authMiddleware");
 
@@ -19,5 +20,6 @@ router.get(
 );
 router.put("/:id", authMiddleware, updateSubfolder); // Add this line
 router.delete("/:id", authMiddleware, deleteSubfolder); // Add this line
+router.put("/:id/archive", authMiddleware, archiveSubfolder); // Add this line
 
 module.exports = router;

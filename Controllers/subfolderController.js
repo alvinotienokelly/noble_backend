@@ -206,10 +206,41 @@ const updateSubfolder = async (req, res) => {
   }
 };
 
+// Mark a subfolder as archived
+const archiveSubfolder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const subfolder = await Subfolder.findByPk(id);
+
+    if (!subfolder) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Subfolder not found." });
+    }
+
+    subfolder.archived = true;
+    await subfolder.save();
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "ARCHIVE_SUBFOLDER",
+      description: `Subfolder with ID ${id} archived`,
+      ip_address: req.ip,
+    });
+
+    res
+      .status(200)
+      .json({ status: true, message: "Subfolder archived successfully." });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createSubfolder,
   getSubfolderById,
   getSubfoldersByParentFolderId,
   updateSubfolder,
   deleteSubfolder,
+  archiveSubfolder,
 };

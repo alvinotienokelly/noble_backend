@@ -44,6 +44,11 @@ module.exports = (sequelize, DataTypes) => {
           key: "subfolder_id",
         },
       },
+      archived: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
     },
     { timestamps: true }
   );

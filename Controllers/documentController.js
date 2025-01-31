@@ -325,6 +325,36 @@ const deleteDocument = async (req, res) => {
   }
 };
 
+// Mark a document as archived
+const archiveDocument = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const document = await Document.findByPk(id);
+
+    if (!document) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Document not found." });
+    }
+
+    document.archived = true;
+    await document.save();
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "ARCHIVE_DOCUMENT",
+      description: `Document with ID ${id} archived`,
+      ip_address: req.ip,
+    });
+
+    res
+      .status(200)
+      .json({ status: true, message: "Document archived successfully." });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createDocument,
   getAllDocuments,
@@ -333,4 +363,6 @@ module.exports = {
   deleteDocument,
   getDocumentsByUserDeals,
   documentsFilter,
+  archiveDocument, // Add this line
+
 };

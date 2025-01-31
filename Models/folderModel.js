@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
+      archived: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
     },
     { timestamps: true }
   );

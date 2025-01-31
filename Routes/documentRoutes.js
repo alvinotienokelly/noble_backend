@@ -7,7 +7,8 @@ const {
   updateDocument,
   deleteDocument,
   getDocumentsByUserDeals,
-  documentsFilter
+  documentsFilter,
+  archiveDocument, // Add this line
 } = documentController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
@@ -22,6 +23,6 @@ router.put("/:id", authMiddleware, checkAdmin, fileUpload, updateDocument);
 router.delete("/:id", authMiddleware, checkAdmin, deleteDocument);
 router.get("/user-deals/documents", authMiddleware, getDocumentsByUserDeals);
 router.get("/filter/documents", authMiddleware, documentsFilter);
-
+router.put("/:id/archive", authMiddleware, archiveDocument); // Add this line
 
 module.exports = router;
