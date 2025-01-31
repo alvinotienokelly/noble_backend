@@ -47,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
           "Inactive",
           "Closed",
           "Closed & Reopened",
+          "Archived", // Add Archived status
         ],
         allowNull: false,
         defaultValue: "Active",
