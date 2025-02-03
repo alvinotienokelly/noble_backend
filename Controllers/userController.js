@@ -13,7 +13,8 @@ const ContactPerson = db.contact_persons;
 const Role = db.roles;
 // Assigning users to the variable User
 const User = db.users;
-
+const SocialMediaAccount = db.social_media_accounts;
+const SocialAccountType = db.social_account_types;
 // Utility function to mask email
 const maskEmail = (email) => {
   const [localPart, domain] = email.split("@");
@@ -376,6 +377,11 @@ const getProfile = async (req, res) => {
         { model: DealTypePreferences, as: "dealTypePreferences" }, // Include deal type preferences
         { model: PrimaryLocationPreferences, as: "primaryLocationPreferences" }, // Include primary location preferences
         { model: ContactPerson, as: "contactPersons" }, // Include contact persons
+        {
+          model: db.social_media_accounts,
+          as: "socialMediaAccounts",
+          include: [{ model: SocialAccountType, as: "socialAccountType" }],
+        }, // Include social media accounts with social account type
       ], // Include user preferences
     });
     if (!user) {
