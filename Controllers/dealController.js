@@ -109,7 +109,7 @@ const createDeal = async (req, res) => {
       userId: created_by,
       action: "CREATE_DEAL",
       details: `Deal ${newDeal.title} created with ID ${newDeal.deal_id}`,
-     ip_address: req.ip,
+      ip_address: req.ip,
     });
 
     res.status(201).json({ status: true, deal: newDeal });
@@ -675,6 +675,7 @@ const filterDeals = async (req, res) => {
       endDate,
       page = 1,
       limit = 10,
+      deal_type,
     } = req.query;
 
     const offset = (page - 1) * limit;
@@ -732,7 +733,9 @@ const filterDeals = async (req, res) => {
         whereClause.createdAt = { [Op.lte]: new Date(endDate) };
       }
     }
-
+    if (deal_type) {
+      whereClause.deal_type = deal_type;
+    }
     const { count: totalDeals, rows: deals } = await Deal.findAndCountAll({
       where: whereClause,
       include: [
