@@ -76,7 +76,7 @@ const expressDealInterest = async (req, res) => {
     // Send email to user
     const emailSubject = "Deal Access Invitation";
     const emailBody = `Hello,\n\nYou have been invited to access the deal "${deal.title}". Please log in to your account to view the details.\n\nBest regards,\nYour Team`;
-    await sendEmail(user_email, emailSubject, emailBody);
+    // await sendEmail(user_email, emailSubject, emailBody);
 
     res.status(200).json({ status: true, invite });
   } catch (error) {
