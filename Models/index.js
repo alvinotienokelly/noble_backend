@@ -90,6 +90,11 @@ db.social_account_types = require("./socialAccountTypeModel")(
   sequelize,
   DataTypes
 );
+db.social_media_accounts = require("./socialMediaAccountModel")(
+  sequelize,
+  DataTypes
+);
+
 db.user_reviews = require("./userReviewModel")(sequelize, DataTypes);
 db.contact_persons = require("./contactPersonModel")(sequelize, DataTypes);
 db.deal_stages = require("./dealStageModel")(sequelize, DataTypes);
@@ -131,6 +136,25 @@ db.subfolder_access_invite = require("./subfolderAccessInviteModel")(
   sequelize,
   DataTypes
 ); // Add this line
+
+// Define associations
+db.users.hasMany(db.social_media_accounts, {
+  foreignKey: "user_id",
+  as: "socialMediaAccounts",
+});
+db.social_media_accounts.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+db.social_account_types.hasMany(db.social_media_accounts, {
+  foreignKey: "social_account_type_id",
+  as: "socialMediaAccounts",
+});
+db.social_media_accounts.belongsTo(db.social_account_types, {
+  foreignKey: "social_account_type_id",
+  as: "socialAccountType",
+});
 
 // Define subfolders invite associations
 db.subfolders.hasMany(db.subfolder_access_invite, {
