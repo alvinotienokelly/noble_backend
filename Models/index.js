@@ -44,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
- "postgres://postgres:@@7389@localhost:5432/noblestride",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -144,6 +144,7 @@ db.investor_milestone_statuses = require("./investorMilestoneStatusModel")(
   sequelize,
   DataTypes
 );
+db.deal_milestones = require("./dealMilestoneModel")(sequelize, DataTypes);
 
 // Define investor_milestones associations
 db.investor_milestones.hasMany(db.investor_milestone_statuses, {
