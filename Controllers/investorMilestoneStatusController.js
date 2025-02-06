@@ -1,6 +1,9 @@
 // Controllers/investorMilestoneStatusController.js
 const db = require("../Models");
 const InvestorMilestoneStatus = db.investor_milestone_statuses;
+const InvestorMilestone = db.investor_milestones;
+const User = db.users;
+const Deal = db.deals;
 
 // Create a new investor milestone status
 const createInvestorMilestoneStatus = async (req, res) => {
@@ -13,6 +16,51 @@ const createInvestorMilestoneStatus = async (req, res) => {
       status,
     });
     res.status(201).json({ status: true, milestoneStatus });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Get all investor milestone statuses by user_id and deal_id
+const getAllInvestorMilestoneStatusesByUserAndDeal = async (req, res) => {
+  try {
+    const { user_id, deal_id } = req.params;
+
+    const milestoneStatuses = await InvestorMilestoneStatus.findAll({
+      where: {
+        user_id,
+        deal_id,
+      },
+      include: [
+        {
+          model: InvestorMilestone,
+          as: "milestone",
+          attributes: ["milestone_id", "name", "description"],
+        },
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "name", "email"],
+        },
+        {
+          model: Deal,
+          as: "deal",
+          attributes: ["deal_id", "title", "description"],
+        },
+      ],
+    });
+
+    if (!milestoneStatuses || milestoneStatuses.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "No milestone statuses found for the specified criteria.",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      milestoneStatuses,
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
@@ -31,9 +79,13 @@ const getAllInvestorMilestoneStatuses = async (req, res) => {
 // Get an investor milestone status by ID
 const getInvestorMilestoneStatusById = async (req, res) => {
   try {
-    const milestoneStatus = await InvestorMilestoneStatus.findByPk(req.params.id);
+    const milestoneStatus = await InvestorMilestoneStatus.findByPk(
+      req.params.id
+    );
     if (!milestoneStatus) {
-      return res.status(404).json({ status: false, message: "Milestone status not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Milestone status not found." });
     }
     res.status(200).json({ status: true, milestoneStatus });
   } catch (error) {
@@ -45,9 +97,13 @@ const getInvestorMilestoneStatusById = async (req, res) => {
 const updateInvestorMilestoneStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const milestoneStatus = await InvestorMilestoneStatus.findByPk(req.params.id);
+    const milestoneStatus = await InvestorMilestoneStatus.findByPk(
+      req.params.id
+    );
     if (!milestoneStatus) {
-      return res.status(404).json({ status: false, message: "Milestone status not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Milestone status not found." });
     }
     await milestoneStatus.update({ status });
     res.status(200).json({ status: true, milestoneStatus });
@@ -59,12 +115,19 @@ const updateInvestorMilestoneStatus = async (req, res) => {
 // Delete an investor milestone status
 const deleteInvestorMilestoneStatus = async (req, res) => {
   try {
-    const milestoneStatus = await InvestorMilestoneStatus.findByPk(req.params.id);
+    const milestoneStatus = await InvestorMilestoneStatus.findByPk(
+      req.params.id
+    );
     if (!milestoneStatus) {
-      return res.status(404).json({ status: false, message: "Milestone status not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Milestone status not found." });
     }
     await milestoneStatus.destroy();
-    res.status(200).json({ status: true, message: "Milestone status deleted successfully." });
+    res.status(200).json({
+      status: true,
+      message: "Milestone status deleted successfully.",
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
@@ -76,4 +139,5 @@ module.exports = {
   getInvestorMilestoneStatusById,
   updateInvestorMilestoneStatus,
   deleteInvestorMilestoneStatus,
+  getAllInvestorMilestoneStatusesByUserAndDeal,
 };

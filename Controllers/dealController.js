@@ -21,6 +21,7 @@ const Region = db.regions;
 const DealStage = db.deal_stages;
 const Task = db.tasks;
 const { createAuditLog } = require("./auditLogService");
+// const DealAccessInvite = db.deal_access_invite;
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -109,7 +110,7 @@ const createDeal = async (req, res) => {
       userId: created_by,
       action: "CREATE_DEAL",
       details: `Deal ${newDeal.title} created with ID ${newDeal.deal_id}`,
-     ip_address: req.ip,
+      ip_address: req.ip,
     });
 
     res.status(201).json({ status: true, deal: newDeal });
@@ -472,6 +473,17 @@ const getDealById = async (req, res) => {
     const deal = await Deal.findOne({
       where: { deal_id: req.params.id },
       include: [
+        {
+          model: DealAccessInvite,
+          as: "dealAccessInvites",
+          include: [
+            {
+              model: User,
+              as: "investor",
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
         {
@@ -675,6 +687,7 @@ const filterDeals = async (req, res) => {
       endDate,
       page = 1,
       limit = 10,
+      deal_type,
     } = req.query;
 
     const offset = (page - 1) * limit;
@@ -732,7 +745,9 @@ const filterDeals = async (req, res) => {
         whereClause.createdAt = { [Op.lte]: new Date(endDate) };
       }
     }
-
+    if (deal_type) {
+      whereClause.deal_type = deal_type;
+    }
     const { count: totalDeals, rows: deals } = await Deal.findAndCountAll({
       where: whereClause,
       include: [

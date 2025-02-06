@@ -53,6 +53,7 @@ const stageCardRoutes = require("./Routes/stageCardRoutes");
 const subfolderAccessInviteRoutes = require("./Routes/subfolderAccessInviteRoutes");
 const socialMediaAccountRoutes = require("./Routes/socialMediaAccountRoutes");
 const investorMilestoneRoutes = require("./Routes/investorMilestoneRoutes");
+const investorMilestoneStatusRoutes = require("./Routes/investorMilestoneStatusRoutes");
 
 require("dotenv").config();
 
@@ -115,7 +116,7 @@ app.use("/api/stage-cards", stageCardRoutes);
 app.use("/api/subfolder-access-invites", subfolderAccessInviteRoutes);
 app.use("/api/social-media-accounts", socialMediaAccountRoutes);
 app.use("/api/investor-milestones", investorMilestoneRoutes);
-
+app.use("/api/investor-milestone-statuses", investorMilestoneStatusRoutes);
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
   exec(

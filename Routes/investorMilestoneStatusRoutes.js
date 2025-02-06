@@ -7,6 +7,7 @@ const {
   getInvestorMilestoneStatusById,
   updateInvestorMilestoneStatus,
   deleteInvestorMilestoneStatus,
+  getAllInvestorMilestoneStatusesByUserAndDeal,
 } = investorMilestoneStatusController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 
@@ -17,5 +18,10 @@ router.get("/", authMiddleware, getAllInvestorMilestoneStatuses);
 router.get("/:id", authMiddleware, getInvestorMilestoneStatusById);
 router.put("/:id", authMiddleware, updateInvestorMilestoneStatus);
 router.delete("/:id", authMiddleware, deleteInvestorMilestoneStatus);
+router.get(
+  "/user/:user_id/deal/:deal_id",
+  authMiddleware,
+  getAllInvestorMilestoneStatusesByUserAndDeal
+); // Add this line
 
 module.exports = router;
