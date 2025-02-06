@@ -136,6 +136,10 @@ db.subfolder_access_invite = require("./subfolderAccessInviteModel")(
   sequelize,
   DataTypes
 ); // Add this line
+db.investor_milestones = require("./investorMilestoneModel")(
+  sequelize,
+  DataTypes
+);
 
 // Define associations
 db.users.hasMany(db.social_media_accounts, {
