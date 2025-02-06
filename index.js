@@ -55,7 +55,7 @@ const socialMediaAccountRoutes = require("./Routes/socialMediaAccountRoutes");
 const investorMilestoneRoutes = require("./Routes/investorMilestoneRoutes");
 const investorMilestoneStatusRoutes = require("./Routes/investorMilestoneStatusRoutes");
 const dealMilestoneRoutes = require("./Routes/dealMilestoneRoutes");
-
+const dealMilestoneStatusRoutes = require("./Routes/dealMilestoneStatusRoutes");
 
 
 require("dotenv").config();
@@ -121,6 +121,8 @@ app.use("/api/social-media-accounts", socialMediaAccountRoutes);
 app.use("/api/investor-milestones", investorMilestoneRoutes);
 app.use("/api/investor-milestone-statuses", investorMilestoneStatusRoutes);
 app.use("/api/deal-milestones", dealMilestoneRoutes);
+app.use("/api/deal-milestone-statuses", dealMilestoneStatusRoutes);
+
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
