@@ -54,6 +54,9 @@ const subfolderAccessInviteRoutes = require("./Routes/subfolderAccessInviteRoute
 const socialMediaAccountRoutes = require("./Routes/socialMediaAccountRoutes");
 const investorMilestoneRoutes = require("./Routes/investorMilestoneRoutes");
 const investorMilestoneStatusRoutes = require("./Routes/investorMilestoneStatusRoutes");
+const dealMilestoneRoutes = require("./Routes/dealMilestoneRoutes");
+
+
 
 require("dotenv").config();
 
@@ -117,6 +120,8 @@ app.use("/api/subfolder-access-invites", subfolderAccessInviteRoutes);
 app.use("/api/social-media-accounts", socialMediaAccountRoutes);
 app.use("/api/investor-milestones", investorMilestoneRoutes);
 app.use("/api/investor-milestone-statuses", investorMilestoneStatusRoutes);
+app.use("/api/deal-milestones", dealMilestoneRoutes);
+
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
   exec(
