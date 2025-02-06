@@ -21,6 +21,7 @@ const Region = db.regions;
 const DealStage = db.deal_stages;
 const Task = db.tasks;
 const { createAuditLog } = require("./auditLogService");
+// const DealAccessInvite = db.deal_access_invite;
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -472,6 +473,17 @@ const getDealById = async (req, res) => {
     const deal = await Deal.findOne({
       where: { deal_id: req.params.id },
       include: [
+        {
+          model: DealAccessInvite,
+          as: "dealAccessInvites",
+          include: [
+            {
+              model: User,
+              as: "investor",
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
         { model: User, as: "createdBy" },
         { model: User, as: "targetCompany" },
         {
