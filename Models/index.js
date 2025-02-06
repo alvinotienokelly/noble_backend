@@ -140,8 +140,40 @@ db.investor_milestones = require("./investorMilestoneModel")(
   sequelize,
   DataTypes
 );
+db.investor_milestone_statuses = require("./investorMilestoneStatusModel")(
+  sequelize,
+  DataTypes
+);
 
-// Define associations
+// Define investor_milestones associations
+db.investor_milestones.hasMany(db.investor_milestone_statuses, {
+  foreignKey: "investor_milestone_id",
+  as: "milestoneStatuses",
+});
+db.investor_milestone_statuses.belongsTo(db.investor_milestones, {
+  foreignKey: "investor_milestone_id",
+  as: "milestone",
+});
+
+db.users.hasMany(db.investor_milestone_statuses, {
+  foreignKey: "user_id",
+  as: "userMilestoneStatuses",
+});
+db.investor_milestone_statuses.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+db.deals.hasMany(db.investor_milestone_statuses, {
+  foreignKey: "deal_id",
+  as: "dealMilestoneStatuses",
+});
+db.investor_milestone_statuses.belongsTo(db.deals, {
+  foreignKey: "deal_id",
+  as: "deal",
+});
+
+// Define social_media_account associations
 db.users.hasMany(db.social_media_accounts, {
   foreignKey: "user_id",
   as: "socialMediaAccounts",
