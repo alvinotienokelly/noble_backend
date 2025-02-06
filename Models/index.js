@@ -145,6 +145,29 @@ db.investor_milestone_statuses = require("./investorMilestoneStatusModel")(
   DataTypes
 );
 db.deal_milestones = require("./dealMilestoneModel")(sequelize, DataTypes);
+db.deal_milestone_statuses = require("./dealMilestoneStatusModel")(
+  sequelize,
+  DataTypes
+);
+
+// Define associations deal_milestone_statuses
+db.deal_milestones.hasMany(db.deal_milestone_statuses, {
+  foreignKey: "deal_milestone_id",
+  as: "milestoneStatuses",
+});
+db.deal_milestone_statuses.belongsTo(db.deal_milestones, {
+  foreignKey: "deal_milestone_id",
+  as: "milestone",
+});
+
+db.deals.hasMany(db.deal_milestone_statuses, {
+  foreignKey: "deal_id",
+  as: "dealMilestoneStatus",
+});
+db.deal_milestone_statuses.belongsTo(db.deals, {
+  foreignKey: "deal_id",
+  as: "deal",
+});
 
 // Define investor_milestones associations
 db.investor_milestones.hasMany(db.investor_milestone_statuses, {
