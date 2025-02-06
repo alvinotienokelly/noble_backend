@@ -5,6 +5,8 @@ const User = db.users;
 const Deal = db.deals;
 const { sendEmail } = require("../Middlewares/emailService");
 const { createAuditLog } = require("./auditLogService");
+const InvestorMilestoneStatus = db.investor_milestone_statuses;
+const InvestorMilestone = db.investor_milestones;
 
 // Function to send deal access invite
 const sendDealAccessInvite = async (req, res) => {
@@ -62,10 +64,33 @@ const expressDealInterest = async (req, res) => {
         .json({ status: false, message: "Deal not found." });
     }
 
+    const existingInvite = await DealAccessInvite.findOne({
+      where: { investor_id, deal_id },
+    });
+
+    if (existingInvite) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invite already exists." });
+    }
+
     const invite = await DealAccessInvite.create({
       investor_id,
       deal_id,
     });
+
+    // Fetch all InvestorMilestones
+    const investorMilestones = await InvestorMilestone.findAll();
+
+    // Loop through all InvestorMilestones and create InvestorMilestoneStatus records
+    for (const milestone of investorMilestones) {
+      await InvestorMilestoneStatus.create({
+        investor_milestone_id: milestone.milestone_id,
+        user_id: investor_id,
+        deal_id: deal_id,
+        status: "Pending",
+      });
+    }
 
     await createAuditLog({
       userId: req.user.id,
@@ -76,7 +101,7 @@ const expressDealInterest = async (req, res) => {
     // Send email to user
     const emailSubject = "Deal Access Invitation";
     const emailBody = `Hello,\n\nYou have been invited to access the deal "${deal.title}". Please log in to your account to view the details.\n\nBest regards,\nYour Team`;
-    await sendEmail(user_email, emailSubject, emailBody);
+    // await sendEmail(user_email, emailSubject, emailBody);
 
     res.status(200).json({ status: true, invite });
   } catch (error) {
