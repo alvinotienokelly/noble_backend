@@ -4,6 +4,7 @@ const User = db.users;
 const Document = db.documents;
 const Subfolder = db.subfolders;
 const { createAuditLog } = require("./auditLogService");
+const { Op } = require("sequelize");
 
 const createFolder = async (req, res) => {
   try {
@@ -138,7 +139,9 @@ const archiveFolder = async (req, res) => {
     const folder = await Folder.findByPk(id);
 
     if (!folder) {
-      return res.status(404).json({ status: false, message: "Folder not found." });
+      return res
+        .status(404)
+        .json({ status: false, message: "Folder not found." });
     }
 
     folder.archived = true;
@@ -151,7 +154,92 @@ const archiveFolder = async (req, res) => {
       ip_address: req.ip,
     });
 
-    res.status(200).json({ status: true, message: "Folder archived successfully." });
+    res
+      .status(200)
+      .json({ status: true, message: "Folder archived successfully." });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Filter folders based on various criteria
+const filterFolders = async (req, res) => {
+  try {
+    const {
+      name,
+      created_by,
+      created_for,
+      archived,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const whereClause = {};
+
+    if (name) {
+      whereClause.name = { [Op.iLike]: `%${name}%` }; // Case-insensitive search
+    }
+
+    if (created_by) {
+      whereClause.created_by = created_by;
+    }
+
+    if (created_for) {
+      whereClause.created_for = created_for;
+    }
+
+    if (archived !== undefined) {
+      whereClause.archived = archived === "true";
+    }
+
+    if (startDate) {
+      whereClause.createdAt = { [Op.gte]: new Date(startDate) };
+    }
+
+    if (endDate) {
+      if (whereClause.createdAt) {
+        whereClause.createdAt[Op.lte] = new Date(endDate);
+      } else {
+        whereClause.createdAt = { [Op.lte]: new Date(endDate) };
+      }
+    }
+
+    const { count: totalFolders, rows: folders } = await Folder.findAndCountAll(
+      {
+        where: whereClause,
+        include: [
+          { model: User, as: "creator", attributes: ["id", "name", "email"] },
+          {
+            model: User,
+            as: "createdFor",
+            attributes: ["id", "name", "email"],
+          },
+        ],
+        offset,
+        limit: parseInt(limit),
+      }
+    );
+
+    const totalPages = Math.ceil(totalFolders / limit);
+
+    if (!folders || folders.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No folders found for the specified criteria.",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      totalFolders,
+      totalPages,
+      currentPage: parseInt(page),
+      folders,
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
@@ -163,4 +251,5 @@ module.exports = {
   getAllFolders,
   getFolderById,
   archiveFolder,
+  filterFolders, // Add this line
 };
