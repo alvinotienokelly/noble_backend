@@ -108,7 +108,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       maximum_selling_stake: {
         type: DataTypes.ENUM,
-        values: ["Minority", "Majority"],
+        values: ["Minority", "Majority", "Open"],
         allowNull: true,
       },
       teaser: {
