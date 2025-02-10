@@ -85,6 +85,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: false,
       },
+      document_type_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "document_types",
+          key: "type_id",
+        },
+      },
     },
     { timestamps: true }
   );
