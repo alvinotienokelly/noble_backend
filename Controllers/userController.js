@@ -85,6 +85,33 @@ const getUsersByType = async (req, res) => {
   }
 };
 
+// Update user status only
+const updateUserStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Find the user by ID
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res
+        .status(200)
+        .json({ status: false, message: "User not found." });
+    }
+
+    // Update the status field
+    await user.update({ status });
+
+    res.status(200).json({
+      status: true,
+      message: "User status updated successfully.",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 //forgot password function
 const forgotPassword = async (req, res) => {
   try {
@@ -440,4 +467,5 @@ module.exports = {
   getUserById,
   getProfile,
   getEmployees,
+  updateUserStatus,
 };
