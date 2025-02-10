@@ -13,6 +13,7 @@ const {
   getUserById,
   getProfile,
   getEmployees,
+  updateUserStatus, // Add this line
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -49,7 +50,7 @@ router.post("/reset-password", resetPassword);
 router.post("/bulk-upload", authMiddleware, bulkUploadUsers);
 router.get("/user/:id", authMiddleware, getUserById); // Add this line
 router.get("/profile", authMiddleware, getProfile); // Add this line
-
+router.put("/:id/status", authMiddleware, updateUserStatus); // Add this line
 router.get("/employees", authMiddleware, getEmployees); // Add this line
 
 module.exports = router;

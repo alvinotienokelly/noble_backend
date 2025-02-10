@@ -48,6 +48,11 @@ module.exports = (sequelize, DataTypes) => {
           key: "role_id",
         },
       },
+      status: {
+        type: DataTypes.ENUM,
+        values: ["On Hold", "Open", "Closed", "Archived"], // Add status field
+        defaultValue: "Open",
+      },
     },
     { timestamps: true }
   );
