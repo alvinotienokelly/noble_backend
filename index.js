@@ -56,6 +56,7 @@ const investorMilestoneRoutes = require("./Routes/investorMilestoneRoutes");
 const investorMilestoneStatusRoutes = require("./Routes/investorMilestoneStatusRoutes");
 const dealMilestoneRoutes = require("./Routes/dealMilestoneRoutes");
 const dealMilestoneStatusRoutes = require("./Routes/dealMilestoneStatusRoutes");
+const documentTypeRoutes = require("./Routes/documentTypeRoutes");
 
 
 require("dotenv").config();
@@ -122,6 +123,7 @@ app.use("/api/investor-milestones", investorMilestoneRoutes);
 app.use("/api/investor-milestone-statuses", investorMilestoneStatusRoutes);
 app.use("/api/deal-milestones", dealMilestoneRoutes);
 app.use("/api/deal-milestone-statuses", dealMilestoneStatusRoutes);
+app.use("/api/document-types", documentTypeRoutes);
 
 
 // Route to run the seeder
