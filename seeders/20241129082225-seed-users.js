@@ -166,6 +166,7 @@ module.exports = {
       kyc_status: "Verified",
       preference_sector: JSON.stringify(["Tech", "Finance"]),
       preference_region: JSON.stringify(["North America", "Europe"]),
+      role_id: "955abb93-8eca-402b-97b4-b5138c823cdf",
       password: hashedPassword,
       role: "Target Company",
       createdAt: new Date(),
