@@ -5,13 +5,15 @@ const {
   getSubfoldersByParentFolderId,
   updateSubfolder,
   deleteSubfolder,
-  archiveSubfolder
+  archiveSubfolder,
+  filterSubfolders,
 } = require("../Controllers/subfolderController");
 const authMiddleware = require("../Middlewares/authMiddleware");
 
 const router = express.Router();
 
 router.post("/", authMiddleware, createSubfolder);
+router.get("/filter", authMiddleware, filterSubfolders); // Add this line
 router.get("/:id", authMiddleware, getSubfolderById);
 router.get(
   "/parent/:parent_folder_id",
