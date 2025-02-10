@@ -10,12 +10,13 @@ const {
   createEmbeddedSigningUrl,
 } = require("../Middlewares/docusignService");
 const logger = require("../Middlewares/logger");
+const DocumentType = db.document_types;
 
 const { createAuditLog } = require("./auditLogService");
 
 const createDocument = async (req, res) => {
   try {
-    const { folder_id, subfolder_id } = req.body;
+    const { folder_id, subfolder_id, document_type_id } = req.body;
     const uploaded_by = req.user.id;
     req.body.uploaded_by = uploaded_by;
     const { originalname, path } = req.file;
@@ -47,12 +48,21 @@ const createDocument = async (req, res) => {
       }
     }
 
+    // Check if the document type exists
+    const documentType = await DocumentType.findByPk(document_type_id);
+    if (!documentType) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Document type not found." });
+    }
+
     const document = await Document.create({
       deal_id: req.body.deal_id,
       uploaded_by: uploaded_by,
       file_name: originalname,
       file_path: path,
       folder_id: folder_id,
+      document_type_id: document_type_id,
       subfolder_id: subfolder_id,
       requires_signature: req.body.requires_signature || false,
     });
@@ -255,7 +265,7 @@ const getDocumentById = async (req, res) => {
 
 const updateDocument = async (req, res) => {
   try {
-    const { folder_id, subfolder_id } = req.body;
+    const { folder_id, subfolder_id, document_type_id } = req.body;
     const uploaded_by = req.user.id;
     req.body.uploaded_by = uploaded_by;
 
@@ -266,6 +276,13 @@ const updateDocument = async (req, res) => {
         .json({ status: false, message: "Document not found." });
     }
 
+    // Check if the document type exists
+    const documentType = await DocumentType.findByPk(document_type_id);
+    if (!documentType) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Document type not found." });
+    }
     // Check if the folder exists
     if (folder_id) {
       const folder = await Folder.findByPk(folder_id);
@@ -364,5 +381,4 @@ module.exports = {
   getDocumentsByUserDeals,
   documentsFilter,
   archiveDocument, // Add this line
-
 };
