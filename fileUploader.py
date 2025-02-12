@@ -26,7 +26,7 @@ def extract_data(file_path):
 
         required_columns = [
             "project", "ticket_size", "status", "deal_type", "sector",
-            "description", "maximum_selling_stake", "deal_lead", "teaser",
+            "description", "maximum_selling_stake", "teaser",
             "model"
         ]
 
@@ -37,10 +37,14 @@ def extract_data(file_path):
             for item in extracted_data:
                 item["title"] = item["description"][:100]  # First 100 letters of description
                 item["region"] = "Africa"
+                item["ticket_size"] = round(item["ticket_size"])
                 item["deal_stage"] = "Due Diligence"
                 item["key_investors"] = "Financiers"
                 item["deal_size"] = 14.0
-                item["target_company_id"] = 1
+                item["target_company_id"] = 3
+                item["deal_lead"] = 3
+                item["retainer_amount"] = 0
+                item["success_fee"] = 0
 
             return json.dumps(extracted_data, indent=4)
         else:
