@@ -10,6 +10,7 @@ const {
   deleteInvestorMilestoneStatus,
   getAllInvestorMilestoneStatusesByUserAndDeal,
   getAllInvestorMilestoneStatusesByUser,
+  markInvestorMilestoneStatusAsPending,
 } = investorMilestoneStatusController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 
