@@ -22,6 +22,11 @@ router.put(
   authMiddleware,
   markInvestorMilestoneStatusAsCompleted
 ); // Add this line
+router.put(
+  "/:id/pending",
+  authMiddleware,
+  markInvestorMilestoneStatusAsPending
+); // Add this line
 
 router.get("/user", authMiddleware, getAllInvestorMilestoneStatusesByUser); // Add this line
 

@@ -174,6 +174,24 @@ const markInvestorMilestoneStatusAsCompleted = async (req, res) => {
   }
 };
 
+// Mark an investor milestone status as pending
+const markInvestorMilestoneStatusAsPending = async (req, res) => {
+  try {
+    const milestoneStatus = await InvestorMilestoneStatus.findByPk(
+      req.params.id
+    );
+    if (!milestoneStatus) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Milestone status not found." });
+    }
+    await milestoneStatus.update({ status: "Pending" });
+    res.status(200).json({ status: true, milestoneStatus });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 // Delete an investor milestone status
 const deleteInvestorMilestoneStatus = async (req, res) => {
   try {
@@ -204,4 +222,5 @@ module.exports = {
   getAllInvestorMilestoneStatusesByUserAndDeal,
   getAllInvestorMilestoneStatusesByUser,
   markInvestorMilestoneStatusAsCompleted,
+  markInvestorMilestoneStatusAsPending,
 };
