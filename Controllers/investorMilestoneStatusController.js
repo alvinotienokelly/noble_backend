@@ -66,6 +66,50 @@ const getAllInvestorMilestoneStatusesByUserAndDeal = async (req, res) => {
   }
 };
 
+// Get all investor milestone statuses by user_id and deal_id
+const getAllInvestorMilestoneStatusesByUser = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+
+    const milestoneStatuses = await InvestorMilestoneStatus.findAll({
+      where: {
+        user_id,
+      },
+      include: [
+        {
+          model: InvestorMilestone,
+          as: "milestone",
+          attributes: ["milestone_id", "name", "description"],
+        },
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "name", "email"],
+        },
+        {
+          model: Deal,
+          as: "deal",
+          attributes: ["deal_id", "title", "description"],
+        },
+      ],
+    });
+
+    if (!milestoneStatuses || milestoneStatuses.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "No milestone statuses found for the specified criteria.",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      milestoneStatuses,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 // Get all investor milestone statuses
 const getAllInvestorMilestoneStatuses = async (req, res) => {
   try {
@@ -140,4 +184,5 @@ module.exports = {
   updateInvestorMilestoneStatus,
   deleteInvestorMilestoneStatus,
   getAllInvestorMilestoneStatusesByUserAndDeal,
+  getAllInvestorMilestoneStatusesByUser
 };
