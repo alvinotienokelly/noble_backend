@@ -89,7 +89,7 @@ const getAllInvestorMilestoneStatusesByUser = async (req, res) => {
         {
           model: Deal,
           as: "deal",
-          attributes: ["deal_id", "title", "description"],
+          attributes: ["deal_id", "project", "description"],
         },
       ],
     });
