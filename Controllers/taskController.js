@@ -139,7 +139,7 @@ const getTasksByUserId = async (req, res) => {
     const offset = (page - 1) * limit;
 
     const { count: totalTasks, rows: tasks } = await Task.findAndCountAll({
-      where: { assigned_to: req.params.userId },
+      where: { assigned_to: req.user.id },
       include: [
         { model: User, as: "assignee" },
         { model: User, as: "creator" },
@@ -351,7 +351,8 @@ const sendTaskReminders = async () => {
     await createAuditLog({
       userId: null, // System user or null if no user context
       action: "SEND_TASK_REMINDERS",
-      description: "Sent task reminders for tasks due within the next 24 hours.",
+      description:
+        "Sent task reminders for tasks due within the next 24 hours.",
       ip_address: null, // No IP address in this context
     });
 
