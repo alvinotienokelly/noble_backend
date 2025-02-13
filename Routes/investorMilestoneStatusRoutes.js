@@ -26,7 +26,7 @@ router.get(
 ); // Add this line
 
 router.get(
-  "/user/:user_id",
+  "/user",
   authMiddleware,
   getAllInvestorMilestoneStatusesByUser
 ); // Add this line
