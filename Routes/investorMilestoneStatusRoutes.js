@@ -6,6 +6,7 @@ const {
   getAllInvestorMilestoneStatuses,
   getInvestorMilestoneStatusById,
   updateInvestorMilestoneStatus,
+  markInvestorMilestoneStatusAsCompleted, // Add this line
   deleteInvestorMilestoneStatus,
   getAllInvestorMilestoneStatusesByUserAndDeal,
   getAllInvestorMilestoneStatusesByUser,
@@ -16,6 +17,11 @@ const router = express.Router();
 
 router.post("/", authMiddleware, createInvestorMilestoneStatus);
 router.get("/", authMiddleware, getAllInvestorMilestoneStatuses);
+router.put(
+  "/:id/complete",
+  authMiddleware,
+  markInvestorMilestoneStatusAsCompleted
+); // Add this line
 
 router.get("/user", authMiddleware, getAllInvestorMilestoneStatusesByUser); // Add this line
 
