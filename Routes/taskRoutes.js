@@ -21,9 +21,9 @@ const router = express.Router();
 
 router.post("/", authMiddleware, createTask);
 router.get("/", authMiddleware, getAllTasks);
+router.get("/user/:userId", authMiddleware, getTasksByUserId);
 router.get("/:id", authMiddleware, getTaskById);
 router.put("/:id", authMiddleware, updateTask);
-router.get("/user/:userId", authMiddleware, getTasksByUserId);
 router.get("/deal/:dealId", authMiddleware, getTaskByDealId);
 router.get("/date/due-date-range", authMiddleware, getTasksByDueDateRange);
 router.delete("/:id", authMiddleware, deleteTask);
