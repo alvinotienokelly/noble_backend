@@ -907,6 +907,65 @@ const getMilestonesAndTasksByDealAndStage = async (req, res) => {
   }
 };
 
+// Function to get all deals in which an investor has a DealAccessInvite that is Accepted
+const getAcceptedDealsForInvestor = async (req, res) => {
+  try {
+    const investor_id = req.user.id;
+
+    const invites = await DealAccessInvite.findAll({
+      where: { investor_id, status: "Accepted" },
+      include: [
+        {
+          model: Deal,
+          as: "deal",
+          include: [
+            { model: User, as: "createdBy" },
+            { model: User, as: "targetCompany" },
+            {
+              model: DealCountry,
+              as: "dealCountries",
+              include: [{ model: Country, as: "country" }],
+            },
+            {
+              model: DealRegion,
+              as: "dealRegions",
+              include: [{ model: Region, as: "region" }],
+            },
+            {
+              model: DealContinent,
+              as: "dealContinents",
+              include: ["continent"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!invites || invites.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No accepted deals found for the specified investor.",
+      });
+    }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_ACCEPTED_DEALS_FOR_INVESTOR",
+      details: `Fetched accepted deals for investor ${investor_id}`,
+      ip_address: req.ip,
+    });
+
+    const deals = invites.map((invite) => invite.deal);
+
+    res.status(200).json({
+      status: true,
+      deals,
+    });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createDeal,
   getAllDeals,
@@ -918,4 +977,5 @@ module.exports = {
   filterDeals,
   recommendDeals,
   getMilestonesAndTasksByDealAndStage, // Add this line
+  getAcceptedDealsForInvestor, // Add this line
 };
