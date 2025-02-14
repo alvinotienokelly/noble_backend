@@ -482,6 +482,33 @@ const markUserAsArchived = async (req, res) => {
   }
 };
 
+// Function to mark a user status as Archived
+const markUserAsOpen = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const user = await User.findByPk(user_id);
+
+    if (!user) {
+      return res
+        .status(200)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ status: "Open" });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "MARK_USER_AS_ARCHIVED",
+      details: `Marked user with ID ${user_id} as Archived`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -496,4 +523,5 @@ module.exports = {
   getEmployees,
   updateUserStatus,
   markUserAsArchived,
+  markUserAsOpen,
 };
