@@ -1113,7 +1113,7 @@ const markDealAsArchived = async (req, res) => {
         .json({ status: false, message: "Deal not found." });
     }
 
-    await deal.update({ status: "Active" });
+    await deal.update({ status: "Archived" });
 
     await createAuditLog({
       userId: req.user.id,
