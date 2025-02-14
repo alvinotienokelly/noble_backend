@@ -21,6 +21,7 @@ router.post("/", authMiddleware, checkAdmin, createDeal);
 router.get("/", authMiddleware, getAllDeals);
 router.get("/getTargetCompanyDeals", authMiddleware, getTargetCompanyDeals);
 router.get("/accepted-deals", authMiddleware, getAcceptedDealsForInvestor); // Add this line
+router.put("/:id/mark-active", authMiddleware, markDealAsActive); // Add this line
 router.get("/:id", authMiddleware, getDealById);
 router.put("/:id", authMiddleware, checkAdmin, updateDeal);
 router.delete("/:id", authMiddleware, deleteDeal);
