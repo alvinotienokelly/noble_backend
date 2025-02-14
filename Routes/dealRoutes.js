@@ -15,6 +15,7 @@ const {
   markDealAsPending,
   markDealOnhold,
   markDealClosed,
+  markDealClosedAndOpened,
 } = dealController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
@@ -29,6 +30,7 @@ router.put("/:id/mark-active", authMiddleware, markDealAsActive); // Add this li
 router.put("/:id/mark-pending", authMiddleware, markDealAsPending); // Add this line
 router.put("/:id/on-hold", authMiddleware, markDealOnhold); // Add this line
 router.put("/:id/mark-closed", authMiddleware, markDealClosed); // Add this line
+router.put("/:id/mark-closed-opened", authMiddleware, markDealClosedAndOpened); // Add this line
 router.get("/:id", authMiddleware, getDealById);
 router.put("/:id", authMiddleware, checkAdmin, updateDeal);
 router.delete("/:id", authMiddleware, deleteDeal);
