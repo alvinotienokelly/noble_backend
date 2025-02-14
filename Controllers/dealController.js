@@ -1020,6 +1020,33 @@ const markDealAsPending = async (req, res) => {
   }
 };
 
+// Function to mark a deal status as Pending
+const markDealOnhold = async (req, res) => {
+  try {
+    const deal_id = req.params.id;
+    const deal = await Deal.findByPk(deal_id);
+
+    if (!deal) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Deal not found." });
+    }
+
+    await deal.update({ status: "On Hold" });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "MARK_DEAL_AS_PENDING",
+      details: `Marked deal with ID ${deal_id} as Pending`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, deal });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createDeal,
   getAllDeals,
@@ -1034,4 +1061,5 @@ module.exports = {
   getAcceptedDealsForInvestor, // Add this line
   markDealAsActive,
   markDealAsPending,
+  markDealOnhold
 };
