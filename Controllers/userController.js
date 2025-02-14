@@ -10,6 +10,7 @@ const DealTypePreferences = db.deal_type_preferences;
 const PrimaryLocationPreferences = db.primary_location_preferences;
 const Sector = db.sectors;
 const ContactPerson = db.contact_persons;
+const { createAuditLog } = require("./auditLogService");
 const Role = db.roles;
 // Assigning users to the variable User
 const User = db.users;
