@@ -11,6 +11,8 @@ const {
   getMilestonesAndTasksByDealAndStage, // Add this line
   filterDeals,
   getAcceptedDealsForInvestor,
+  markDealAsActive,
+  markDealAsPending
 } = dealController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
@@ -22,6 +24,7 @@ router.get("/", authMiddleware, getAllDeals);
 router.get("/getTargetCompanyDeals", authMiddleware, getTargetCompanyDeals);
 router.get("/accepted-deals", authMiddleware, getAcceptedDealsForInvestor); // Add this line
 router.put("/:id/mark-active", authMiddleware, markDealAsActive); // Add this line
+router.put("/:id/mark-pending", authMiddleware, markDealAsPending); // Add this line
 router.get("/:id", authMiddleware, getDealById);
 router.put("/:id", authMiddleware, checkAdmin, updateDeal);
 router.delete("/:id", authMiddleware, deleteDeal);
