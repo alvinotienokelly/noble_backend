@@ -149,6 +149,10 @@ db.deal_milestone_statuses = require("./dealMilestoneStatusModel")(
   sequelize,
   DataTypes
 );
+db.sector_preferences = require("./sectorPreferenceModel")(
+  sequelize,
+  DataTypes
+);
 db.document_types = require("./documentTypeModel")(sequelize, DataTypes);
 // Define associations
 db.documents.belongsTo(db.document_types, {
@@ -159,7 +163,23 @@ db.document_types.hasMany(db.documents, {
   foreignKey: "document_type_id",
   as: "documents",
 });
+db.users.hasMany(db.sector_preferences, {
+  foreignKey: "user_id",
+  as: "sectorPreferences",
+});
+db.sector_preferences.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
 
+db.sectors.hasMany(db.sector_preferences, {
+  foreignKey: "sector_id",
+  as: "sectorPreferences",
+});
+db.sector_preferences.belongsTo(db.sectors, {
+  foreignKey: "sector_id",
+  as: "sector",
+});
 // Define associations deal_milestone_statuses
 db.deal_milestones.hasMany(db.deal_milestone_statuses, {
   foreignKey: "deal_milestone_id",
