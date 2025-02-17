@@ -17,6 +17,8 @@ const SectorPreference = db.sector_preferences;
 const SubSector = db.subsectors;
 const SubSectorPreference = db.sub_sector_preferences;
 const User = db.users;
+const Continent = db.continents;
+const ContinentPreference = db.continent_preferences;
 const SocialMediaAccount = db.social_media_accounts;
 const SocialAccountType = db.social_account_types;
 // Utility function to mask email
@@ -299,6 +301,18 @@ const getUserById = async (req, res) => {
           model: UserTicketPreferences,
           as: "ticketPreferences",
           attributes: ["preference_id", "ticket_size_min", "ticket_size_max"],
+        },
+        {
+          model: ContinentPreference,
+          as: "continentPreferences",
+          attributes: ["preference_id", "continent_id"],
+          include: [
+            {
+              model: Continent,
+              as: "continent",
+              attributes: ["continent_id", "name"],
+            },
+          ],
         },
         {
           model: SectorPreference,
