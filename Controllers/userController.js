@@ -292,6 +292,11 @@ const getUserById = async (req, res) => {
           as: "contactPersons",
           attributes: ["contact_id", "name", "email", "phone", "position"],
         },
+        {
+          model: UserTicketPreferences,
+          as: "ticketPreferences",
+          attributes: ["preference_id", "ticket_size_min", "ticket_size_max"],
+        },
       ],
     });
 
