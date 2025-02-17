@@ -166,7 +166,7 @@ db.region_preferences = require("./regionPreferenceModel")(
   sequelize,
   DataTypes
 );
-db.country_preferences = require("./countryPreferenceModel")(
+db.country_preferences = require("./CountryPreferenceModel")(
   sequelize,
   DataTypes
 );
