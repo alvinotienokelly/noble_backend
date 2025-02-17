@@ -765,7 +765,317 @@ const updateDescription = async (req, res) => {
   }
 };
 
+// Function to update total investments
+const updateAddressableMarket = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { addressable_market } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ addressable_market });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_ADDRESSABLE_MARKET_INVESTMENTS",
+      details: `Updated total investments for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Function to update total investments
+const updateCurrentMarket = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { current_market } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ current_market });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_CURRENT_MARKET_INVESTMENTS",
+      details: `Updated total investments for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateTotalAssets = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { total_assets } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ total_assets });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_CURRENT_MARKET_INVESTMENTS",
+      details: `Updated total investments for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateEbiTda = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { ebitda } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ ebitda });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_EBITDA_INVESTMENTS",
+      details: `Updated total investments for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateGrossMargin = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { gross_margin } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ gross_margin });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_EBITDA_INVESTMENTS",
+      details: `Updated total investments for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateCac = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { cac_payback_period } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ cac_payback_period });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_CAC_PAYBACK_PERIOD",
+      details: `Updated   for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateTam = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { tam } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ tam });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_TAM",
+      details: `Updated   for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateSam = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { sam } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ sam });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_SAM",
+      details: `Updated   for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateSom = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { som } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ som });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_SOM",
+      details: `Updated   for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateYearFounded = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { year_founded } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ year_founded });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_YEAR_FOUNDED",
+      details: `Updated   for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+const updateLocation = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { location } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ location });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_LOCATION",
+      details: `Updated   for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
+  updateAddressableMarket,
+  updateCurrentMarket,
+  updateTam,
+  updateSam,
+  updateLocation,
+  updateYearFounded,
+  updateSom,
+  updateCac,
+  updateEbiTda,
+  updateTotalAssets,
+  updateGrossMargin,
   signup,
   login,
   verifyCode,

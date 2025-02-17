@@ -22,6 +22,17 @@ const {
   updateSuccessfulExits, // Add this line
   updatePortfolioIPR, // Add this line
   updateDescription, // Add this line
+  updateAddressableMarket,
+  updateCurrentMarket,
+  updateTam,
+  updateSam,
+  updateLocation,
+  updateYearFounded,
+  updateSom,
+  updateCac,
+  updateEbiTda,
+  updateTotalAssets,
+  updateGrossMargin,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -42,7 +53,17 @@ router.put("/:id/average-check-size", authMiddleware, updateAverageCheckSize); /
 router.put("/:id/successful-exits", authMiddleware, updateSuccessfulExits); // Add this line
 router.put("/:id/portfolio-ipr", authMiddleware, updatePortfolioIPR); // Add this line
 router.put("/:id/description", authMiddleware, updateDescription); // Add this line
-
+router.put("/:id/addressable-market", authMiddleware, updateAddressableMarket);
+router.put("/:id/current-market", authMiddleware, updateCurrentMarket);
+router.put("/:id/tam", authMiddleware, updateTam);
+router.put("/:id/sam", authMiddleware, updateSam);
+router.put("/:id/location", authMiddleware, updateLocation);
+router.put("/:id/year-founded", authMiddleware, updateYearFounded);
+router.put("/:id/som", authMiddleware, updateSom);
+router.put("/:id/cac", authMiddleware, updateCac);
+router.put("/:id/ebitda", authMiddleware, updateEbiTda);
+router.put("/:id/total-assets", authMiddleware, updateTotalAssets);
+router.put("/:id/gross-margin", authMiddleware, updateGrossMargin);
 //login route
 router.post("/login", login);
 
