@@ -13,6 +13,9 @@ const ContactPerson = db.contact_persons;
 const { createAuditLog } = require("./auditLogService");
 const Role = db.roles;
 // Assigning users to the variable User
+const SectorPreference = db.sector_preferences;
+const Sector = db.sectors;
+
 const User = db.users;
 const SocialMediaAccount = db.social_media_accounts;
 const SocialAccountType = db.social_account_types;
@@ -296,6 +299,18 @@ const getUserById = async (req, res) => {
           model: UserTicketPreferences,
           as: "ticketPreferences",
           attributes: ["preference_id", "ticket_size_min", "ticket_size_max"],
+        },
+        {
+          model: SectorPreference,
+          as: "sectorPreferences",
+          attributes: ["preference_id", "sector_id"],
+          include: [
+            {
+              model: Sector,
+              as: "sector",
+              attributes: ["sector_id", "name"],
+            },
+          ],
         },
       ],
     });
