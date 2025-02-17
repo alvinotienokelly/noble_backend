@@ -42,7 +42,6 @@ const createMultipleDealTypePreferences = async (req, res) => {
     const existingPreferences = await DealTypePreferences.findAll({
       where: {
         user_id,
-        deal_type: deal_types,
       },
     });
 
