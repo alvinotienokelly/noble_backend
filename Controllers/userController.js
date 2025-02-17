@@ -16,6 +16,8 @@ const Role = db.roles;
 const SectorPreference = db.sector_preferences;
 const SubSector = db.subsectors;
 const SubSectorPreference = db.sub_sector_preferences;
+const RegionPreference = db.region_preferences;
+const Region = db.regions;
 const User = db.users;
 const Continent = db.continents;
 const ContinentPreference = db.continent_preferences;
@@ -292,6 +294,7 @@ const getUserById = async (req, res) => {
           as: "dealTypePreferences",
           attributes: ["preference_id", "deal_type"],
         },
+
         {
           model: ContactPerson,
           as: "contactPersons",
@@ -311,6 +314,18 @@ const getUserById = async (req, res) => {
               model: Continent,
               as: "continent",
               attributes: ["continent_id", "name"],
+            },
+          ],
+        },
+        {
+          model: RegionPreference,
+          as: "regionPreferences",
+          attributes: ["preference_id", "region_id"],
+          include: [
+            {
+              model: Region,
+              as: "region",
+              attributes: ["region_id", "name"],
             },
           ],
         },
