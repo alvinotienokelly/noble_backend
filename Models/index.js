@@ -154,6 +154,29 @@ db.sector_preferences = require("./sectorPreferenceModel")(
   DataTypes
 );
 db.document_types = require("./documentTypeModel")(sequelize, DataTypes);
+db.sub_sector_preferences = require("./subSectorPreferenceModel")(
+  sequelize,
+  DataTypes
+);
+// Define associations
+db.users.hasMany(db.sub_sector_preferences, {
+  foreignKey: "user_id",
+  as: "subSectorPreferences",
+});
+db.sub_sector_preferences.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+db.subsectors.hasMany(db.sub_sector_preferences, {
+  foreignKey: "sub_sector_id",
+  as: "subSectorPreferences",
+});
+db.sub_sector_preferences.belongsTo(db.subsectors, {
+  foreignKey: "sub_sector_id",
+  as: "subSector",
+});
+
 // Define associations
 db.documents.belongsTo(db.document_types, {
   foreignKey: "document_type_id",
