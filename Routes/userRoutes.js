@@ -17,6 +17,11 @@ const {
   markUserAsArchived, // Add this line
   markUserAsOpen, // Add this line
   markUserAsOnHold, // Add this line
+  updateTotalInvestments, // Add this line
+  updateAverageCheckSize, // Add this line
+  updateSuccessfulExits, // Add this line
+  updatePortfolioIPR, // Add this line
+  updateDescription, // Add this line
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -32,6 +37,11 @@ router.post("/signup", userAuth.saveUser, signup);
 router.put("/:id/archive", authMiddleware, markUserAsArchived); // Add this line
 router.put("/:id/open", authMiddleware, markUserAsOpen); // Add this line
 router.put("/:id/on-hold", authMiddleware, markUserAsOnHold); // Add this line
+router.put("/:id/total-investments", authMiddleware, updateTotalInvestments); // Add this line
+router.put("/:id/average-check-size", authMiddleware, updateAverageCheckSize); // Add this line
+router.put("/:id/successful-exits", authMiddleware, updateSuccessfulExits); // Add this line
+router.put("/:id/portfolio-ipr", authMiddleware, updatePortfolioIPR); // Add this line
+router.put("/:id/description", authMiddleware, updateDescription); // Add this line
 
 //login route
 router.post("/login", login);

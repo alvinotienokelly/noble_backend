@@ -537,6 +537,146 @@ const markUserAsOnHold = async (req, res) => {
   }
 };
 
+// Function to update total investments
+const updateTotalInvestments = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { total_investments } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ total_investments });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_TOTAL_INVESTMENTS",
+      details: `Updated total investments for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Function to update average check size
+const updateAverageCheckSize = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { average_check_size } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ average_check_size });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_AVERAGE_CHECK_SIZE",
+      details: `Updated average check size for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Function to update successful exits
+const updateSuccessfulExits = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { successful_exits } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ successful_exits });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_SUCCESSFUL_EXITS",
+      details: `Updated successful exits for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Function to update portfolio IPR
+const updatePortfolioIPR = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { portfolio_ipr } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ portfolio_ipr });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_PORTFOLIO_IPR",
+      details: `Updated portfolio IPR for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Function to update description
+const updateDescription = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const { description } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+
+    await user.update({ description });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_DESCRIPTION",
+      details: `Updated description for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -553,4 +693,9 @@ module.exports = {
   markUserAsArchived,
   markUserAsOpen,
   markUserAsOnHold,
+  updateTotalInvestments, // Add this line
+  updateAverageCheckSize, // Add this line
+  updateSuccessfulExits, // Add this line
+  updatePortfolioIPR, // Add this line
+  updateDescription, // Add this line
 };
