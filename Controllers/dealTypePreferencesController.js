@@ -39,6 +39,22 @@ const createMultipleDealTypePreferences = async (req, res) => {
         .json({ status: false, message: "Invalid deal types provided." });
     }
 
+    const existingPreferences = await DealTypePreferences.findAll({
+      where: {
+        user_id,
+        deal_type: deal_types,
+      },
+    });
+
+    const existingDealTypes = existingPreferences.map((pref) => pref.deal_type);
+
+    await DealTypePreferences.destroy({
+      where: {
+        user_id,
+        deal_type: existingDealTypes,
+      },
+    });
+
     const dealTypePreferences = await Promise.all(
       deal_types.map(async (deal_type) => {
         return await DealTypePreferences.create({
