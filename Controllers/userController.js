@@ -276,10 +276,23 @@ const verifyCode = async (req, res) => {
   }
 };
 
+// Get user by ID
 const getUserById = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id, {
       attributes: { exclude: ["password"] }, // Exclude the password field from the response
+      include: [
+        {
+          model: DealTypePreferences,
+          as: "dealTypePreferences",
+          attributes: ["preference_id", "deal_type"],
+        },
+        {
+          model: ContactPerson,
+          as: "contactPersons",
+          attributes: ["contact_id", "name", "email", "phone", "position"],
+        },
+      ],
     });
 
     if (!user) {
