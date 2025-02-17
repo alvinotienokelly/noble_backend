@@ -58,6 +58,7 @@ const dealMilestoneRoutes = require("./Routes/dealMilestoneRoutes");
 const dealMilestoneStatusRoutes = require("./Routes/dealMilestoneStatusRoutes");
 const documentTypeRoutes = require("./Routes/documentTypeRoutes");
 const sectorPreferenceRoutes = require("./Routes/sectorPreferenceRoutes");
+const subSectorPreferenceRoutes = require("./Routes/subSectorPreferenceRoutes");
 
 
 require("dotenv").config();
@@ -126,6 +127,7 @@ app.use("/api/deal-milestones", dealMilestoneRoutes);
 app.use("/api/deal-milestone-statuses", dealMilestoneStatusRoutes);
 app.use("/api/document-types", documentTypeRoutes);
 app.use("/api/sector-preferences", sectorPreferenceRoutes);
+app.use("/api/subsector-preferences", subSectorPreferenceRoutes);
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
