@@ -14,7 +14,8 @@ const { createAuditLog } = require("./auditLogService");
 const Role = db.roles;
 // Assigning users to the variable User
 const SectorPreference = db.sector_preferences;
-
+const SubSector = db.subsectors;
+const SubSectorPreference = db.sub_sector_preferences;
 const User = db.users;
 const SocialMediaAccount = db.social_media_accounts;
 const SocialAccountType = db.social_account_types;
@@ -308,6 +309,18 @@ const getUserById = async (req, res) => {
               model: Sector,
               as: "sector",
               attributes: ["sector_id", "name"],
+            },
+          ],
+        },
+        {
+          model: SubSectorPreference,
+          as: "subSectorPreferences",
+          attributes: ["preference_id", "sub_sector_id"],
+          include: [
+            {
+              model: SubSector,
+              as: "subSector",
+              attributes: ["subsector_id", "name"],
             },
           ],
         },
