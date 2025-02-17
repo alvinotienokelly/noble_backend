@@ -23,6 +23,8 @@ const Continent = db.continents;
 const ContinentPreference = db.continent_preferences;
 const SocialMediaAccount = db.social_media_accounts;
 const SocialAccountType = db.social_account_types;
+const CountryPreference = db.country_preferences;
+const Country = db.country;
 // Utility function to mask email
 const maskEmail = (email) => {
   const [localPart, domain] = email.split("@");
@@ -350,6 +352,18 @@ const getUserById = async (req, res) => {
               model: SubSector,
               as: "subSector",
               attributes: ["subsector_id", "name"],
+            },
+          ],
+        },
+        {
+          model: CountryPreference,
+          as: "countryPreferences",
+          attributes: ["preference_id", "country_id"],
+          include: [
+            {
+              model: Country,
+              as: "country",
+              attributes: ["country_id", "name"],
             },
           ],
         },
