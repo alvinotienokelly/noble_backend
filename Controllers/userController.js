@@ -14,7 +14,6 @@ const { createAuditLog } = require("./auditLogService");
 const Role = db.roles;
 // Assigning users to the variable User
 const SectorPreference = db.sector_preferences;
-const Sector = db.sectors;
 
 const User = db.users;
 const SocialMediaAccount = db.social_media_accounts;
