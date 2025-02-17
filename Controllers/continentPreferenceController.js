@@ -28,8 +28,6 @@ const getUserContinentPreferences = async (req, res) => {
     const preferences = await ContinentPreference.findAll({
       where: { user_id: user_id },
       include: [{ model: Continent, as: "continent" }],
-      attributes: ["continent_id"],
-      group: ["continent_id", "continent.id"],
     });
 
     res.status(200).json({ status: true, preferences });
