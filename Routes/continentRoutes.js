@@ -1,7 +1,8 @@
 // Routes/continentRoutes.js
 const express = require("express");
 const continentController = require("../Controllers/continentController");
-const { createContinent, getAllContinents, updateContinent, deleteContinent } = continentController;
+const { createContinent, getAllContinents, updateContinent, deleteContinent } =
+  continentController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 
 const router = express.Router();

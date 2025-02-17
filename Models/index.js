@@ -166,6 +166,30 @@ db.region_preferences = require("./regionPreferenceModel")(
   sequelize,
   DataTypes
 );
+db.country_preferences = require("./countryPreferenceModel")(
+  sequelize,
+  DataTypes
+);
+
+db.country_preferences.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+db.users.hasMany(db.country_preferences, {
+  foreignKey: "user_id",
+  as: "countryPreferences",
+});
+
+db.country.hasMany(db.country_preferences, {
+  foreignKey: "country_id",
+  as: "countryPreferences",
+});
+db.country_preferences.belongsTo(db.country, {
+  foreignKey: "country_id",
+  as: "country",
+});
+
 // Define associations
 db.users.hasMany(db.region_preferences, {
   foreignKey: "user_id",
