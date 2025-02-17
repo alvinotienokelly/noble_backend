@@ -111,6 +111,32 @@ const updateDealTypePreference = async (req, res) => {
     res.status(500).json({ status: false, message: error.message });
   }
 };
+// Get all unique deal type preferences for the logged-in user
+const getUniqueDealTypePreferences = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const preferences = await DealTypePreferences.findAll({
+      where: { user_id },
+      attributes: [
+        [
+          db.sequelize.fn("DISTINCT", db.sequelize.col("deal_type")),
+          "deal_type",
+        ],
+      ],
+    });
+
+    await createAuditLog({
+      userId: req.user.id,
+      ip_address: req.ip,
+      action: "GET_UNIQUE_DEAL_TYPE_PREFERENCES",
+      details: `Fetched unique deal type preferences for user_id: ${user_id}`,
+    });
+
+    res.status(200).json({ status: true, preferences });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
 
 // Delete a deal type preference by ID
 const deleteDealTypePreference = async (req, res) => {
@@ -139,4 +165,5 @@ module.exports = {
   updateDealTypePreference,
   deleteDealTypePreference,
   createMultipleDealTypePreferences,
+  getUniqueDealTypePreferences,
 };
