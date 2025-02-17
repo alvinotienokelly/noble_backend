@@ -60,7 +60,7 @@ const documentTypeRoutes = require("./Routes/documentTypeRoutes");
 const sectorPreferenceRoutes = require("./Routes/sectorPreferenceRoutes");
 const subSectorPreferenceRoutes = require("./Routes/subSectorPreferenceRoutes");
 const continentPreferenceRoutes = require("./Routes/continentPreferenceRoutes");
-
+const regionPreferenceRoutes = require("./Routes/regionPreferenceRoutes");
 
 require("dotenv").config();
 
@@ -130,7 +130,7 @@ app.use("/api/document-types", documentTypeRoutes);
 app.use("/api/sector-preferences", sectorPreferenceRoutes);
 app.use("/api/subsector-preferences", subSectorPreferenceRoutes);
 app.use("/api/continent-preferences", continentPreferenceRoutes);
-
+app.use("/api/region-preferences", regionPreferenceRoutes);
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
   exec(
