@@ -21,6 +21,23 @@ const createContinentPreference = async (req, res) => {
   }
 };
 
+const getUserContinentPreferences = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+
+    const preferences = await ContinentPreference.findAll({
+      where: { user_id: user_id },
+      include: [{ model: Continent, as: "continent" }],
+      attributes: ["continent_id"],
+      group: ["continent_id", "continent.id"],
+    });
+
+    res.status(200).json({ status: true, preferences });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 // Get all continent preferences for the logged-in user
 const getContinentPreferences = async (req, res) => {
   try {
@@ -84,4 +101,5 @@ module.exports = {
   getContinentPreferences,
   updateContinentPreference,
   deleteContinentPreference,
+  getUserContinentPreferences,
 };
