@@ -53,6 +53,26 @@ module.exports = (sequelize, DataTypes) => {
         values: ["On Hold", "Open", "Closed", "Archived"], // Add status field
         defaultValue: "Open",
       },
+      total_investments: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      average_check_size: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      successful_exits: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      portfolio_ipr: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
     },
     { timestamps: true }
   );
