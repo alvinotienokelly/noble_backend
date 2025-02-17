@@ -158,6 +158,29 @@ db.sub_sector_preferences = require("./subSectorPreferenceModel")(
   sequelize,
   DataTypes
 );
+db.continent_preferences = require("./continentPreferenceModel")(
+  sequelize,
+  DataTypes
+);
+
+// Define associations
+db.users.hasMany(db.continent_preferences, {
+  foreignKey: "user_id",
+  as: "continentPreferences",
+});
+db.continent_preferences.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+db.continents.hasMany(db.continent_preferences, {
+  foreignKey: "continent_id",
+  as: "continentPreferences",
+});
+db.continent_preferences.belongsTo(db.continents, {
+  foreignKey: "continent_id",
+  as: "continent",
+});
 // Define associations
 db.users.hasMany(db.sub_sector_preferences, {
   foreignKey: "user_id",
