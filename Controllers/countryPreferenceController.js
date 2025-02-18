@@ -78,10 +78,40 @@ const deleteCountryPreference = async (req, res) => {
     res.status(500).json({ status: false, message: error.message });
   }
 };
+// Bulk create country preferences
+const bulkCreateCountryPreferences = async (req, res) => {
+  try {
+    const { country_ids } = req.body;
+    const user_id = req.user.id;
 
+    if (!Array.isArray(country_ids) || country_ids.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid country IDs provided." });
+    }
+
+    await CountryPreference.destroy({
+      where: { user_id },
+    });
+
+    const countryPreferences = await Promise.all(
+      country_ids.map(async (country_id) => {
+        return await CountryPreference.create({
+          user_id,
+          country_id,
+        });
+      })
+    );
+
+    res.status(200).json({ status: true, countryPreferences });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
 module.exports = {
   createCountryPreference,
   getCountryPreferences,
   updateCountryPreference,
   deleteCountryPreference,
+  bulkCreateCountryPreferences, // Add this line
 };
