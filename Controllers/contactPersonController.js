@@ -2,7 +2,6 @@
 const db = require("../Models");
 const ContactPerson = db.contact_persons;
 const { createAuditLog } = require("./auditLogService");
-const { createNotification } = require("./notificationController");
 
 const createContactPerson = async (req, res) => {
   try {
@@ -18,19 +17,14 @@ const createContactPerson = async (req, res) => {
     });
 
     // Create an audit log entry
-    // await createAuditLog({
-    //   userId: req.user.id,
-    //   action: "create_contact_person",
-    //   details: `Created contact person with ID ${contactPerson.contact_id}`,
-    //   // entity: "ContactPerson",
-    //   // entityId: contactPerson.id,
-    //   ip_address: req.ip,
-    // });
-    await createNotification(
-      user_id,
-      "Contact Persons Created",
-      "Your contact persons have been created."
-    );
+    await createAuditLog({
+      userId: req.user.id,
+      action: "create_contact_person",
+      details: `Created contact person with ID ${contactPerson.contact_id}`,
+      // entity: "ContactPerson",
+      // entityId: contactPerson.id,
+      ip_address: req.ip,
+    });
 
     res.status(201).json({ status: true, contactPerson });
   } catch (error) {
@@ -70,17 +64,12 @@ const updateContactPerson = async (req, res) => {
         .json({ status: false, message: "Contact person not found." });
     }
     await contactPerson.update(req.body);
-    // await createAuditLog({
-    //   userId: req.user.id,
-    //   action: "update_contact_person",
-    //   details: `Updated contact person with ID ${contactPerson.contact_id}`,
-    //   ip_address: req.ip,
-    // });
-    await createNotification(
-      req.user.id,
-      "Contact Person Updated",
-      `Contact person with ID ${contactPerson.contact_id} has been updated.`
-    );
+    await createAuditLog({
+      userId: req.user.id,
+      action: "update_contact_person",
+      details: `Updated contact person with ID ${contactPerson.contact_id}`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, contactPerson });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -96,18 +85,12 @@ const deleteContactPerson = async (req, res) => {
         .json({ status: false, message: "Contact person not found." });
     }
     await contactPerson.destroy();
-    // await createAuditLog({
-    //   userId: req.user.id,
-    //   action: "delete_contact_person",
-    //   details: `Deleted contact person with ID ${contactPerson.contact_id}`,
-    //   ip_address: req.ip,
-    // });
-
-    await createNotification(
-      req.user.id,
-      "Contact Person Deleted",
-      `Contact person with ID ${contactPerson.contact_id} has been deleted.`
-    );
+    await createAuditLog({
+      userId: req.user.id,
+      action: "delete_contact_person",
+      details: `Deleted contact person with ID ${contactPerson.contact_id}`,
+      ip_address: req.ip,
+    });
     res
       .status(200)
       .json({ status: true, message: "Contact person deleted successfully." });
@@ -122,19 +105,6 @@ const getContactPersonsByUser = async (req, res) => {
     const contactPersons = await ContactPerson.findAll({
       where: { user_id: userId },
     });
-    // await createAuditLog({
-    //   userId: req.user.id,
-    //   action: "GET_CONTACT_PERSONS_BY_USER",
-    //   details: `Fetched contact persons for user ID ${userId}`,
-    //   ip_address: req.ip,
-    // });
-
-    await createNotification(
-      userId,
-      "Contact Persons Retrieved",
-      "Your contact persons have been retrieved."
-    );
-
     res.status(200).json({ status: true, contactPersons });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
