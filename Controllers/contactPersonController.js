@@ -125,7 +125,7 @@ const getContactPersonsByUser = async (req, res) => {
     await createAuditLog({
       userId: req.user.id,
       action: "GET_CONTACT_PERSONS_BY_USER",
-      details: `Fetched contact persons for user ID ${user_id}`,
+      details: `Fetched contact persons for user ID ${userId}`,
       ip_address: req.ip,
     });
 
