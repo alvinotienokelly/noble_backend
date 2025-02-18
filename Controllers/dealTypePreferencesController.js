@@ -3,6 +3,7 @@ const db = require("../Models");
 const DealTypePreferences = db.deal_type_preferences;
 const User = db.users;
 const { createAuditLog } = require("./auditLogService");
+const { createNotification } = require("./notificationController");
 
 // Create a new deal type preference
 const createDealTypePreference = async (req, res) => {
@@ -61,6 +62,11 @@ const createMultipleDealTypePreferences = async (req, res) => {
           deal_type,
         });
       })
+    );
+    await createNotification(
+      user_id,
+      "Updated Deal Type Preferences",
+      "Your deal type preferences have been updated."
     );
 
     await createAuditLog({
