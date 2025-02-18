@@ -106,6 +106,10 @@ const bulkCreateContinentPreferences = async (req, res) => {
         .json({ status: false, message: "Invalid continent IDs provided." });
     }
 
+    await ContinentPreference.destroy({
+      where: { user_id },
+    });
+
     const continentPreferences = await Promise.all(
       continent_ids.map(async (continent_id) => {
         return await ContinentPreference.create({
