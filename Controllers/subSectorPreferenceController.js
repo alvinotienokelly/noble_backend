@@ -3,6 +3,7 @@ const db = require("../Models");
 const SubSectorPreference = db.sub_sector_preferences;
 const User = db.users;
 const SubSector = db.subsectors;
+const { createNotification } = require("./notificationController");
 
 // Create a new sub-sector preference
 const createSubSectorPreference = async (req, res) => {
@@ -102,7 +103,11 @@ const bulkCreateSubSectorPreferences = async (req, res) => {
         });
       })
     );
-
+    await createNotification(
+      user_id,
+      "created sub sector preferences",
+      "Your sub sector preferences have been updated."
+    );
     res.status(200).json({ status: true, subSectorPreferences });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
