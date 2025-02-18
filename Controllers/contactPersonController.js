@@ -63,6 +63,8 @@ const getContactPersonById = async (req, res) => {
 
 const updateContactPerson = async (req, res) => {
   try {
+    const user_id = req.user.id;
+
     const contactPerson = await ContactPerson.findByPk(req.params.id);
     if (!contactPerson) {
       return res
@@ -90,6 +92,7 @@ const updateContactPerson = async (req, res) => {
 
 const deleteContactPerson = async (req, res) => {
   try {
+    const user_id = req.user.id;
     const contactPerson = await ContactPerson.findByPk(req.params.id);
     if (!contactPerson) {
       return res
