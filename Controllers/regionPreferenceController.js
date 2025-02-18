@@ -79,9 +79,41 @@ const deleteRegionPreference = async (req, res) => {
   }
 };
 
+// Bulk create region preferences
+const bulkCreateRegionPreferences = async (req, res) => {
+  try {
+    const { region_ids } = req.body;
+    const user_id = req.user.id;
+
+    if (!Array.isArray(region_ids) || region_ids.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid region IDs provided." });
+    }
+
+    await RegionPreference.destroy({
+      where: { user_id },
+    });
+
+    const regionPreferences = await Promise.all(
+      region_ids.map(async (region_id) => {
+        return await RegionPreference.create({
+          user_id,
+          region_id,
+        });
+      })
+    );
+
+    res.status(200).json({ status: true, regionPreferences });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createRegionPreference,
   getRegionPreferences,
+  bulkCreateRegionPreferences,
   updateRegionPreference,
   deleteRegionPreference,
 };
