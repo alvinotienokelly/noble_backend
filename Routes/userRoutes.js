@@ -33,6 +33,7 @@ const {
   updateEbiTda,
   updateTotalAssets,
   updateGrossMargin,
+  updateUserProfile,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
