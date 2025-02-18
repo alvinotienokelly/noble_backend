@@ -3,6 +3,7 @@ const db = require("../Models");
 const RegionPreference = db.region_preferences;
 const User = db.users;
 const Region = db.regions;
+const { createNotification } = require("./notificationController");
 
 // Create a new region preference
 const createRegionPreference = async (req, res) => {
@@ -102,6 +103,11 @@ const bulkCreateRegionPreferences = async (req, res) => {
           region_id,
         });
       })
+    );
+    await createNotification(
+      user_id,
+      "Region preference added",
+      "Your region preferences have been added."
     );
 
     res.status(200).json({ status: true, regionPreferences });
