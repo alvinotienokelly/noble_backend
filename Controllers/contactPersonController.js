@@ -70,6 +70,12 @@ const updateContactPerson = async (req, res) => {
         .json({ status: false, message: "Contact person not found." });
     }
     await contactPerson.update(req.body);
+    await createNotification(
+      user_id,
+      "Contact Persons Updated",
+      "Your contact persons have been Updated."
+    );
+
     await createAuditLog({
       userId: req.user.id,
       action: "update_contact_person",
