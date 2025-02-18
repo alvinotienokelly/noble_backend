@@ -3,6 +3,7 @@ const db = require("../Models");
 const ContinentPreference = db.continent_preferences;
 const User = db.users;
 const Continent = db.continents;
+const { createNotification } = require("./notificationController");
 
 // Create a new continent preference
 const createContinentPreference = async (req, res) => {
@@ -117,6 +118,11 @@ const bulkCreateContinentPreferences = async (req, res) => {
           continent_id,
         });
       })
+    );
+    await createNotification(
+      user_id,
+      "Continent preference recorded",
+      "Your continent preferences have been recorded."
     );
 
     res.status(200).json({ status: true, continentPreferences });
