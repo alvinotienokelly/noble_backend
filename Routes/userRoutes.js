@@ -45,6 +45,7 @@ const router = express.Router();
 //signup endpoint
 //passing the middleware function to the signup
 router.post("/signup", userAuth.saveUser, signup);
+router.put("/profile", authMiddleware, updateUserProfile); // Add this line
 router.put("/:id/archive", authMiddleware, markUserAsArchived); // Add this line
 router.put("/:id/open", authMiddleware, markUserAsOpen); // Add this line
 router.put("/:id/on-hold", authMiddleware, markUserAsOnHold); // Add this line
