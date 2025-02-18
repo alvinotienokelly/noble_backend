@@ -2,6 +2,7 @@
 const db = require("../Models");
 const ContactPerson = db.contact_persons;
 const { createAuditLog } = require("./auditLogService");
+const { createNotification } = require("./notificationController");
 
 const createContactPerson = async (req, res) => {
   try {
@@ -15,6 +16,11 @@ const createContactPerson = async (req, res) => {
       phone,
       position,
     });
+    await createNotification(
+      user_id,
+      "Contact Persons Created",
+      "Your contact persons have been created."
+    );
 
     // Create an audit log entry
     await createAuditLog({
