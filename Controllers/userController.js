@@ -25,6 +25,8 @@ const SocialMediaAccount = db.social_media_accounts;
 const SocialAccountType = db.social_account_types;
 const CountryPreference = db.country_preferences;
 const Country = db.country;
+const { createNotification } = require("./notificationController");
+
 // Utility function to mask email
 const maskEmail = (email) => {
   const [localPart, domain] = email.split("@");
@@ -1123,6 +1125,7 @@ const updateUserProfile = async (req, res) => {
     if (location) updatedFields.location = location;
 
     await user.update(updatedFields);
+    await createNotification(user_id, "Profile Updated", "Your profile has been updated.");
 
     await createAuditLog({
       userId: req.user.id,

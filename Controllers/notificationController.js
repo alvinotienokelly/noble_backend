@@ -15,11 +15,11 @@ const createNotification = async (userId, title, message) => {
       message,
     });
 
-    // await createAuditLog({
-    //   userId,
-    //   action: "CREATE_NOTIFICATION",
-    //   details: `Notification titled "${title}" created for user ID ${userId}`,
-    // });
+    await createAuditLog({
+      userId,
+      action: "CREATE_NOTIFICATION",
+      details: `Notification titled "${title}" created for user ID ${userId}`,
+    });
     return notification;
   } catch (error) {
     console.error("Error creating notification:", error);
