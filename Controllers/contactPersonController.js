@@ -2,6 +2,7 @@
 const db = require("../Models");
 const ContactPerson = db.contact_persons;
 const { createAuditLog } = require("./auditLogService");
+const { createNotification } = require("./notificationController");
 
 const createContactPerson = async (req, res) => {
   try {
@@ -25,6 +26,11 @@ const createContactPerson = async (req, res) => {
       // entityId: contactPerson.id,
       ip_address: req.ip,
     });
+    await createNotification(
+      user_id,
+      "Create contact person",
+      "Your  contact person Created."
+    );
 
     res.status(201).json({ status: true, contactPerson });
   } catch (error) {
