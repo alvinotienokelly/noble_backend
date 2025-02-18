@@ -97,6 +97,11 @@ const deleteContactPerson = async (req, res) => {
         .json({ status: false, message: "Contact person not found." });
     }
     await contactPerson.destroy();
+    await createNotification(
+      user_id,
+      "Contact Persons deleted",
+      "Your contact persons have been deleted."
+    );
     await createAuditLog({
       userId: req.user.id,
       action: "delete_contact_person",
