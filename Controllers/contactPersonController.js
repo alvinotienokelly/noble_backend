@@ -130,7 +130,7 @@ const getContactPersonsByUser = async (req, res) => {
     });
 
     await createNotification(
-      user_id,
+      userId,
       "Contact Persons Retrieved",
       "Your contact persons have been retrieved."
     );
