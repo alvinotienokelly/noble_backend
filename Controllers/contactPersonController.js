@@ -27,13 +27,12 @@ const createContactPerson = async (req, res) => {
       ip_address: req.ip,
     });
 
-
     // Create a notification
-    await createNotification({
-       req.user.id,
+    await createNotification(
+      req.user.id,
       `A new contact person named ${contactPerson.name} has been created.`,
-       "contact_person_creation",  
-    });
+      "contact_person_creation"
+    );
 
     res.estatus(201).json({ status: true, contactPerson });
   } catch (error) {
@@ -114,6 +113,11 @@ const getContactPersonsByUser = async (req, res) => {
     const contactPersons = await ContactPerson.findAll({
       where: { user_id: userId },
     });
+    await createNotification(
+      req.user.id,
+      `Fetched contact persons for user with ID ${userId}.`,
+      "contact_person_fetch"
+    );
     res.status(200).json({ status: true, contactPersons });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
