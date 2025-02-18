@@ -75,47 +75,47 @@ module.exports = (sequelize, DataTypes) => {
       },
       addressable_market: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       current_market: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       total_assets: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       ebitda: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       gross_margin: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       cac_payback_period: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       tam: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       sam: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       som: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       year_founded: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       location: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
     },
     { timestamps: true }
