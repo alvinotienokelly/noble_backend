@@ -78,10 +78,41 @@ const deleteSubSectorPreference = async (req, res) => {
     res.status(500).json({ status: false, message: error.message });
   }
 };
+// Bulk create sub-sector preferences
+const bulkCreateSubSectorPreferences = async (req, res) => {
+  try {
+    const { sub_sector_ids } = req.body;
+    const user_id = req.user.id;
+
+    if (!Array.isArray(sub_sector_ids) || sub_sector_ids.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid sub-sector IDs provided." });
+    }
+
+    await SubSectorPreference.destroy({
+      where: { user_id },
+    });
+
+    const subSectorPreferences = await Promise.all(
+      sub_sector_ids.map(async (sub_sector_id) => {
+        return await SubSectorPreference.create({
+          user_id,
+          sub_sector_id,
+        });
+      })
+    );
+
+    res.status(200).json({ status: true, subSectorPreferences });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
 
 module.exports = {
   createSubSectorPreference,
   getSubSectorPreferences,
   updateSubSectorPreference,
   deleteSubSectorPreference,
+  bulkCreateSubSectorPreferences,
 };

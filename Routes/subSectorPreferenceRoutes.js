@@ -4,6 +4,7 @@ const subSectorPreferenceController = require("../Controllers/subSectorPreferenc
 const {
   createSubSectorPreference,
   getSubSectorPreferences,
+  bulkCreateSubSectorPreferences, // Add this line
   updateSubSectorPreference,
   deleteSubSectorPreference,
 } = subSectorPreferenceController;
@@ -12,6 +13,7 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 const router = express.Router();
 
 router.post("/", authMiddleware, createSubSectorPreference);
+router.post("/bulk", authMiddleware, bulkCreateSubSectorPreferences); // Add this line
 router.get("/", authMiddleware, getSubSectorPreferences);
 router.put("/:id", authMiddleware, updateSubSectorPreference);
 router.delete("/:id", authMiddleware, deleteSubSectorPreference);
