@@ -2,6 +2,7 @@
 const db = require("../Models");
 const ContactPerson = db.contact_persons;
 const { createAuditLog } = require("./auditLogService");
+const { createNotification } = require("./notificationController");
 
 const createContactPerson = async (req, res) => {
   try {
@@ -25,6 +26,11 @@ const createContactPerson = async (req, res) => {
       // entityId: contactPerson.id,
       ip_address: req.ip,
     });
+    await createNotification(
+      user_id,
+      "Contact Persons Created",
+      "Your contact persons have been created."
+    );
 
     res.status(201).json({ status: true, contactPerson });
   } catch (error) {
@@ -70,6 +76,11 @@ const updateContactPerson = async (req, res) => {
       details: `Updated contact person with ID ${contactPerson.contact_id}`,
       ip_address: req.ip,
     });
+    await createNotification(
+      req.user.id,
+      "Contact Person Updated",
+      `Contact person with ID ${contactPerson.contact_id} has been updated.`
+    );
     res.status(200).json({ status: true, contactPerson });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -91,6 +102,12 @@ const deleteContactPerson = async (req, res) => {
       details: `Deleted contact person with ID ${contactPerson.contact_id}`,
       ip_address: req.ip,
     });
+
+    await createNotification(
+      req.user.id,
+      "Contact Person Deleted",
+      `Contact person with ID ${contactPerson.contact_id} has been deleted.`
+    );
     res
       .status(200)
       .json({ status: true, message: "Contact person deleted successfully." });
@@ -105,6 +122,19 @@ const getContactPersonsByUser = async (req, res) => {
     const contactPersons = await ContactPerson.findAll({
       where: { user_id: userId },
     });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_CONTACT_PERSONS_BY_USER",
+      details: `Fetched contact persons for user ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    await createNotification(
+      user_id,
+      "Contact Persons Retrieved",
+      "Your contact persons have been retrieved."
+    );
+
     res.status(200).json({ status: true, contactPersons });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
