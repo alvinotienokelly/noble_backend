@@ -79,9 +79,41 @@ const deleteSectorPreference = async (req, res) => {
   }
 };
 
+// Bulk create sector preferences
+const bulkCreateSectorPreferences = async (req, res) => {
+  try {
+    const { sector_ids } = req.body;
+    const user_id = req.user.id;
+
+    if (!Array.isArray(sector_ids) || sector_ids.length === 0) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Invalid sector IDs provided." });
+    }
+
+    await SectorPreference.destroy({
+      where: { user_id },
+    });
+
+    const sectorPreferences = await Promise.all(
+      sector_ids.map(async (sector_id) => {
+        return await SectorPreference.create({
+          user_id,
+          sector_id,
+        });
+      })
+    );
+
+    res.status(201).json({ status: true, sectorPreferences });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createSectorPreference,
   getSectorPreferences,
   updateSectorPreference,
   deleteSectorPreference,
+  bulkCreateSectorPreferences, // Add this line
 };
