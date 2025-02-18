@@ -94,10 +94,38 @@ const deleteContinentPreference = async (req, res) => {
   }
 };
 
+// Bulk create continent preferences
+const bulkCreateContinentPreferences = async (req, res) => {
+  try {
+    const { continent_ids } = req.body;
+    const user_id = req.user.id;
+
+    if (!Array.isArray(continent_ids) || continent_ids.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid continent IDs provided." });
+    }
+
+    const continentPreferences = await Promise.all(
+      continent_ids.map(async (continent_id) => {
+        return await ContinentPreference.create({
+          user_id,
+          continent_id,
+        });
+      })
+    );
+
+    res.status(200).json({ status: true, continentPreferences });
+  } catch (error) {
+    res.status(200).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createContinentPreference,
   getContinentPreferences,
   updateContinentPreference,
   deleteContinentPreference,
   getUserContinentPreferences,
+  bulkCreateContinentPreferences,
 };
