@@ -3,6 +3,7 @@ const db = require("../Models");
 const SectorPreference = db.sector_preferences;
 const User = db.users;
 const Sector = db.sectors;
+const { createNotification } = require("./notificationController");
 
 // Create a new sector preference
 const createSectorPreference = async (req, res) => {
@@ -102,6 +103,12 @@ const bulkCreateSectorPreferences = async (req, res) => {
           sector_id,
         });
       })
+    );
+
+    await createNotification(
+      user_id,
+      "created sector preferences",
+      "Your sector preferences have been updated."
     );
 
     res.status(201).json({ status: true, sectorPreferences });
