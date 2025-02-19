@@ -245,11 +245,13 @@ const filterFolders = async (req, res) => {
     res.status(500).json({ status: false, message: error.message });
   }
 };
-
 // Function to get folders in which the logged-in user has a FolderAccessInvite with status "Accepted" or "Pending"
 const getAcceptedAndPendingFolderInvites = async (req, res) => {
   try {
     const userId = req.user.id;
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
 
     const user = await User.findByPk(userId);
     if (!user) {
@@ -259,32 +261,35 @@ const getAcceptedAndPendingFolderInvites = async (req, res) => {
     }
     const user_email = user.email;
 
-    const invites = await FolderAccessInvite.findAll({
-      where: {
-        user_email,
-        status: {
-          [db.Sequelize.Op.in]: ["Accepted", "Pending"],
+    const { count: totalInvites, rows: invites } =
+      await FolderAccessInvite.findAndCountAll({
+        where: {
+          user_email,
+          status: {
+            [db.Sequelize.Op.in]: ["Accepted", "Pending"],
+          },
         },
-      },
-      include: [
-        {
-          model: Folder,
-          as: "folder",
-          include: [
-            {
-              model: db.users,
-              as: "creator",
-              attributes: ["id", "name", "email"],
-            },
-            {
-              model: db.users,
-              as: "createdFor",
-              attributes: ["id", "name", "email"],
-            },
-          ],
-        },
-      ],
-    });
+        include: [
+          {
+            model: Folder,
+            as: "folder",
+            include: [
+              {
+                model: db.users,
+                as: "creator",
+                attributes: ["id", "name", "email"],
+              },
+              {
+                model: db.users,
+                as: "createdFor",
+                attributes: ["id", "name", "email"],
+              },
+            ],
+          },
+        ],
+        offset,
+        limit: parseInt(limit),
+      });
 
     if (!invites || invites.length === 0) {
       return res.status(404).json({
@@ -302,9 +307,13 @@ const getAcceptedAndPendingFolderInvites = async (req, res) => {
     });
 
     const folders = invites.map((invite) => invite.folder);
+    const totalPages = Math.ceil(totalInvites / limit);
 
     res.status(200).json({
       status: true,
+      totalInvites,
+      totalPages,
+      currentPage: parseInt(page),
       folders,
     });
   } catch (error) {
