@@ -34,6 +34,7 @@ const {
   updateTotalAssets,
   updateGrossMargin,
   updateUserProfile,
+  adminUpdateUserProfile,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -48,6 +49,7 @@ const router = express.Router();
 router.post("/signup", userAuth.saveUser, signup);
 router.put("/profile", authMiddleware, updateUserProfile); // Add this line
 router.put("/:id/archive", authMiddleware, markUserAsArchived); // Add this line
+router.put("/admin/profile/:id", authMiddleware, adminUpdateUserProfile);
 router.put("/:id/open", authMiddleware, markUserAsOpen); // Add this line
 router.put("/:id/on-hold", authMiddleware, markUserAsOnHold); // Add this line
 router.put("/:id/total-investments", authMiddleware, updateTotalInvestments); // Add this line

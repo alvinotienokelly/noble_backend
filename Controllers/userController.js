@@ -1125,7 +1125,89 @@ const updateUserProfile = async (req, res) => {
     if (location) updatedFields.location = location;
 
     await user.update(updatedFields);
-    await createNotification(user_id, "Profile Updated", "Your profile has been updated.");
+    await createNotification(
+      user_id,
+      "Profile Updated",
+      "Your profile has been updated."
+    );
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_USER_PROFILE",
+      details: `Updated profile for user with ID ${user_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, user });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Function to update user profile
+const adminUpdateUserProfile = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const {
+      name,
+      email,
+      profile_image,
+      total_investments,
+      average_check_size,
+      successful_exits,
+      portfolio_ipr,
+      description,
+      addressable_market,
+      current_market,
+      total_assets,
+      ebitda,
+      gross_margin,
+      cac_payback_period,
+      tam,
+      sam,
+      som,
+      year_founded,
+      location,
+    } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res
+        .status(200)
+        .json({ status: false, message: "User not found." });
+    }
+
+    const updatedFields = {};
+
+    if (name) updatedFields.name = name;
+    if (email) updatedFields.email = email;
+    if (profile_image) updatedFields.profile_image = profile_image;
+    if (total_investments) updatedFields.total_investments = total_investments;
+    if (average_check_size)
+      updatedFields.average_check_size = average_check_size;
+    if (successful_exits) updatedFields.successful_exits = successful_exits;
+    if (portfolio_ipr) updatedFields.portfolio_ipr = portfolio_ipr;
+    if (description) updatedFields.description = description;
+    if (addressable_market)
+      updatedFields.addressable_market = addressable_market;
+    if (current_market) updatedFields.current_market = current_market;
+    if (total_assets) updatedFields.total_assets = total_assets;
+    if (ebitda) updatedFields.ebitda = ebitda;
+    if (gross_margin) updatedFields.gross_margin = gross_margin;
+    if (cac_payback_period)
+      updatedFields.cac_payback_period = cac_payback_period;
+    if (tam) updatedFields.tam = tam;
+    if (sam) updatedFields.sam = sam;
+    if (som) updatedFields.som = som;
+    if (year_founded) updatedFields.year_founded = year_founded;
+    if (location) updatedFields.location = location;
+
+    await user.update(updatedFields);
+    await createNotification(
+      user_id,
+      "Profile Updated",
+      "Your profile has been updated."
+    );
 
     await createAuditLog({
       userId: req.user.id,
@@ -1173,4 +1255,5 @@ module.exports = {
   updatePortfolioIPR, // Add this line
   updateDescription, // Add this line
   updateUserProfile, // Add this line
+  adminUpdateUserProfile, // Add this line
 };
