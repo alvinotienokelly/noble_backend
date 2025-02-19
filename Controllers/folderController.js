@@ -5,6 +5,7 @@ const Document = db.documents;
 const Subfolder = db.subfolders;
 const { createAuditLog } = require("./auditLogService");
 const { Op } = require("sequelize");
+const FolderAccessInvite = db.folder_access_invite;
 
 const createFolder = async (req, res) => {
   try {
@@ -245,6 +246,64 @@ const filterFolders = async (req, res) => {
   }
 };
 
+// Function to get folders in which the logged-in user has a FolderAccessInvite with status "Accepted" or "Pending"
+const getAcceptedAndPendingFolderInvites = async (req, res) => {
+  try {
+    const user_email = req.user.email;
+
+    const invites = await FolderAccessInvite.findAll({
+      where: {
+        user_email,
+        status: {
+          [db.Sequelize.Op.in]: ["Accepted", "Pending"],
+        },
+      },
+      include: [
+        {
+          model: Folder,
+          as: "folder",
+          include: [
+            {
+              model: db.users,
+              as: "creator",
+              attributes: ["id", "name", "email"],
+            },
+            {
+              model: db.users,
+              as: "createdFor",
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!invites || invites.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message:
+          "No accepted or pending folder invites found for the logged-in user.",
+      });
+    }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_ACCEPTED_AND_PENDING_FOLDER_INVITES",
+      details: `Fetched accepted and pending folder invites for user ${user_email}`,
+      ip_address: req.ip,
+    });
+
+    const folders = invites.map((invite) => invite.folder);
+
+    res.status(200).json({
+      status: true,
+      folders,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createFolder,
   getFoldersByUser,
@@ -252,4 +311,5 @@ module.exports = {
   getFolderById,
   archiveFolder,
   filterFolders, // Add this line
+  getAcceptedAndPendingFolderInvites, // Add this line
 };
