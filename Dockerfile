@@ -1,26 +1,23 @@
-# Use the official Node.js image as the base image
-FROM node:16
+# Use Node.js 23 on Alpine Linux
+FROM node:23-alpine
 
-# Install bash and curl
-RUN apk update && apk add --no-cache bash curl
+# Install dependencies for node-gyp
+RUN apk update && apk add --no-cache bash curl python3 make g++
 
-# Create a directory for the application
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# install dependencies
+# Install dependencies (using the recommended --omit=dev)
 RUN npm install --production
 
-# Copy the application code to the working directory
+# Copy the rest of the application files
 COPY . .
 
-# Make the init file executable 
-RUN chmod +x init.sh
+# Expose the application's port
+EXPOSE 3000
 
-# Expose the application on port 3000 (or the port your app uses)
-EXPOSE 3001
-
-# Command to run the application
-ENTRYPOINT ["/app/init.sh"]
+# Start the application
+CMD ["npm", "start"]
