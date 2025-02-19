@@ -1,28 +1,42 @@
-# version: "3.8"
-
 services:
-  node-app:
-    build: .
+  userservice-db:
+    image: postgres:16.3
+    container_name: noblestride-db
+    restart: always
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-    restart: always
-    networks:
-      - app-network
-
-  nginx:
-    image: nginx:latest
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "80:80"
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./static:/usr/share/nginx/html
-    depends_on:
-      - node-app
-    restart: always
+      - userservice-db-data:/var/lib/postgresql/data
     networks:
-      - app-network
+      - noblestride-network
+
+  app:
+    image: noblestride:1.0
+    container_name: noblestride
+    restart: on-failure
+    depends_on:
+      userservice-db:
+        condition: service_healthy
+
+    networks:
+      - noblestride-network
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+
+volumes:
+  userservice-db-data:
 
 networks:
-  app-network:
+  noblestride-network:
     driver: bridge
