@@ -249,7 +249,15 @@ const filterFolders = async (req, res) => {
 // Function to get folders in which the logged-in user has a FolderAccessInvite with status "Accepted" or "Pending"
 const getAcceptedAndPendingFolderInvites = async (req, res) => {
   try {
-    const user_email = req.user.email;
+    const userId = req.user.id;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+    const user_email = user.email;
 
     const invites = await FolderAccessInvite.findAll({
       where: {
