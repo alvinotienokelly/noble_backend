@@ -667,8 +667,7 @@ const updateDeal = async (req, res) => {
     res.status(500).json({ status: false, message: error.message });
   }
 };
-
-// Filter deals based on columns in the Deal model
+// Function to filter deals
 const filterDeals = async (req, res) => {
   try {
     const {
@@ -688,6 +687,10 @@ const filterDeals = async (req, res) => {
       page = 1,
       limit = 10,
       deal_type,
+      archived,
+      continent_id, // Add continent_id
+      region_id, // Add region_id
+      country_id, // Add country_id
     } = req.query;
 
     const offset = (page - 1) * limit;
@@ -745,30 +748,48 @@ const filterDeals = async (req, res) => {
         whereClause.createdAt = { [Op.lte]: new Date(endDate) };
       }
     }
+
     if (deal_type) {
       whereClause.deal_type = deal_type;
     }
+
+    if (archived !== undefined) {
+      whereClause.archived = archived === "true";
+    }
+
+    // Add filters for continent_id, region_id, and country_id
+    const includeClause = [];
+
+    if (continent_id) {
+      includeClause.push({
+        model: DealContinent,
+        as: "dealContinents",
+        where: { continent_id },
+        include: [{ model: Continent, as: "continent" }],
+      });
+    }
+
+    if (region_id) {
+      includeClause.push({
+        model: DealRegion,
+        as: "dealRegions",
+        where: { region_id },
+        include: [{ model: Region, as: "region" }],
+      });
+    }
+
+    if (country_id) {
+      includeClause.push({
+        model: DealCountry,
+        as: "dealCountries",
+        where: { country_id },
+        include: [{ model: Country, as: "country" }],
+      });
+    }
+
     const { count: totalDeals, rows: deals } = await Deal.findAndCountAll({
       where: whereClause,
-      include: [
-        { model: User, as: "createdBy" },
-        { model: User, as: "targetCompany" },
-        {
-          model: DealCountry,
-          as: "dealCountries",
-          include: [{ model: Country, as: "country" }],
-        },
-        {
-          model: DealStage,
-          as: "dealStage",
-        },
-        {
-          model: DealRegion,
-          as: "dealRegions",
-          include: [{ model: Region, as: "region" }],
-        },
-        { model: DealContinent, as: "dealContinents", include: ["continent"] },
-      ],
+      include: includeClause.length > 0 ? includeClause : undefined,
       offset,
       limit: parseInt(limit),
     });
@@ -776,11 +797,18 @@ const filterDeals = async (req, res) => {
     const totalPages = Math.ceil(totalDeals / limit);
 
     if (!deals || deals.length === 0) {
-      return res.status(200).json({
+      return res.status(404).json({
         status: false,
         message: "No deals found for the specified criteria.",
       });
     }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "FILTER_DEALS",
+      details: `Filtered deals with criteria: ${JSON.stringify(req.query)}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({
       status: true,
