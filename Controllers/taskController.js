@@ -516,7 +516,7 @@ const deleteTask = async (req, res) => {
 const getUserTasksByDealId = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { dealId } = req.params.dealId;
+    const { dealId } = req.params;
     const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
 
     const offset = (page - 1) * limit;
