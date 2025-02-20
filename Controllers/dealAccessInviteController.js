@@ -228,7 +228,7 @@ const checkAcceptedDealAccessInvite = async (req, res) => {
 
     if (!invite) {
       return res
-        .status(404)
+        .status(200)
         .json({
           status: false,
           message: "No accepted invite found for this deal.",
