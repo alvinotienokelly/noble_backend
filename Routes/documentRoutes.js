@@ -9,6 +9,7 @@ const {
   getDocumentsByUserDeals,
   documentsFilter,
   archiveDocument, // Add this line
+  getDocumentsForUserWithShareStatus, // Add this line
 } = documentController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
@@ -18,6 +19,11 @@ const router = express.Router();
 
 router.post("/", authMiddleware, fileUpload, createDocument);
 router.get("/", authMiddleware, getAllDocuments);
+router.get(
+  "/user/documents",
+  authMiddleware,
+  getDocumentsForUserWithShareStatus
+); // Add this line
 router.get("/:id", authMiddleware, getDocumentById);
 router.put("/:id", authMiddleware, checkAdmin, fileUpload, updateDocument);
 router.delete("/:id", authMiddleware, checkAdmin, deleteDocument);

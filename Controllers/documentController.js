@@ -11,6 +11,7 @@ const {
 } = require("../Middlewares/docusignService");
 const logger = require("../Middlewares/logger");
 const DocumentType = db.document_types;
+const DocumentShare = db.document_shares;
 
 const { createAuditLog } = require("./auditLogService");
 
@@ -372,6 +373,70 @@ const archiveDocument = async (req, res) => {
   }
 };
 
+// Function to get documents for the logged-in user with DocumentShare status "Pending" or "Accepted"
+const getDocumentsForUserWithShareStatus = async (req, res) => {
+  try {
+    const user_email = req.user.email;
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    const { count: totalShares, rows: shares } =
+      await DocumentShare.findAndCountAll({
+        where: {
+          user_email,
+          status: {
+            [db.Sequelize.Op.in]: ["Pending", "Accepted"],
+          },
+        },
+        include: [
+          {
+            model: Document,
+            as: "document",
+            include: [
+              {
+                model: db.users,
+                as: "uploader",
+                attributes: ["id", "name", "email"],
+              },
+              { model: db.deals, as: "deal", attributes: ["deal_id", "title"] },
+            ],
+          },
+        ],
+        offset,
+        limit: parseInt(limit),
+      });
+
+    if (!shares || shares.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message:
+          "No documents found for the logged-in user with the specified share status.",
+      });
+    }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_DOCUMENTS_FOR_USER_WITH_SHARE_STATUS",
+      details: `Fetched documents for user ${user_email} with share status "Pending" or "Accepted"`,
+      ip_address: req.ip,
+    });
+
+    const documents = shares.map((share) => share.document);
+    const totalPages = Math.ceil(totalShares / limit);
+
+    res.status(200).json({
+      status: true,
+      totalShares,
+      totalPages,
+      currentPage: parseInt(page),
+      documents,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createDocument,
   getAllDocuments,
@@ -381,4 +446,5 @@ module.exports = {
   getDocumentsByUserDeals,
   documentsFilter,
   archiveDocument, // Add this line
+  getDocumentsForUserWithShareStatus, // Add this line
 };
