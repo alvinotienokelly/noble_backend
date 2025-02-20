@@ -22,6 +22,7 @@ const DealStage = db.deal_stages;
 const Task = db.tasks;
 const { createAuditLog } = require("./auditLogService");
 // const DealAccessInvite = db.deal_access_invite;
+const Continent = db.continents;
 
 // Create a new deal
 const createDeal = async (req, res) => {
