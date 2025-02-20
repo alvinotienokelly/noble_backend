@@ -216,6 +216,40 @@ const rejectDealInvite = async (req, res) => {
   }
 };
 
+// Function to check if the logged-in user has a DealAccessInvite for a deal that is Accepted
+const checkAcceptedDealAccessInvite = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { deal_id } = req.body;
+
+    const invite = await DealAccessInvite.findOne({
+      where: { investor_id: user_id, deal_id, status: "Accepted" },
+    });
+
+    if (!invite) {
+      return res
+        .status(404)
+        .json({
+          status: false,
+          message: "No accepted invite found for this deal.",
+        });
+    }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "CHECK_ACCEPTED_DEAL_ACCESS_INVITE",
+      details: `Checked accepted deal access invite for deal ${deal_id}`,
+      ip_address: req.ip,
+    });
+
+    res
+      .status(200)
+      .json({ status: true, message: "Accepted invite found for this deal." });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   sendDealAccessInvite,
   getInvestorInvites,
@@ -223,4 +257,5 @@ module.exports = {
   rejectDealInvite,
   acceptDealInvite,
   expressDealInterest,
+  checkAcceptedDealAccessInvite,
 };
