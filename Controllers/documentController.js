@@ -376,10 +376,18 @@ const archiveDocument = async (req, res) => {
 // Function to get documents for the logged-in user with DocumentShare status "Pending" or "Accepted"
 const getDocumentsForUserWithShareStatus = async (req, res) => {
   try {
-    const user_email = req.user.email;
+    const userId = req.user.id;
     const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
 
     const offset = (page - 1) * limit;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found." });
+    }
+    const user_email = user.email;
 
     const { count: totalShares, rows: shares } =
       await DocumentShare.findAndCountAll({
