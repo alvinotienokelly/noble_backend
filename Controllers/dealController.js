@@ -506,7 +506,7 @@ const getDealById = async (req, res) => {
     });
     if (!deal) {
       return res
-        .status(404)
+        .status(200)
         .json({ status: "false", message: "Deal not found." });
     }
     const created_by = req.user.id;
@@ -597,7 +597,7 @@ const updateDeal = async (req, res) => {
 
     if (!deal) {
       return res
-        .status(404)
+        .status(200)
         .json({ status: false, message: "Deal not found." });
     }
 
@@ -798,7 +798,7 @@ const filterDeals = async (req, res) => {
     const totalPages = Math.ceil(totalDeals / limit);
 
     if (!deals || deals.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         status: false,
         message: "No deals found for the specified criteria.",
       });
@@ -1003,7 +1003,7 @@ const markDealAsActive = async (req, res) => {
 
     if (!deal) {
       return res
-        .status(404)
+        .status(200)
         .json({ status: false, message: "Deal not found." });
     }
 
@@ -1210,7 +1210,7 @@ const filterDealsByLocation = async (req, res) => {
     const totalPages = Math.ceil(totalDeals / limit);
 
     if (!deals || deals.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         status: false,
         message: "No deals found for the specified criteria.",
       });
