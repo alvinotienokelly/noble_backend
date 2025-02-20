@@ -14,6 +14,7 @@ const {
   assignTaskToUser,
   changeTaskStatus,
   getTasksForUserDeals,
+  getUserTasksByDealId,
 } = taskController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 
