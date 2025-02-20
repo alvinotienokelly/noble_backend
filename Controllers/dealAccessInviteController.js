@@ -165,9 +165,9 @@ const acceptDealInvite = async (req, res) => {
         .json({ status: false, message: "Invite not found." });
     }
 
-    if (invite.investor_id !== req.user.id) {
-      return res.status(200).json({ status: false, message: "Access denied." });
-    }
+    // if (invite.investor_id !== req.user.id) {
+    //   return res.status(200).json({ status: false, message: "Access denied." });
+    // }
 
     invite.status = "Accepted";
     await invite.save();
