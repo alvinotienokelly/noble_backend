@@ -21,6 +21,7 @@ const router = express.Router();
 
 router.post("/", authMiddleware, createTask);
 router.get("/", authMiddleware, getAllTasks);
+router.get("/deal/:dealId/user-tasks", authMiddleware, getUserTasksByDealId); // Add this line
 router.get("/user", authMiddleware, getTasksByUserId);
 router.get("/:id", authMiddleware, getTaskById);
 router.put("/:id", authMiddleware, updateTask);

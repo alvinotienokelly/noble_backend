@@ -512,6 +512,54 @@ const deleteTask = async (req, res) => {
   }
 };
 
+// Function to get user tasks by dealId
+const getUserTasksByDealId = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { dealId } = req.params.dealId;
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    const { count: totalTasks, rows: tasks } = await Task.findAndCountAll({
+      where: { deal_id: dealId, assigned_to: userId },
+      include: [
+        { model: User, as: "assignee" },
+        { model: User, as: "creator" },
+        { model: Deal, as: "deal" },
+      ],
+      offset,
+      limit: parseInt(limit),
+    });
+
+    const totalPages = Math.ceil(totalTasks / limit);
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No tasks found for this deal.",
+      });
+    }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "GET_USER_TASKS_BY_DEAL_ID",
+      description: `Fetched tasks for deal with ID ${dealId} assigned to user with ID ${userId}.`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({
+      status: true,
+      totalTasks,
+      totalPages,
+      currentPage: parseInt(page),
+      tasks,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   createTask,
   getAllTasks,
@@ -526,4 +574,5 @@ module.exports = {
   assignTaskToUser,
   changeTaskStatus,
   getTasksForUserDeals,
+  getUserTasksByDealId, // Add this line
 };
