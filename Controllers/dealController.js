@@ -1128,6 +1128,84 @@ const markDealAsArchived = async (req, res) => {
   }
 };
 
+// Function to filter deals by continent_id, region_id, or country_id
+const filterDealsByLocation = async (req, res) => {
+  try {
+    const {
+      continent_id,
+      region_id,
+      country_id,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const whereClause = {};
+
+    if (continent_id) {
+      whereClause["$dealContinents.continent_id$"] = continent_id;
+    }
+
+    if (region_id) {
+      whereClause["$dealRegions.region_id$"] = region_id;
+    }
+
+    if (country_id) {
+      whereClause["$dealCountries.country_id$"] = country_id;
+    }
+
+    const { count: totalDeals, rows: deals } = await Deal.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: DealContinent,
+          as: "dealContinents",
+          include: [{ model: Continent, as: "continent" }],
+        },
+        {
+          model: DealRegion,
+          as: "dealRegions",
+          include: [{ model: Region, as: "region" }],
+        },
+        {
+          model: DealCountry,
+          as: "dealCountries",
+          include: [{ model: Country, as: "country" }],
+        },
+      ],
+      offset,
+      limit: parseInt(limit),
+    });
+
+    const totalPages = Math.ceil(totalDeals / limit);
+
+    if (!deals || deals.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "No deals found for the specified criteria.",
+      });
+    }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "FILTER_DEALS_BY_LOCATION",
+      details: `Filtered deals by location - Continent ID: ${continent_id}, Region ID: ${region_id}, Country ID: ${country_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({
+      status: true,
+      totalDeals,
+      totalPages,
+      currentPage: parseInt(page),
+      deals,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   markDealAsArchived,
   createDeal,
@@ -1146,4 +1224,5 @@ module.exports = {
   markDealOnhold,
   markDealClosed,
   markDealClosedAndOpened,
+  filterDealsByLocation,
 };
