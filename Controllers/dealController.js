@@ -675,7 +675,6 @@ const updateDealStage = async (req, res) => {
     const { deal_stage_id } = req.body;
     const deal = await Deal.findByPk(req.params.id);
     const id = deal.deal_id;
-    const success_fee_percentage = (success_fee / 100) * deal_size;
 
     if (!deal) {
       return res
