@@ -18,6 +18,7 @@ const {
   markDealClosedAndOpened,
   markDealAsArchived, // Add this line
   filterDealsByLocation,
+  updateDealStage,
 } = dealController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
@@ -26,6 +27,7 @@ const router = express.Router();
 
 router.post("/", authMiddleware, checkAdmin, createDeal);
 router.get("/", authMiddleware, getAllDeals);
+router.put("/:id/update-stage", authMiddleware, updateDealStage); // Add this line
 router.get("/filter-by-location", authMiddleware, filterDealsByLocation); // Add this line
 router.get("/getTargetCompanyDeals", authMiddleware, getTargetCompanyDeals);
 router.get("/accepted-deals", authMiddleware, getAcceptedDealsForInvestor); // Add this line

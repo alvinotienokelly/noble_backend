@@ -668,6 +668,38 @@ const updateDeal = async (req, res) => {
     res.status(500).json({ status: false, message: error.message });
   }
 };
+
+// Update a deal by ID
+const updateDealStage = async (req, res) => {
+  try {
+    const { deal_stage_id } = req.body;
+    const deal = await Deal.findByPk(req.params.id);
+    const id = deal.deal_id;
+    const success_fee_percentage = (success_fee / 100) * deal_size;
+
+    if (!deal) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Deal not found." });
+    }
+
+    await deal.update({
+      deal_stage_id,
+    });
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "UPDATE_DEAL",
+      details: `Updated deal with ID ${deal.deal_id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({ status: true, deal });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 // Function to filter deals
 const filterDeals = async (req, res) => {
   try {
@@ -1254,4 +1286,5 @@ module.exports = {
   markDealClosed,
   markDealClosedAndOpened,
   filterDealsByLocation,
+  updateDealStage,
 };
