@@ -44,7 +44,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 //port for my database is 5433
 //database name is discover
 const sequelize = new Sequelize(
-  "postgresql://noblestride_liv1_user:VAAXtPf98mDkZkyAuD2c1B4FIBZ5q6Sz@dpg-cuiqfu8gph6c73aed00g-a/noblestride_liv1",
+  "postgres://postgres:@@7389@localhost:5432/noblestride",
   { dialect: "postgres" }
 );
 
@@ -170,18 +170,27 @@ db.country_preferences = require("./CountryPreferenceModel")(
   sequelize,
   DataTypes
 );
-db.DealLead = require("./dealLeadModel")(sequelize, DataTypes);
+db.deal_leads = require("./dealLeadModel")(sequelize, DataTypes);
 
 // Define associations
-db.users.belongsToMany(db.deals, {
-  through: db.DealLead,
+db.users.hasMany(db.deal_leads, {
   foreignKey: "user_id",
-  as: "deals",
+  as: "dealLeads",
 });
-db.deals.belongsToMany(db.users, {
-  through: db.DealLead,
+
+db.deals.hasMany(db.deal_leads, {
   foreignKey: "deal_id",
   as: "dealLeads",
+});
+
+db.deal_leads.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+db.deal_leads.belongsTo(db.deals, {
+  foreignKey: "deal_id",
+  as: "deal",
 });
 
 db.country_preferences.belongsTo(db.users, {

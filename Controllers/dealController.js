@@ -23,7 +23,7 @@ const Task = db.tasks;
 const { createAuditLog } = require("./auditLogService");
 // const DealAccessInvite = db.deal_access_invite;
 const Continent = db.continents;
-const DealLead = db.deal_lead;
+const DealLead = db.deal_leads;
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -583,6 +583,7 @@ const updateDeal = async (req, res) => {
       key_investors,
       sector_id,
       subsector_id,
+      deal_leads,
       deal_type,
       teaser,
       has_information_memorandum,
