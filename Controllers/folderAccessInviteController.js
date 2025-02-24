@@ -5,6 +5,7 @@ const Folder = db.folders;
 const User = db.users;
 const { sendEmail } = require("../Middlewares/emailService");
 const { createAuditLog } = require("./auditLogService");
+const { createNotification } = require("./notificationController");
 
 // Function to send folder access invite
 const sendFolderAccessInvite = async (req, res) => {
@@ -34,7 +35,9 @@ const sendFolderAccessInvite = async (req, res) => {
         // Send email to user
         const emailSubject = "Folder Access Invitation";
         const emailBody = `Hello,\n\nYou have been invited to access the folder "${folder.name}". Please log in to your account to view the details.\n\nBest regards,\nYour Team`;
-        await sendEmail(user_email, emailSubject, emailBody);
+        // await sendEmail(user_email, emailSubject, emailBody);
+
+        const user = await User.findOne({ where: { email: user_email } });
 
         await createAuditLog({
           action: "SEND_FOLDER_ACCESS_INVITE",
@@ -42,6 +45,12 @@ const sendFolderAccessInvite = async (req, res) => {
           userId: req.user.id,
           ip_address: req.ip,
         });
+
+        await createNotification(
+          user.id,
+          "Folder Access Invitation",
+          "You have been invited to access a folder."
+        );
 
         return invite;
       })
@@ -75,6 +84,13 @@ const acceptFolderAccessInvite = async (req, res) => {
       ip_address: req.ip,
     });
 
+    const folder = await Folder.findByPk(invite.folder_id);
+    await createNotification(
+      req.user.id,
+      "Folder Access Accepted",
+      `You have accepted the invite to access the folder "${folder.name}".`
+    );
+
     res.status(200).json({ status: true, invite });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -103,6 +119,13 @@ const rejectFolderAccessInvite = async (req, res) => {
       ip_address: req.ip,
     });
 
+    const folder = await Folder.findByPk(invite.folder_id);
+    await createNotification(
+      req.user.id,
+      "Folder Access Rejected",
+      `You have rejected the invite to access the folder "${folder.name}".`
+    );
+
     res.status(200).json({ status: true, invite });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -124,6 +147,12 @@ const getFolderInvites = async (req, res) => {
       userId: req.user.id,
       ip_address: req.ip,
     });
+    const folder = await Folder.findByPk(folder_id);
+    await createNotification(
+      req.user.id,
+      "Folder Invites Fetched",
+      `You have fetched the invites for the folder "${folder.name}".`
+    );
     res.status(200).json({ status: true, invites });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
