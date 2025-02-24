@@ -14,6 +14,7 @@ const DocumentType = db.document_types;
 const DocumentShare = db.document_shares;
 
 const { createAuditLog } = require("./auditLogService");
+const { createNotification } = require("./notificationController");
 
 const createDocument = async (req, res) => {
   try {
@@ -81,6 +82,12 @@ const createDocument = async (req, res) => {
       ip_address: req.ip,
     });
 
+    await createNotification(
+      uploaded_by,
+      "Document Upload",
+      "Document uploaded successfully"
+    );
+
     res.status(200).json({ status: true, document });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -145,6 +152,15 @@ const documentsFilter = async (req, res) => {
         message: "No documents found for the specified criteria.",
       });
     }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "FILTER_DOCUMENTS",
+      description: `User ${
+        req.user.id
+      } filtered documents with criteria: ${JSON.stringify(req.query)}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({
       status: true,
@@ -214,6 +230,11 @@ const getDocumentsByUserDeals = async (req, res) => {
       description: `User ${userId} retrieved documents for their deals`,
       ip_address: req.ip,
     });
+    await createNotification(
+      userId,
+      "Documents Retrieved",
+      "Documents for your deals have been retrieved successfully"
+    );
     res.status(200).json({ status: true, documents });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -256,6 +277,11 @@ const getDocumentById = async (req, res) => {
         description: `User ${req.user.id} retrieved signing URL for document ${document.document_id}`,
         ip_address: req.ip,
       });
+      await createNotification(
+        req.user.id,
+        "Document Signing",
+        `Signing URL for document ${document.document_id} retrieved successfully`
+      );
       return res.status(200).json({ status: true, signingUrl });
     }
     res.status(200).json({ status: true, document });
@@ -319,6 +345,11 @@ const updateDocument = async (req, res) => {
       description: `Document ${document.file_name} updated by user ${uploaded_by}`,
       ip_address: req.ip,
     });
+    await createNotification(
+      uploaded_by,
+      "Document Update",
+      `Document ${document.file_name} updated successfully`
+    );
     await document.update(req.body);
     res.status(200).json({ status: true, document });
   } catch (error) {
@@ -335,6 +366,17 @@ const deleteDocument = async (req, res) => {
         .json({ status: false, message: "Document not found." });
     }
     await document.destroy();
+    await createNotification(
+      req.user.id,
+      "Document Deletion",
+      `Document ${document.file_name} deleted successfully`
+    );
+    await createAuditLog({
+      userId: req.user.id,
+      action: "DELETE_DOCUMENT",
+      description: `Document ${document.file_name} deleted by user ${req.user.id}`,
+      ip_address: req.ip,
+    });
     res
       .status(200)
       .json({ status: true, message: "Document deleted successfully." });
@@ -364,6 +406,12 @@ const archiveDocument = async (req, res) => {
       description: `Document with ID ${id} archived`,
       ip_address: req.ip,
     });
+
+    await createNotification(
+      req.user.id,
+      "Document Archived",
+      `Document ${document.file_name} archived successfully`
+    );
 
     res
       .status(200)
@@ -429,6 +477,12 @@ const getDocumentsForUserWithShareStatus = async (req, res) => {
       details: `Fetched documents for user ${user_email} with share status "Pending" or "Accepted"`,
       ip_address: req.ip,
     });
+
+    await createNotification(
+      req.user.id,
+      "Document Share Status",
+      `Documents with share status "Pending" or "Accepted" retrieved successfully`
+    );
 
     const documents = shares.map((share) => share.document);
     const totalPages = Math.ceil(totalShares / limit);

@@ -172,6 +172,12 @@ const deleteDealTypePreference = async (req, res) => {
     }
 
     await dealTypePreference.destroy();
+    await createAuditLog({
+      userId: req.user.id,
+      ip_address: req.ip,
+      action: "DELETE_DEAL_TYPE_PREFERENCE",
+      details: `Deleted deal type preference with id: ${id}`,
+    });
     res
       .status(200)
       .json({ status: true, message: "Preference deleted successfully." });
