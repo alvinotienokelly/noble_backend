@@ -7,6 +7,7 @@ const { sendEmail } = require("../Middlewares/emailService");
 const { createAuditLog } = require("./auditLogService");
 const InvestorMilestoneStatus = db.investor_milestone_statuses;
 const InvestorMilestone = db.investor_milestones;
+const { createNotification } = require("./notificationController");
 
 // Function to send deal access invite
 const sendDealAccessInvite = async (req, res) => {
@@ -32,6 +33,13 @@ const sendDealAccessInvite = async (req, res) => {
       investor_id,
       deal_id,
     });
+
+    await createNotification(
+      investor_id,
+      "Deal Access Invitation",
+      "You have been invited to access a deal" + deal.project
+    );
+
     // Create audit log
     await createAuditLog({
       userId: req.user.id,
@@ -91,6 +99,12 @@ const expressDealInterest = async (req, res) => {
         status: "Pending",
       });
     }
+
+    await createNotification(
+      investor_id,
+      "Deal Interest Expressed",
+      `You have expressed interest in the deal "${deal.project}".`
+    );
 
     await createAuditLog({
       userId: req.user.id,
@@ -172,6 +186,12 @@ const acceptDealInvite = async (req, res) => {
     invite.status = "Accepted";
     await invite.save();
 
+    await createNotification(
+      invite.investor_id,
+      "Deal Invite Accepted",
+      `Your invite for the deal "${invite.deal_id}" has been accepted.`
+    );
+
     await createAuditLog({
       userId: req.user.id,
       action: "ACCEPT_DEAL_INVITE",
@@ -210,6 +230,12 @@ const rejectDealInvite = async (req, res) => {
       ip_address: req.ip,
     });
 
+    await createNotification(
+      invite.investor_id,
+      "Deal Invite Rejected",
+      `Your invite for the deal "${invite.deal_id}" has been rejected.`
+    );
+
     res.status(200).json({ status: true, invite });
   } catch (error) {
     res.status(200).json({ status: false, message: error.message });
@@ -227,12 +253,10 @@ const checkAcceptedDealAccessInvite = async (req, res) => {
     });
 
     if (!invite) {
-      return res
-        .status(200)
-        .json({
-          status: false,
-          message: "No accepted invite found for this deal.",
-        });
+      return res.status(200).json({
+        status: false,
+        message: "No accepted invite found for this deal.",
+      });
     }
 
     await createAuditLog({
@@ -241,6 +265,12 @@ const checkAcceptedDealAccessInvite = async (req, res) => {
       details: `Checked accepted deal access invite for deal ${deal_id}`,
       ip_address: req.ip,
     });
+
+    await createNotification(
+      user_id,
+      "Accepted Deal Access Invite",
+      `You have an accepted invite for the deal "${deal_id}".`
+    );
 
     res
       .status(200)
