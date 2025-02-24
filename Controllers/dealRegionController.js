@@ -3,7 +3,7 @@ const db = require("../Models");
 const DealRegion = db.deal_regions;
 const Deal = db.deals;
 const Region = db.regions;
-
+const { createAuditLog } = require("./auditLogService");
 // Add a region to a deal
 const addRegionToDeal = async (req, res) => {
   try {
@@ -17,6 +17,7 @@ const addRegionToDeal = async (req, res) => {
     }
 
     const region = await Region.findByPk(region_id);
+
     if (!region) {
       return res
         .status(404)
@@ -27,7 +28,12 @@ const addRegionToDeal = async (req, res) => {
       deal_id,
       region_id,
     });
-
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Create_Deal_Region",
+      details: `User created a region for deal with id ${deal_id}`,
+      ip_address: req.ip,
+    });
     res.status(201).json({ status: true, dealRegion });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -48,6 +54,13 @@ const getRegionsForDeal = async (req, res) => {
         .status(404)
         .json({ status: false, message: "Deal not found." });
     }
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Get_Deal_Regions",
+      details: `User retrieved regions for deal with id ${deal_id}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({ status: true, regions: deal.regions });
   } catch (error) {
@@ -71,12 +84,16 @@ const removeRegionFromDeal = async (req, res) => {
     }
 
     await dealRegion.destroy();
-    res
-      .status(200)
-      .json({
-        status: true,
-        message: "Region removed from deal successfully.",
-      });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Remove_Deal_Region",
+      details: `User removed region with id ${region_id} from deal with id ${deal_id}`,
+      ip_address: req.ip,
+    });
+    res.status(200).json({
+      status: true,
+      message: "Region removed from deal successfully.",
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
