@@ -5,7 +5,9 @@ const DealStage = db.deal_stages;
 const User = db.users;
 const Deal = db.deals;
 const { createAuditLog } = require("./auditLogService");
+const { createNotification } = require("./notificationController");
 
+// Fu
 const updateInvestorDealStage = async (req, res) => {
   try {
     const { investor_id, deal_id, stage_id } = req.body;
@@ -36,6 +38,11 @@ const updateInvestorDealStage = async (req, res) => {
       description: "InvestorDealStage",
       ip_address: req.ip,
     });
+    await createNotification(
+      investor_id,
+      "Investor deal stage updated",
+      "Investor deal stage updated successfully"
+    );
     res.status(200).json({ status: true, investment });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -58,6 +65,12 @@ const addInvestorToDealStage = async (req, res) => {
       description: "InvestorDealStage",
       ip_address: req.ip,
     });
+
+    await createNotification(
+      investor_id,
+      "Investor added to deal stage",
+      "Investor has been successfully added to the deal stage"
+    );
 
     res.status(201).json({ status: true, investment });
   } catch (error) {
