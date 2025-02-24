@@ -170,6 +170,19 @@ db.country_preferences = require("./CountryPreferenceModel")(
   sequelize,
   DataTypes
 );
+db.DealLead = require("./dealLeadModel")(sequelize, DataTypes);
+
+// Define associations
+db.users.belongsToMany(db.deals, {
+  through: db.DealLead,
+  foreignKey: "user_id",
+  as: "deals",
+});
+db.deals.belongsToMany(db.users, {
+  through: db.DealLead,
+  foreignKey: "deal_id",
+  as: "dealLeads",
+});
 
 db.country_preferences.belongsTo(db.users, {
   foreignKey: "user_id",

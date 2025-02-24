@@ -34,7 +34,7 @@ const createDeal = async (req, res) => {
       deal_size,
       target_company_id,
       key_investors,
-      deal_lead,
+      deal_leads, // Expecting array of user IDs
       has_information_memorandum,
       has_vdr,
       consultant_name,
@@ -62,7 +62,6 @@ const createDeal = async (req, res) => {
       deal_size,
       target_company_id,
       key_investors,
-      deal_lead,
       deal_type,
       teaser,
       has_information_memorandum,
@@ -76,7 +75,15 @@ const createDeal = async (req, res) => {
       retainer_amount, // Include retainer_amount
       success_fee_percentage, // Include access_fee_amount
     });
-
+    // Loop through deal_leads and create entries in DealLead
+    if (deal_leads && deal_leads.length > 0) {
+      for (const user_id of deal_leads) {
+        await DealLead.create({
+          deal_id: newDeal.deal_id,
+          user_id,
+        });
+      }
+    }
     // Loop through continent_ids and create entries in DealContinent
     if (continent_ids && continent_ids.length > 0) {
       for (const continent_id of continent_ids) {
@@ -569,7 +576,6 @@ const updateDeal = async (req, res) => {
     const {
       title,
       description,
-      deal_lead,
       deal_stage_id,
       deal_size,
       target_company_id,
@@ -608,7 +614,6 @@ const updateDeal = async (req, res) => {
       deal_size,
       target_company_id,
       key_investors,
-      deal_lead,
       deal_type,
       teaser,
       has_information_memorandum,
@@ -622,6 +627,16 @@ const updateDeal = async (req, res) => {
       retainer_amount, // Include retainer_amount
       success_fee_percentage, // Include access_fee_amount
     });
+    // Update DealLead entries
+    if (deal_leads) {
+      await DealLead.destroy({ where: { deal_id: id } });
+      for (const user_id of deal_leads) {
+        await DealLead.create({
+          deal_id: id,
+          user_id,
+        });
+      }
+    }
 
     // Update DealContinent entries
     if (continent_ids) {
