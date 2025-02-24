@@ -3,6 +3,8 @@ const db = require("../Models");
 const DealMilestoneStatus = db.deal_milestone_statuses;
 const DealMilestone = db.deal_milestones;
 const Deal = db.deals;
+const { createNotification } = require("./notificationController");
+const { createAuditLog } = require("./auditLogService");
 
 // Create a new deal milestone status
 const createDealMilestoneStatus = async (req, res) => {
@@ -13,6 +15,19 @@ const createDealMilestoneStatus = async (req, res) => {
       deal_id,
       status,
     });
+    await createNotification(
+      req.user.id,
+      `New milestone status created for deal: ${deal_id}`,
+      "deal_milestone_status"
+    );
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Create_Deal_Milestone_Status",
+      details: `Milestone status created for deal: ${deal_id}`,
+      ip_address: req.ip,
+    });
+
     res.status(201).json({ status: true, milestoneStatus });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -80,6 +95,17 @@ const updateDealMilestoneStatus = async (req, res) => {
         .status(404)
         .json({ status: false, message: "Milestone status not found." });
     }
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Update_Deal_Milestone_Status",
+      details: `Milestone status updated for deal: ${milestoneStatus.deal_id}`,
+      ip_address: req.ip,
+    });
+    await createNotification(
+      req.user.id,
+      `Milestone status updated for deal: ${milestoneStatus.deal_id}`,
+      "deal_milestone_status"
+    );
     await milestoneStatus.update({ status });
     res.status(200).json({ status: true, milestoneStatus });
   } catch (error) {
@@ -97,12 +123,21 @@ const deleteDealMilestoneStatus = async (req, res) => {
         .json({ status: false, message: "Milestone status not found." });
     }
     await milestoneStatus.destroy();
-    res
-      .status(200)
-      .json({
-        status: true,
-        message: "Milestone status deleted successfully.",
-      });
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Delete_Deal_Milestone_Status",
+      details: `Milestone status deleted for deal: ${milestoneStatus.deal_id}`,
+      ip_address: req.ip,
+    });
+    await createNotification(
+      req.user.id,
+      `Milestone status deleted for deal: ${milestoneStatus.deal_id}`,
+      "deal_milestone_status"
+    );
+    res.status(200).json({
+      status: true,
+      message: "Milestone status deleted successfully.",
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
   }
