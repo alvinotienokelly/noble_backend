@@ -752,6 +752,13 @@ const filterDeals = async (req, res) => {
     if (target_company_id) {
       whereClause.target_company_id = target_company_id;
     }
+    if (sector_id) {
+      whereClause.sector_id = sector_id;
+    }
+
+    if (subsector_id) {
+      whereClause.subsector_id = subsector_id;
+    }
 
     if (key_investors) {
       whereClause.key_investors = { [Op.iLike]: `%${key_investors}%` }; // Case-insensitive search
