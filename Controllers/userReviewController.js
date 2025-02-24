@@ -1,6 +1,8 @@
 const db = require("../Models");
 const UserReview = db.user_reviews;
 const User = db.users;
+const { createNotification } = require("./notificationController");
+const { createAuditLog } = require("./auditLogService");
 
 const createUserReview = async (req, res) => {
   try {
@@ -10,6 +12,19 @@ const createUserReview = async (req, res) => {
       rating,
       review_note,
       relationship,
+    });
+
+    await createNotification(
+      user_id,
+      "User Review Created",
+      "A user review has been created for you."
+    );
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Create_User_Review",
+      details: `User review created for user with ID ${user_id}`,
+      ip_address: req.ip,
     });
 
     res.status(201).json({ status: true, userReview });
@@ -32,6 +47,19 @@ const getUserReviews = async (req, res) => {
       });
 
     const totalPages = Math.ceil(totalUserReviews / limit);
+
+    await createNotification(
+      req.user.id,
+      "User Reviews Retrieved",
+      `User reviews have been retrieved for page ${page}.`
+    );
+
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Get_User_Reviews",
+      details: `User reviews retrieved for page ${page} with limit ${limit}`,
+      ip_address: req.ip,
+    });
 
     res.status(200).json({
       status: true,
@@ -70,6 +98,12 @@ const updateUserReview = async (req, res) => {
         .json({ status: false, message: "User review not found." });
     }
     await userReview.update(req.body);
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Update_User_Review",
+      details: `User review with ID ${req.params.id} updated`,
+      ip_address: req.ip,
+    });
     res.status(200).json({ status: true, userReview });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -85,6 +119,12 @@ const deleteUserReview = async (req, res) => {
         .json({ status: false, message: "User review not found." });
     }
     await userReview.destroy();
+    await createAuditLog({
+      userId: req.user.id,
+      action: "Delete_User_Review",
+      details: `User review with ID ${req.params.id} deleted`,
+      ip_address: req.ip,
+    });
     res
       .status(200)
       .json({ status: true, message: "User review deleted successfully." });
