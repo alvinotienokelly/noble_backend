@@ -4,6 +4,7 @@ const DocumentShare = db.document_shares;
 const Document = db.documents;
 const { sendEmail } = require("../Middlewares/emailService");
 const { createAuditLog } = require("./auditLogService");
+const { createNotification } = require("./notificationController");
 
 // Function to share a document
 const shareDocument = async (req, res) => {
@@ -33,6 +34,14 @@ const shareDocument = async (req, res) => {
       userId: req.user.id,
       description: `Document "${document.file_name}" shared with ${user_email}.`,
     });
+
+    const user = await db.users.findOne({ where: { email: user_email } });
+
+    await createNotification(
+      user.id,
+      "Document Access Invitation",
+      "You have been invited to access a document. " + document.file_name
+    );
     res.status(200).json({ status: true, share });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -61,6 +70,13 @@ const acceptDocumentShare = async (req, res) => {
       description: `Document share with ID ${share_id} accepted.`,
     });
 
+    const document = await Document.findByPk(share.document_id);
+    await createNotification(
+      req.user.id,
+      "Document Share Accepted",
+      `You have accepted the document share for "${document.file_name}".`
+    );
+
     res.status(200).json({ status: true, share });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -88,6 +104,13 @@ const rejectDocumentShare = async (req, res) => {
       description: `Document share with ID ${share_id} rejected.`,
     });
 
+    const document = await Document.findByPk(share.document_id);
+    await createNotification(
+      req.user.id,
+      "Document Share Rejected",
+      `You have rejected the document share for "${document.file_name}".`
+    );
+
     res.status(200).json({ status: true, share });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -110,7 +133,7 @@ const getDocumentShares = async (req, res) => {
       userId: req.user.id,
       description: `Fetched shares for document ID ${document_id}.`,
     });
-    
+
     res.status(200).json({ status: true, shares });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
