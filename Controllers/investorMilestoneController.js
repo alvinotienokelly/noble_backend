@@ -16,11 +16,11 @@ const createInvestorMilestone = async (req, res) => {
       details: `Milestone: ${milestone.name}`,
       ip_address: req.ip,
     });
-    await createNotification({
+    await createNotification(
       req.user.id,
       "New Milestone Created",
-      `You created a new milestone with ID ${milestone.id}`,
-    });
+      `You created a new milestone with ID ${milestone.id}`
+    );
     res.status(200).json({ status: true, milestone });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
