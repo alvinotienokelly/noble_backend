@@ -208,16 +208,20 @@ const signup = async (req, res) => {
       role,
       role_id,
       password,
-      preference_sector,
-      preference_region,
+      continent_ids,
+      sub_sector_ids,
+      region_ids,
+      country_ids,
+      sector_ids,
+      ticket_size_min,
+      ticket_size_max,
+      deal_types,
     } = req.body;
     const data = {
       name,
       email,
       role,
       role_id,
-      preference_sector,
-      preference_region,
       password: await bcrypt.hash(password, 10),
     };
 
@@ -230,6 +234,40 @@ const signup = async (req, res) => {
       });
     }
 
+    if (!Array.isArray(sub_sector_ids) || sub_sector_ids.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid sub-sector IDs provided." });
+    }
+    if (!Array.isArray(region_ids) || region_ids.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid region IDs provided." });
+    }
+
+    if (!Array.isArray(sector_ids) || sector_ids.length === 0) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Invalid sector IDs provided." });
+    }
+
+    if (!Array.isArray(country_ids) || country_ids.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid country IDs provided." });
+    }
+    if (!Array.isArray(deal_types) || deal_types.length === 0) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Invalid deal types provided." });
+    }
+
+    if (!Array.isArray(continent_ids) || continent_ids.length === 0) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid continent IDs provided." });
+    }
+
     //saving the user
     const user = await User.create(data);
 
@@ -240,6 +278,79 @@ const signup = async (req, res) => {
       let token = jwt.sign({ id: user.id }, process.env.secretKey, {
         expiresIn: 1 * 24 * 60 * 60 * 1000,
       });
+
+      // Create user preferences
+      if (sector_ids && sector_ids.length > 0) {
+        const sectorPreferences = await Promise.all(
+          sector_ids.map(async (sector_id) => {
+            return await SectorPreference.create({
+              user_id: user.id,
+              sector_id,
+            });
+          })
+        );
+      }
+
+      if (deal_types && deal_types.length > 0) {
+        const dealTypePreferences = await Promise.all(
+          deal_types.map(async (deal_type) => {
+            return await DealTypePreferences.create({
+              user_id: user.id,
+              deal_type,
+            });
+          })
+        );
+      }
+
+      if (sub_sector_ids && sub_sector_ids.length > 0) {
+        const subSectorPreferences = await Promise.all(
+          sub_sector_ids.map(async (sub_sector_id) => {
+            return await SubSectorPreference.create({
+              user_id: user.id,
+              sub_sector_id,
+            });
+          })
+        );
+      }
+
+      if (country_ids && country_ids.length > 0) {
+        const countryPreferences = await Promise.all(
+          country_ids.map(async (country_id) => {
+            return await CountryPreference.create({
+              user_id: user.id,
+              country_id,
+            });
+          })
+        );
+      }
+      if (continent_ids && continent_ids.length > 0) {
+        const continentPreferences = await Promise.all(
+          continent_ids.map(async (continent_id) => {
+            return await ContinentPreference.create({
+              user_id: user.id,
+              continent_id,
+            });
+          })
+        );
+      }
+      if (region_ids && region_ids.length > 0) {
+        const regionPreferences = await Promise.all(
+          region_ids.map(async (region_id) => {
+            return await RegionPreference.create({
+              user_id: user.id,
+              region_id,
+            });
+          })
+        );
+      }
+
+      if (ticket_size_min && ticket_size_max) {
+        const userTicketPreference = await UserTicketPreferences.create({
+          user_id: user.id,
+          ticket_size_min,
+          ticket_size_max,
+        });
+      }
 
       res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
       console.log("user", JSON.stringify(user, null, 2));
