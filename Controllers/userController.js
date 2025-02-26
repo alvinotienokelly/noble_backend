@@ -26,6 +26,21 @@ const SocialAccountType = db.social_account_types;
 const CountryPreference = db.country_preferences;
 const Country = db.country;
 const { createNotification } = require("./notificationController");
+const personalEmailDomains = [
+  "gmail.com",
+  "yahoo.com",
+  "hotmail.com",
+  "aol.com",
+  "outlook.com",
+  "icloud.com",
+  // Add more personal email domains as needed
+];
+
+// Function to check if an email domain is personal
+const isPersonalEmailDomain = (email) => {
+  const domain = email.split("@")[1];
+  return personalEmailDomains.includes(domain);
+};
 
 // Utility function to mask email
 const maskEmail = (email) => {
@@ -205,6 +220,16 @@ const signup = async (req, res) => {
       preference_region,
       password: await bcrypt.hash(password, 10),
     };
+
+    // Check if the email domain is personal
+    if (isPersonalEmailDomain(email)) {
+      return res.status(200).json({
+        status: false,
+        message:
+          "Personal email domains are not allowed. Please use a company email address.",
+      });
+    }
+
     //saving the user
     const user = await User.create(data);
 
