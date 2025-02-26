@@ -234,39 +234,39 @@ const signup = async (req, res) => {
       });
     }
 
-    if (!Array.isArray(sub_sector_ids) || sub_sector_ids.length === 0) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid sub-sector IDs provided." });
-    }
-    if (!Array.isArray(region_ids) || region_ids.length === 0) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid region IDs provided." });
-    }
+    // if (!Array.isArray(sub_sector_ids) || sub_sector_ids.length === 0) {
+    //   return res
+    //     .status(200)
+    //     .json({ status: false, message: "Invalid sub-sector IDs provided." });
+    // }
+    // if (!Array.isArray(region_ids) || region_ids.length === 0) {
+    //   return res
+    //     .status(200)
+    //     .json({ status: false, message: "Invalid region IDs provided." });
+    // }
 
-    if (!Array.isArray(sector_ids) || sector_ids.length === 0) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Invalid sector IDs provided." });
-    }
+    // if (!Array.isArray(sector_ids) || sector_ids.length === 0) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: false, message: "Invalid sector IDs provided." });
+    // }
 
-    if (!Array.isArray(country_ids) || country_ids.length === 0) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid country IDs provided." });
-    }
-    if (!Array.isArray(deal_types) || deal_types.length === 0) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Invalid deal types provided." });
-    }
+    // if (!Array.isArray(country_ids) || country_ids.length === 0) {
+    //   return res
+    //     .status(200)
+    //     .json({ status: false, message: "Invalid country IDs provided." });
+    // }
+    // if (!Array.isArray(deal_types) || deal_types.length === 0) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: false, message: "Invalid deal types provided." });
+    // }
 
-    if (!Array.isArray(continent_ids) || continent_ids.length === 0) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Invalid continent IDs provided." });
-    }
+    // if (!Array.isArray(continent_ids) || continent_ids.length === 0) {
+    //   return res
+    //     .status(200)
+    //     .json({ status: false, message: "Invalid continent IDs provided." });
+    // }
 
     //saving the user
     const user = await User.create(data);
