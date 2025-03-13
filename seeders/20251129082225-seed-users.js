@@ -1,7 +1,6 @@
 "use strict";
 
 const bcrypt = require("bcrypt");
-const Role = require("../models/roleModel");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
