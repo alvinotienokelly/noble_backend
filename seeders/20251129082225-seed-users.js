@@ -1,5 +1,6 @@
 "use strict";
 
+const db = require("../Models");
 const bcrypt = require("bcrypt");
 const Role = db.roles;
 
