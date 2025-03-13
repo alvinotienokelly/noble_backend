@@ -3,21 +3,21 @@
     "username": "postgres",
     "password": "@@7389",
     "database": "noblestride",
-    "host": "127.0.0.1",
+    "host": "noblestride-service-db",
     "dialect": "postgres"
   },
   "test": {
     "username": "postgres",
     "password": "@@7389",
     "database": "noblestride",
-    "host": "127.0.0.1",
+    "host": "noblestride-service-db",
     "dialect": "postgres"
   },
   "production": {
     "username": "postgres",
     "password": "@@7389",
     "database": "noblestride",
-    "host": "127.0.0.1",
+    "host": "noblestride-service-db",
     "dialect": "postgres"
   }
 }
