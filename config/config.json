@@ -14,10 +14,10 @@
     "dialect": "postgres"
   },
   "production": {
-    "username": "noblestride_liv1_user",
-    "password": "VAAXtPf98mDkZkyAuD2c1B4FIBZ5q6Sz",
-    "database": "noblestride_liv1",
-    "host": "dpg-cuiqfu8gph6c73aed00g-a",
+    "username": "postgres",
+    "password": "@@7389",
+    "database": "noblestride",
+    "host": "127.0.0.1",
     "dialect": "postgres"
   }
 }
