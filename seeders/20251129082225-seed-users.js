@@ -1,6 +1,7 @@
 "use strict";
 
 const bcrypt = require("bcrypt");
+const Role = db.roles;
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -157,6 +158,12 @@ module.exports = {
       "Khetia Drapers Ltd (KDL)",
     ];
 
+    const targetCompanyRole = await Role.findOne({
+      where: { name: "Target Company" },
+    });
+
+    const roleId = targetCompanyRole.role_id;
+
     const users = companies.map((company, index) => ({
       name: company,
       email: `${company.toLowerCase().replace(/[^a-z0-9]/g, "")}@example.com`,
@@ -166,7 +173,7 @@ module.exports = {
       kyc_status: "Verified",
       preference_sector: JSON.stringify(["Tech", "Finance"]),
       preference_region: JSON.stringify(["North America", "Europe"]),
-      role_id: "248be558-66b2-49bd-a5c3-1b94c45027ff",
+      role_id: roleId,
       password: hashedPassword,
       role: "Target Company",
       createdAt: new Date(),
