@@ -12,6 +12,10 @@ COPY package*.json ./
 # install dependencies
 RUN npm install --production
 
+# Install sequelize-cli globally
+RUN npm install -g sequelize-cli
+
+
 # Copy the application code to the working directory
 COPY . .
 

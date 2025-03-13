@@ -1,0 +1,7 @@
+FROM postgres:13
+
+# Enable the uuid-ossp extension
+RUN apt-get update && apt-get install -y postgresql-contrib
+
+# Copy the initialization script
+COPY init-db.sh /docker-entrypoint-initdb.d/
