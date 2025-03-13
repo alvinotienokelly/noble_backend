@@ -89,13 +89,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      {
-        region_id: Sequelize.literal("uuid_generate_v4()"),
-        name: "Central Asia",
-        continent_id: continents[1].continent_id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
+
       {
         region_id: Sequelize.literal("uuid_generate_v4()"),
         name: "Eastern Asia",
