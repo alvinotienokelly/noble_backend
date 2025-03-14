@@ -18,54 +18,113 @@ const getDashboardDealStatusData = async (req, res) => {
       group: ["status"],
     });
 
-    // Fetch deals grouped by team member and status
-    const dealsByTeamMemberAndStatus = await Deal.findAll({
+    // Fetch sum of deal sizes grouped by deal lead
+    const dealSizes = await Deal.findAll({
+      attributes: [
+        "deal_lead",
+        [db.sequelize.fn("SUM", db.sequelize.col("deal_size")), "size"],
+      ],
+      group: ["deal_lead", "dealLead.id", "dealLead.name"],
+      include: [{ model: User, as: "dealLead", attributes: ["name"] }],
+    });
+
+    // Format the result
+    const dealSizeStats = dealSizes.map((deal) => ({
+      lead: deal.dealLead.name,
+      size: deal.get("size"),
+    }));
+
+    // Fetch deals grouped by deal lead and status
+    const dealsByLeadAndStatus = await Deal.findAll({
       attributes: [
         "deal_lead",
         "status",
         [db.sequelize.fn("COUNT", db.sequelize.col("deal_id")), "count"],
       ],
-      group: ["deal_lead", "status", "dealLead.id", "dealLead.name"],
-      include: [{ model: User, as: "dealLead", attributes: ["id", "name"] }],
+      group: ["deal_lead", "deal.status", "dealLead.id", "dealLead.name"],
+      include: [{ model: User, as: "dealLead", attributes: ["name"] }],
     });
 
-    // Fetch total sales
-    const totalSales = await Deal.sum("deal_size");
-
-    // Fetch total deals
-    const totalDeals = await Deal.count();
-
-    // Calculate percentage for each deal_lead status
-    const dealsByTeamMemberWithPercentage = dealsByTeamMemberAndStatus.reduce(
+    // Format the result
+    const dealsByLeadAndStatusStats = dealsByLeadAndStatus.reduce(
       (acc, deal) => {
-        const dealLeadId = deal.deal_lead;
+        const leadName = deal.dealLead.name;
         const status = deal.status;
         const count = deal.get("count");
 
-        if (!acc[dealLeadId]) {
-          acc[dealLeadId] = {
-            deal_lead: dealLeadId,
-            dealLead: deal.dealLead,
-            statuses: {},
-            total: 0,
-          };
+        if (!acc[leadName]) {
+          acc[leadName] = {};
         }
 
-        acc[dealLeadId].statuses[status] = {
-          count,
-          percentage: ((count / totalDeals) * 100).toFixed(2),
-        };
-        acc[dealLeadId].total += count;
-
+        acc[leadName][status] = count;
         return acc;
       },
       {}
     );
 
-    // Convert the result to an array
-    const dealsByTeamMemberArray = Object.values(
-      dealsByTeamMemberWithPercentage
-    );
+    // Fetch deals grouped by sector and deal lead
+    const dealsBySectorAndLead = await Deal.findAll({
+      attributes: [
+        "sector_id",
+        "deal_lead",
+        [db.sequelize.fn("COUNT", db.sequelize.col("deal_id")), "count"],
+      ],
+      group: [
+        "deal.sector_id",
+        "deal_lead",
+        "dealSector.sector_id",
+        "dealSector.name",
+        "dealLead.id",
+        "dealLead.name",
+      ],
+      include: [
+        { model: Sector, as: "dealSector", attributes: ["name"] },
+        { model: User, as: "dealLead", attributes: ["name"] },
+      ],
+    });
+
+    // Format the result
+    const sectorData = dealsBySectorAndLead.reduce((acc, deal) => {
+      const sectorName = deal.dealSector.name;
+      const leadName = deal.dealLead.name;
+      const count = deal.get("count");
+
+      if (!acc[sectorName]) {
+        acc[sectorName] = {};
+      }
+
+      acc[sectorName][leadName] = count;
+      return acc;
+    }, {});
+
+    // Fetch deals grouped by deal lead and deal type
+    const dealsByLeadAndType = await Deal.findAll({
+      attributes: [
+        "deal_lead",
+        "deal_type",
+        [db.sequelize.fn("COUNT", db.sequelize.col("deal_id")), "count"],
+      ],
+      group: ["deal_lead", "deal_type", "dealLead.id", "dealLead.name"],
+      include: [{ model: User, as: "dealLead", attributes: ["name"] }],
+    });
+
+    // Format the result
+    const dealsByLeadAndTypeStats = dealsByLeadAndType.reduce((acc, deal) => {
+      const dealType = deal.deal_type;
+      const leadName = deal.dealLead.name;
+      const count = deal.get("count");
+
+      let category = acc.find((item) => item.category === dealType);
+      if (!category) {
+        category = { category: dealType };
+        acc.push(category);
+      }
+
+      category[leadName] = count;
+      return acc;
+    }, []);
+
+    const rawData = dealsByLeadAndTypeStats;
 
     // Call createAuditLog
     await createAuditLog({
@@ -79,8 +138,10 @@ const getDashboardDealStatusData = async (req, res) => {
       status: true,
       data: {
         dealsByStatus,
-        dealsByTeamMember: dealsByTeamMemberArray,
-        totalDeals,
+        dealSizeStats,
+        dealsBySectorAndLead: dealsBySectorAndLead,
+        dealsByLeadAndStatusStats: dealsByLeadAndStatusStats,
+        dealsByLeadAndTypeStats: dealsByLeadAndTypeStats,
       },
     });
   } catch (error) {
@@ -404,7 +465,6 @@ const getDashboardDealConsultantStatusData = async (req, res) => {
       action: "FETCH_DASHBOARD_DEAL_CONSULTANT_STATUS_DATA",
       details: `User ${req.user.id} fetched dashboard deal consultant status data`,
       ip_address: req.ip,
-
     });
 
     res.status(200).json({

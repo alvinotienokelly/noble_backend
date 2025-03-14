@@ -3,7 +3,7 @@
     "username": "postgres",
     "password": "@@7389",
     "database": "noblestride",
-    "host": "noblestride-service-db",
+    "host": "localhost",
     "dialect": "postgres"
   },
   "test": {

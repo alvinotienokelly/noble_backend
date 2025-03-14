@@ -20,7 +20,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-
+      image_url: {
+        type: DataTypes.STRING,
+        allowNull: true, // Image is not mandatory
+      },
       deal_stage_id: {
         type: DataTypes.UUID,
         allowNull: true,

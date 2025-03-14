@@ -55,6 +55,8 @@ const createDeal = async (req, res) => {
     } = req.body;
     const created_by = req.user.id; // Assuming the user ID is available in req.user
     const success_fee_percentage = (success_fee / 100) * deal_size;
+    // const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+    // const { originalname, path } = req.file;
 
     const newDeal = await Deal.create({
       title,
@@ -75,6 +77,7 @@ const createDeal = async (req, res) => {
       model,
       retainer_amount, // Include retainer_amount
       success_fee_percentage, // Include access_fee_amount
+      // image_url,
     });
     // Loop through deal_leads and create entries in DealLead
     if (deal_leads && deal_leads.length > 0) {
@@ -608,6 +611,9 @@ const updateDeal = async (req, res) => {
         .status(200)
         .json({ status: false, message: "Deal not found." });
     }
+    const image_url = req.file
+      ? `/uploads/${req.file.filename}`
+      : deal.image_url;
 
     await deal.update({
       title,
@@ -628,6 +634,7 @@ const updateDeal = async (req, res) => {
       model,
       retainer_amount, // Include retainer_amount
       success_fee_percentage, // Include access_fee_amount
+      image_url,
     });
     // Update DealLead entries
     if (deal_leads) {

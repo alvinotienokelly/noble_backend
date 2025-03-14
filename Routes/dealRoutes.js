@@ -22,10 +22,11 @@ const {
 } = dealController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
+const fileUpload = require("../Middlewares/fileUpload");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, checkAdmin, createDeal);
+router.post("/", authMiddleware,fileUpload, createDeal);
 router.get("/", authMiddleware, getAllDeals);
 router.put("/:id/update-stage", authMiddleware, updateDealStage); // Add this line
 router.get("/filter-by-location", authMiddleware, filterDealsByLocation); // Add this line

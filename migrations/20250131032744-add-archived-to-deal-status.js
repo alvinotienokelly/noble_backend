@@ -3,9 +3,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.sequelize.query(`
-      ALTER TYPE "enum_deals_status" ADD VALUE 'Archived';
-    `);
+    // await queryInterface.sequelize.query(`
+    //   ALTER TYPE "enum_deals_status" ADD VALUE 'Archived';
+    // `);
   },
 
   down: async (queryInterface, Sequelize) => {

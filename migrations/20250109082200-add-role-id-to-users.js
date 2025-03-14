@@ -3,14 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('users', 'role_id', {
-      type: Sequelize.UUID,
-      allowNull: false,
-      references: {
-        model: 'roles',
-        key: 'role_id',
-      },
-    });
+    // await queryInterface.addColumn('users', 'role_id', {
+    //   type: Sequelize.UUID,
+    //   allowNull: false,
+    //   references: {
+    //     model: 'roles',
+    //     key: 'role_id',
+    //   },
+    // });
   },
 
   down: async (queryInterface, Sequelize) => {
