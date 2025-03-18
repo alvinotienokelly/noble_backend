@@ -24,111 +24,117 @@ const { createAuditLog } = require("./auditLogService");
 // const DealAccessInvite = db.deal_access_invite;
 const Continent = db.continents;
 const DealLead = db.deal_leads;
+const upload = require("../Middlewares/imageUpload");
+const path = require("path");
 
 // Create a new deal
 const createDeal = async (req, res) => {
-  try {
-    const {
-      title,
-      description,
-      deal_stage_id,
-      deal_size,
-      target_company_id,
-      key_investors,
-      deal_leads, // Expecting array of user IDs
-      has_information_memorandum,
-      has_vdr,
-      consultant_name,
-      sector_id,
-      subsector_id,
-      deal_type,
-      teaser,
-      maximum_selling_stake,
-      ticket_size,
-      project,
-      model,
-      continent_ids, // Expecting array of continent IDs
-      region_ids,
-      country_ids,
-      retainer_amount,
-      success_fee,
-    } = req.body;
-    const created_by = req.user.id; // Assuming the user ID is available in req.user
-    const success_fee_percentage = (success_fee / 100) * deal_size;
-    // const image_url = req.file ? `/uploads/${req.file.filename}` : null;
-    // const { originalname, path } = req.file;
+  upload.single("image")(req, res, async (err) => {
+    try {
+      const {
+        title,
+        description,
+        deal_stage_id,
+        deal_size,
+        target_company_id,
+        key_investors,
+        deal_leads, // Expecting array of user IDs
+        has_information_memorandum,
+        has_vdr,
+        consultant_name,
+        sector_id,
+        subsector_id,
+        deal_type,
+        teaser,
+        maximum_selling_stake,
+        ticket_size,
+        project,
+        model,
+        continent_ids, // Expecting array of continent IDs
+        region_ids,
+        country_ids,
+        retainer_amount,
+        success_fee,
+      } = req.body;
+      const created_by = req.user.id; // Assuming the user ID is available in req.user
+      const success_fee_percentage = (success_fee / 100) * deal_size;
+      // const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+      // const { originalname, path } = req.file;
+      const image = `/uploads/profile_images/${req.file.filename}`;
 
-    const newDeal = await Deal.create({
-      title,
-      description,
-      deal_stage_id,
-      deal_size,
-      target_company_id,
-      key_investors,
-      deal_type,
-      teaser,
-      has_information_memorandum,
-      has_vdr,
-      consultant_name,
-      maximum_selling_stake,
-      created_by,
-      ticket_size,
-      project,
-      model,
-      retainer_amount, // Include retainer_amount
-      success_fee_percentage, // Include access_fee_amount
-      // image_url,
-    });
-    // Loop through deal_leads and create entries in DealLead
-    if (deal_leads && deal_leads.length > 0) {
-      for (const user_id of deal_leads) {
-        await DealLead.create({
-          deal_id: newDeal.deal_id,
-          user_id,
-        });
+      const newDeal = await Deal.create({
+        title,
+        description,
+        deal_stage_id,
+        deal_size,
+        target_company_id,
+        key_investors,
+        deal_type,
+        teaser,
+        has_information_memorandum,
+        has_vdr,
+        consultant_name,
+        maximum_selling_stake,
+        created_by,
+        ticket_size,
+        project,
+        model,
+        retainer_amount, // Include retainer_amount
+        success_fee_percentage, // Include access_fee_amount
+        image_url: image,
+        // image_url,
+      });
+      // Loop through deal_leads and create entries in DealLead
+      if (deal_leads && deal_leads.length > 0) {
+        for (const user_id of deal_leads) {
+          await DealLead.create({
+            deal_id: newDeal.deal_id,
+            user_id,
+          });
+        }
       }
-    }
-    // Loop through continent_ids and create entries in DealContinent
-    if (continent_ids && continent_ids.length > 0) {
-      for (const continent_id of continent_ids) {
-        await DealContinent.create({
-          deal_id: newDeal.deal_id,
-          continent_id,
-        });
+      // Loop through continent_ids and create entries in DealContinent
+      if (continent_ids && continent_ids.length > 0) {
+        for (const continent_id of continent_ids) {
+          await DealContinent.create({
+            deal_id: newDeal.deal_id,
+            continent_id,
+          });
+        }
       }
-    }
 
-    // Loop through region_ids and create entries in DealRegion
-    if (region_ids && region_ids.length > 0) {
-      for (const region_id of region_ids) {
-        await DealRegion.create({
-          deal_id: newDeal.deal_id,
-          region_id,
-        });
+      // Loop through region_ids and create entries in DealRegion
+      if (region_ids && region_ids.length > 0) {
+        for (const region_id of region_ids) {
+          await DealRegion.create({
+            deal_id: newDeal.deal_id,
+            region_id,
+          });
+        }
       }
-    }
 
-    // Loop through country_ids and create entries in DealCountry
-    if (country_ids && country_ids.length > 0) {
-      for (const country_id of country_ids) {
-        await DealCountry.create({
-          deal_id: newDeal.deal_id,
-          country_id,
-        });
+      // Loop through country_ids and create entries in DealCountry
+      if (country_ids && country_ids.length > 0) {
+        for (const country_id of country_ids) {
+          await DealCountry.create({
+            deal_id: newDeal.deal_id,
+            country_id,
+          });
+        }
       }
-    }
-    // Create an audit log entry
-    await createAuditLog({
-      userId: created_by,
-      action: "CREATE_DEAL",
-      details: `Deal ${newDeal.title} created with ID ${newDeal.deal_id}`,
-      ip_address: req.ip,
-    });
+      // Create an audit log entry
+      await createAuditLog({
+        userId: created_by,
+        action: "CREATE_DEAL",
+        details: `Deal ${newDeal.title} created with ID ${newDeal.deal_id}`,
+        ip_address: req.ip,
+      });
 
-    res.status(201).json({ status: true, deal: newDeal });
-  } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
-  }
+      res.status(201).json({ status: true, deal: newDeal });
+    } catch (error) {
+      res.status(500).json({ status: false, message: error.message });
+    }
+  });
 };
 
 // Get deals based on user's saved preference_sector & preference_region

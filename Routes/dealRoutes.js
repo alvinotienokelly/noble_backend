@@ -26,7 +26,7 @@ const fileUpload = require("../Middlewares/fileUpload");
 
 const router = express.Router();
 
-router.post("/", authMiddleware,fileUpload, createDeal);
+router.post("/", authMiddleware, createDeal);
 router.get("/", authMiddleware, getAllDeals);
 router.put("/:id/update-stage", authMiddleware, updateDealStage); // Add this line
 router.get("/filter-by-location", authMiddleware, filterDealsByLocation); // Add this line
