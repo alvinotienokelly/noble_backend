@@ -30,6 +30,9 @@ const path = require("path");
 // Create a new deal
 const createDeal = async (req, res) => {
   upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ status: false, message: err });
+    }
     try {
       const {
         title,
@@ -60,7 +63,7 @@ const createDeal = async (req, res) => {
       const success_fee_percentage = (success_fee / 100) * deal_size;
       // const image_url = req.file ? `/uploads/${req.file.filename}` : null;
       // const { originalname, path } = req.file;
-      const image = `/uploads/profile_images/${req.file.filename}`;
+      const image = req.file ? `/uploads/${req.file.filename}` : null;
 
       const newDeal = await Deal.create({
         title,
@@ -582,121 +585,127 @@ const getDealById = async (req, res) => {
 
 // Update a deal by ID
 const updateDeal = async (req, res) => {
-  try {
-    const {
-      title,
-      description,
-      deal_stage_id,
-      deal_size,
-      target_company_id,
-      key_investors,
-      sector_id,
-      subsector_id,
-      deal_leads,
-      deal_type,
-      teaser,
-      has_information_memorandum,
-      has_vdr,
-      consultant_name,
-      maximum_selling_stake,
-      ticket_size,
-      project,
-      model,
-      continent_ids, // Expecting array of continent IDs
-      region_ids, // Expecting array of region IDs
-      country_ids, // Expecting array of country IDs
-      retainer_amount, // Add retainer_amount
-      success_fee, // Add access_fee_amount
-    } = req.body;
-    const deal = await Deal.findByPk(req.params.id);
-    const id = deal.deal_id;
-    const success_fee_percentage = (success_fee / 100) * deal_size;
-
-    if (!deal) {
-      return res
-        .status(200)
-        .json({ status: false, message: "Deal not found." });
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ status: false, message: err });
     }
-    const image_url = req.file
-      ? `/uploads/${req.file.filename}`
-      : deal.image_url;
+    try {
+      const {
+        title,
+        description,
+        deal_stage_id,
+        deal_size,
+        target_company_id,
+        key_investors,
+        sector_id,
+        subsector_id,
+        deal_leads,
+        deal_type,
+        teaser,
+        has_information_memorandum,
+        has_vdr,
+        consultant_name,
+        maximum_selling_stake,
+        ticket_size,
+        project,
+        model,
+        continent_ids, // Expecting array of continent IDs
+        region_ids, // Expecting array of region IDs
+        country_ids, // Expecting array of country IDs
+        retainer_amount, // Add retainer_amount
+        success_fee, // Add access_fee_amount
+      } = req.body;
+      const deal = await Deal.findByPk(req.params.id);
+      const id = deal.deal_id;
+      const success_fee_percentage = (success_fee / 100) * deal_size;
 
-    await deal.update({
-      title,
-      description,
-      deal_stage_id,
-      deal_size,
-      target_company_id,
-      key_investors,
-      deal_type,
-      teaser,
-      has_information_memorandum,
-      has_vdr,
-      consultant_name,
-      maximum_selling_stake,
-      ticket_size,
-
-      project,
-      model,
-      retainer_amount, // Include retainer_amount
-      success_fee_percentage, // Include access_fee_amount
-      image_url,
-    });
-    // Update DealLead entries
-    if (deal_leads) {
-      await DealLead.destroy({ where: { deal_id: id } });
-      for (const user_id of deal_leads) {
-        await DealLead.create({
-          deal_id: id,
-          user_id,
-        });
+      if (!deal) {
+        return res
+          .status(200)
+          .json({ status: false, message: "Deal not found." });
       }
-    }
+      const image_url = req.file
+        ? `/uploads/${req.file.filename}`
+        : deal.image_url;
+      const image = req.file ? `/uploads/${req.file.filename}` : null;
 
-    // Update DealContinent entries
-    if (continent_ids) {
-      await DealContinent.destroy({ where: { deal_id: id } });
-      for (const continent_id of continent_ids) {
-        await DealContinent.create({
-          deal_id: id,
-          continent_id,
-        });
+      await deal.update({
+        title,
+        description,
+        deal_stage_id,
+        deal_size,
+        target_company_id,
+        key_investors,
+        deal_type,
+        teaser,
+        has_information_memorandum,
+        has_vdr,
+        consultant_name,
+        maximum_selling_stake,
+        ticket_size,
+
+        project,
+        model,
+        retainer_amount, // Include retainer_amount
+        success_fee_percentage, // Include access_fee_amount
+        image_url: image,
+      });
+      // Update DealLead entries
+      if (deal_leads) {
+        await DealLead.destroy({ where: { deal_id: id } });
+        for (const user_id of deal_leads) {
+          await DealLead.create({
+            deal_id: id,
+            user_id,
+          });
+        }
       }
-    }
 
-    // Update DealRegion entries
-    if (region_ids) {
-      await DealRegion.destroy({ where: { deal_id: id } });
-      for (const region_id of region_ids) {
-        await DealRegion.create({
-          deal_id: id,
-          region_id,
-        });
+      // Update DealContinent entries
+      if (continent_ids) {
+        await DealContinent.destroy({ where: { deal_id: id } });
+        for (const continent_id of continent_ids) {
+          await DealContinent.create({
+            deal_id: id,
+            continent_id,
+          });
+        }
       }
-    }
 
-    // Update DealCountry entries
-    if (country_ids) {
-      await DealCountry.destroy({ where: { deal_id: id } });
-      for (const country_id of country_ids) {
-        await DealCountry.create({
-          deal_id: id,
-          country_id,
-        });
+      // Update DealRegion entries
+      if (region_ids) {
+        await DealRegion.destroy({ where: { deal_id: id } });
+        for (const region_id of region_ids) {
+          await DealRegion.create({
+            deal_id: id,
+            region_id,
+          });
+        }
       }
+
+      // Update DealCountry entries
+      if (country_ids) {
+        await DealCountry.destroy({ where: { deal_id: id } });
+        for (const country_id of country_ids) {
+          await DealCountry.create({
+            deal_id: id,
+            country_id,
+          });
+        }
+      }
+
+      await createAuditLog({
+        userId: req.user.id,
+        action: "UPDATE_DEAL",
+        details: `Updated deal with ID ${deal.deal_id}`,
+        ip_address: req.ip,
+      });
+
+      res.status(200).json({ status: true, deal });
+    } catch (error) {
+      res.status(500).json({ status: false, message: error.message });
     }
-
-    await createAuditLog({
-      userId: req.user.id,
-      action: "UPDATE_DEAL",
-      details: `Updated deal with ID ${deal.deal_id}`,
-      ip_address: req.ip,
-    });
-
-    res.status(200).json({ status: true, deal });
-  } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
-  }
+  });
 };
 
 // Update a deal by ID
