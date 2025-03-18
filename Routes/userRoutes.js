@@ -35,10 +35,13 @@ const {
   updateGrossMargin,
   updateUserProfile,
   adminUpdateUserProfile,
+  uploadProfileImage,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
 const db = require("../Models");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 const User = db.users;
 
@@ -46,6 +49,12 @@ const router = express.Router();
 
 //signup endpoint
 //passing the middleware function to the signup
+router.post("/upload-profile-image", authMiddleware, uploadProfileImage);
+router.post("/profile", upload.single("avatar"), function (req, res, next) {
+  // req.file is the `avatar` file
+  // req.body will hold the text fields, if there were any
+  res.send("Hello world");
+});
 router.post("/signup", userAuth.saveUser, signup);
 router.put("/profile", authMiddleware, updateUserProfile); // Add this line
 router.put("/:id/archive", authMiddleware, markUserAsArchived); // Add this line

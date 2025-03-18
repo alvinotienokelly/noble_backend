@@ -26,6 +26,9 @@ const SocialAccountType = db.social_account_types;
 const CountryPreference = db.country_preferences;
 const Country = db.country;
 const { createNotification } = require("./notificationController");
+const upload = require("../Middlewares/imageUpload");
+const path = require("path");
+
 const personalEmailDomains = [
   "gmail.com",
   "yahoo.com",
@@ -56,6 +59,42 @@ const logout = (req, res) => {
   return res.status(200).json({ status: true, message: "Logout successful." });
 };
 
+const uploadProfileImage = async (req, res) => {
+  upload.single("profile_image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ status: false, message: err });
+    }
+
+    try {
+      const user_id = req.user.id; // Assuming the user ID is available in req.user
+      const user = await User.findByPk(user_id);
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ status: false, message: "User not found." });
+      }
+
+      if (!req.file) {
+        return res
+          .status(400)
+          .json({ status: false, message: "No file uploaded." });
+      }
+
+      // Save the uploaded file path as the profile image
+      const profile_image = `/uploads/profile_images/${req.file.filename}`;
+      await user.update({ profile_image });
+
+      res.status(200).json({
+        status: true,
+        message: "Profile image uploaded successfully.",
+        user,
+      });
+    } catch (error) {
+      res.status(500).json({ status: false, message: error.message });
+    }
+  });
+};
 // Function to get users by type
 const getUsersByType = async (req, res) => {
   try {
@@ -1392,4 +1431,5 @@ module.exports = {
   updateDescription, // Add this line
   updateUserProfile, // Add this line
   adminUpdateUserProfile, // Add this line
+  uploadProfileImage,
 };
