@@ -13,11 +13,11 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getAllCountries);
-router.get("/:id", authMiddleware, getCountryById);
-router.get("/filter", authMiddleware, filterCountries);
-router.post("/", authMiddleware, createCountry);
-router.put("/:id", authMiddleware, updateCountry);
-router.delete("/:id", authMiddleware, deleteCountry);
+router.get("/", getAllCountries);
+router.get("/:id", getCountryById);
+router.get("/filter", filterCountries);
+router.post("/", createCountry);
+router.put("/:id", updateCountry);
+router.delete("/:id", deleteCountry);
 
 module.exports = router;

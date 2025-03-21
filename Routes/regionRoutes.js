@@ -6,9 +6,9 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, createRegion);
-router.get("/", authMiddleware, getAllRegions);
-router.put("/:id", authMiddleware, updateRegion);
-router.delete("/:id", authMiddleware, deleteRegion);
+router.post("/", createRegion);
+router.get("/", getAllRegions);
+router.put("/:id", updateRegion);
+router.delete("/:id", deleteRegion);
 
 module.exports = router;

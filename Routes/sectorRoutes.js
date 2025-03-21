@@ -14,11 +14,15 @@ const upload = require("../Middlewares/bulkUpload");
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getAllSectors);
-router.get("/:id", authMiddleware, getSectorById);
-router.post("/", authMiddleware, createSector);
-router.put("/:id", authMiddleware, updateSector);
-router.delete("/:id", authMiddleware, deleteSector);
-router.post("/bulk-upload", authMiddleware, upload.single("file"), bulkUploadSectorsAndSubsectors); // Add this line
+router.get("/", getAllSectors);
+router.get("/:id", getSectorById);
+router.post("/", createSector);
+router.put("/:id", updateSector);
+router.delete("/:id", deleteSector);
+router.post(
+  "/bulk-upload",
+  upload.single("file"),
+  bulkUploadSectorsAndSubsectors
+); // Add this line
 
 module.exports = router;

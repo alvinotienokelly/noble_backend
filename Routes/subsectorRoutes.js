@@ -6,10 +6,10 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getAllSubsectors);
-router.get("/:id", authMiddleware, getSubsectorById);
-router.post("/", authMiddleware, createSubsector);
-router.put("/:id", authMiddleware, updateSubsector);
-router.delete("/:id", authMiddleware, deleteSubsector);
+router.get("/", getAllSubsectors);
+router.get("/:id", getSubsectorById);
+router.post("/", createSubsector);
+router.put("/:id", updateSubsector);
+router.delete("/:id", deleteSubsector);
 
 module.exports = router;

@@ -7,9 +7,9 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, createContinent);
-router.get("/", authMiddleware, getAllContinents);
-router.put("/:id", authMiddleware, updateContinent);
-router.delete("/:id", authMiddleware, deleteContinent);
+router.post("/", createContinent);
+router.get("/", getAllContinents);
+router.put("/:id", updateContinent);
+router.delete("/:id", deleteContinent);
 
 module.exports = router;
