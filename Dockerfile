@@ -6,6 +6,9 @@ RUN apk update && apk add --no-cache bash curl python3 make g++
 # Create a directory for the application
 WORKDIR /app
 
+# Create the uploads directory and set permissions
+RUN mkdir -p /app/uploads && chmod -R 777 /app/uploads
+
 # Copy package.json and package-lock.json (if available)
 COPY package*.json ./
 
