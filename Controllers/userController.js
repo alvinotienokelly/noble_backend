@@ -95,6 +95,80 @@ const uploadProfileImage = async (req, res) => {
     }
   });
 };
+
+const onboardInvestor = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      total_investments,
+      average_check_size,
+      successful_exits,
+      portfolio_ipr,
+      description,
+      location
+    } = req.body;
+
+    // Fetch the "Investor" role
+    const investorRole = await Role.findOne({ where: { name: "Investor" } });
+    if (!investorRole) {
+      return res.status(404).json({
+        status: false,
+        message: "Investor role not found.",
+      });
+    }
+
+    // Check if the email domain is personal
+    const isPersonalEmailDomain = (email) => {
+      const personalDomains = ["gmail.com", "yahoo.com", "hotmail.com"];
+      const domain = email.split("@")[1];
+      return personalDomains.includes(domain);
+    };
+
+    if (isPersonalEmailDomain(email)) {
+      return res.status(400).json({
+        status: false,
+        message:
+          "Personal email domains are not allowed. Please use a company email address.",
+      });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the investor
+    const investor = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      total_investments,
+      average_check_size,
+      successful_exits,
+      portfolio_ipr,
+      description,
+      role: "Investor",
+      role_id: investorRole.role_id,
+      location
+    });
+
+    // Create an audit log
+    await createAuditLog({
+      userId: req.user.id,
+      action: "ONBOARD_INVESTOR",
+      details: `Onboarded investor with ID ${investor.id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(201).json({
+      status: true,
+      message: "Investor onboarded successfully.",
+      investor,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
 // Function to get users by type
 const getUsersByType = async (req, res) => {
   try {
@@ -1432,4 +1506,5 @@ module.exports = {
   updateUserProfile, // Add this line
   adminUpdateUserProfile, // Add this line
   uploadProfileImage,
+  onboardInvestor,
 };
