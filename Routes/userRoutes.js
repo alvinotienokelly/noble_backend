@@ -37,6 +37,7 @@ const {
   adminUpdateUserProfile,
   onboardInvestor,
   uploadProfileImage,
+  onboardTargetCompany,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -56,6 +57,7 @@ router.post("/profile", upload.single("avatar"), function (req, res, next) {
   // req.body will hold the text fields, if there were any
   res.send("Hello world");
 });
+router.post("/onboard-target-company", authMiddleware, onboardTargetCompany);
 router.post("/onboard-investor", authMiddleware, onboardInvestor);
 router.post("/signup", userAuth.saveUser, signup);
 router.put("/profile", authMiddleware, updateUserProfile); // Add this line
