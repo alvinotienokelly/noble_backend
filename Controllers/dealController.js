@@ -78,10 +78,10 @@ const createDeal = async (req, res) => {
         });
       }
       // Validate that retainer_amount is less than deal_size
-      if (parseInt(retainer_amount) >= parseInt(deal_size)) {
+      if (parseInt(retainer_amount) >= parseInt(ticket_size)) {
         return res.status(400).json({
           status: false,
-          message: "Retainer amount must be less than the deal size.",
+          message: "Retainer amount must be less than the ticket size.",
         });
       }
       const image = req.file ? `/uploads/${req.file.filename}` : null;
@@ -650,10 +650,11 @@ const updateDeal = async (req, res) => {
         : deal.image_url;
       const image = req.file ? `/uploads/${req.file.filename}` : null;
       // Validate that retainer_amount is less than deal_size
-      if (parseInt(retainer_amount) >= parseInt(deal_size)) {
+      // Validate that retainer_amount is less than deal_size
+      if (parseInt(retainer_amount) >= parseInt(ticket_size)) {
         return res.status(400).json({
           status: false,
-          message: "Retainer amount must be less than the deal size.",
+          message: "Retainer amount must be less than the ticket size.",
         });
       }
       await deal.update({
