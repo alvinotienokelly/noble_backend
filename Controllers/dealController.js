@@ -63,6 +63,20 @@ const createDeal = async (req, res) => {
       const success_fee_percentage = (success_fee / 100) * deal_size;
       // const image_url = req.file ? `/uploads/${req.file.filename}` : null;
       // const { originalname, path } = req.file;
+
+      // Check if a deal with the same title or project already exists
+      const existingDeal = await Deal.findOne({
+        where: {
+          [Op.or]: [{ title }, { project }],
+        },
+      });
+
+      if (existingDeal) {
+        return res.status(400).json({
+          status: false,
+          message: "A deal with the same title or project already exists.",
+        });
+      }
       const image = req.file ? `/uploads/${req.file.filename}` : null;
 
       const newDeal = await Deal.create({
