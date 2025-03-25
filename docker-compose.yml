@@ -14,8 +14,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_DB: ${DB_NAME}
-    volumes:
-      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh  
+    # volumes:
+    #   - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     ports:
       - "5436:5432"
     healthcheck:
@@ -23,8 +23,8 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
-    # volumes:
-    #   - noblestrideservice-db-data:/var/lib/postgresql/data
+    volumes:
+      - noblestrideservice-db-data:/var/lib/postgresql/data
     networks:
       - noblestride-network
 
@@ -43,7 +43,7 @@ services:
         npx sequelize-cli db:migrate &&
         npx sequelize-cli db:seed:all &&
         npm start
-      "  
+      "
     ports:
       - "3030:3030"
     env_file:
