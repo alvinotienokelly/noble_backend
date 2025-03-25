@@ -219,19 +219,19 @@ const onboardInvestor = async (req, res) => {
       }
 
       // Check if the email domain is personal
-      const isPersonalEmailDomain = (email) => {
-        const personalDomains = ["gmail.com", "yahoo.com", "hotmail.com"];
-        const domain = email.split("@")[1];
-        return personalDomains.includes(domain);
-      };
+      // const isPersonalEmailDomain = (email) => {
+      //   const personalDomains = ["gmail.com", "yahoo.com", "hotmail.com"];
+      //   const domain = email.split("@")[1];
+      //   return personalDomains.includes(domain);
+      // };
 
-      if (isPersonalEmailDomain(email)) {
-        return res.status(400).json({
-          status: false,
-          message:
-            "Personal email domains are not allowed. Please use a company email address.",
-        });
-      }
+      // if (isPersonalEmailDomain(email)) {
+      //   return res.status(400).json({
+      //     status: false,
+      //     message:
+      //       "Personal email domains are not allowed. Please use a company email address.",
+      //   });
+      // }
 
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -254,12 +254,12 @@ const onboardInvestor = async (req, res) => {
       });
 
       // Create an audit log
-      await createAuditLog({
-        userId: req.user.id,
-        action: "ONBOARD_INVESTOR",
-        details: `Onboarded investor with ID ${investor.id}`,
-        ip_address: req.ip,
-      });
+      // await createAuditLog({
+      //   userId: req.user.id,
+      //   action: "ONBOARD_INVESTOR",
+      //   details: `Onboarded investor with ID ${investor.id}`,
+      //   ip_address: req.ip,
+      // });
 
       res.status(201).json({
         status: true,
