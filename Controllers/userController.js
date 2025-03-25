@@ -97,165 +97,179 @@ const uploadProfileImage = async (req, res) => {
 };
 
 const onboardTargetCompany = async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      password,
-      location,
-      total_assets,
-      ebitda,
-      description,
-      addressable_market,
-      current_market,
-      gross_margin,
-      cac_payback_period,
-      tam,
-      sam,
-      som,
-      year_founded,
-    } = req.body;
-
-    // Fetch the "Target Company" role
-    const targetCompanyRole = await Role.findOne({
-      where: { name: "Target Company" },
-    });
-    if (!targetCompanyRole) {
-      return res.status(404).json({
-        status: false,
-        message: "Target Company role not found.",
-      });
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ status: false, message: err });
     }
+    try {
+      const {
+        name,
+        email,
+        password,
+        location,
+        total_assets,
+        ebitda,
+        description,
+        addressable_market,
+        current_market,
+        gross_margin,
+        cac_payback_period,
+        tam,
+        sam,
+        som,
+        year_founded,
+      } = req.body;
 
-    // Check if the email domain is personal
-    const isPersonalEmailDomain = (email) => {
-      const personalDomains = ["gmail.com", "yahoo.com", "hotmail.com"];
-      const domain = email.split("@")[1];
-      return personalDomains.includes(domain);
-    };
-
-    if (isPersonalEmailDomain(email)) {
-      return res.status(400).json({
-        status: false,
-        message:
-          "Personal email domains are not allowed. Please use a company email address.",
+      // Fetch the "Target Company" role
+      const targetCompanyRole = await Role.findOne({
+        where: { name: "Target Company" },
       });
+      if (!targetCompanyRole) {
+        return res.status(404).json({
+          status: false,
+          message: "Target Company role not found.",
+        });
+      }
+
+      // Check if the email domain is personal
+      const isPersonalEmailDomain = (email) => {
+        const personalDomains = ["gmail.com", "yahoo.com", "hotmail.com"];
+        const domain = email.split("@")[1];
+        return personalDomains.includes(domain);
+      };
+
+      if (isPersonalEmailDomain(email)) {
+        return res.status(400).json({
+          status: false,
+          message:
+            "Personal email domains are not allowed. Please use a company email address.",
+        });
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const image = req.file ? `/uploads/${req.file.filename}` : null;
+
+      // Create the target company
+      const targetCompany = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+        location,
+        description,
+        role: "Target Company",
+        role_id: targetCompanyRole.role_id,
+        addressable_market,
+        current_market,
+        total_assets,
+        ebitda,
+        gross_margin,
+        cac_payback_period,
+        tam,
+        sam,
+        som,
+        year_founded,
+        profile_image: image,
+      });
+
+      // Create an audit log
+      await createAuditLog({
+        userId: req.user.id,
+        action: "ONBOARD_TARGET_COMPANY",
+        details: `Onboarded target company with ID ${targetCompany.id}`,
+        ip_address: req.ip,
+      });
+
+      res.status(201).json({
+        status: true,
+        message: "Target company onboarded successfully.",
+        targetCompany,
+      });
+    } catch (error) {
+      res.status(500).json({ status: false, message: error.message });
     }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the target company
-    const targetCompany = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      location,
-      description,
-      role: "Target Company",
-      role_id: targetCompanyRole.role_id,
-      addressable_market,
-      current_market,
-      total_assets,
-      ebitda,
-      gross_margin,
-      cac_payback_period,
-      tam,
-      sam,
-      som,
-      year_founded,
-    });
-
-    // Create an audit log
-    await createAuditLog({
-      userId: req.user.id,
-      action: "ONBOARD_TARGET_COMPANY",
-      details: `Onboarded target company with ID ${targetCompany.id}`,
-      ip_address: req.ip,
-    });
-
-    res.status(201).json({
-      status: true,
-      message: "Target company onboarded successfully.",
-      targetCompany,
-    });
-  } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
-  }
+  });
 };
 
 const onboardInvestor = async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      password,
-      total_investments,
-      average_check_size,
-      successful_exits,
-      portfolio_ipr,
-      description,
-      location,
-    } = req.body;
-
-    // Fetch the "Investor" role
-    const investorRole = await Role.findOne({ where: { name: "Investor" } });
-    if (!investorRole) {
-      return res.status(404).json({
-        status: false,
-        message: "Investor role not found.",
-      });
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ status: false, message: err });
     }
+    try {
+      const {
+        name,
+        email,
+        password,
+        total_investments,
+        average_check_size,
+        successful_exits,
+        portfolio_ipr,
+        description,
+        location,
+      } = req.body;
 
-    // Check if the email domain is personal
-    const isPersonalEmailDomain = (email) => {
-      const personalDomains = ["gmail.com", "yahoo.com", "hotmail.com"];
-      const domain = email.split("@")[1];
-      return personalDomains.includes(domain);
-    };
+      // Fetch the "Investor" role
+      const investorRole = await Role.findOne({ where: { name: "Investor" } });
+      if (!investorRole) {
+        return res.status(404).json({
+          status: false,
+          message: "Investor role not found.",
+        });
+      }
 
-    if (isPersonalEmailDomain(email)) {
-      return res.status(400).json({
-        status: false,
-        message:
-          "Personal email domains are not allowed. Please use a company email address.",
+      // Check if the email domain is personal
+      const isPersonalEmailDomain = (email) => {
+        const personalDomains = ["gmail.com", "yahoo.com", "hotmail.com"];
+        const domain = email.split("@")[1];
+        return personalDomains.includes(domain);
+      };
+
+      if (isPersonalEmailDomain(email)) {
+        return res.status(400).json({
+          status: false,
+          message:
+            "Personal email domains are not allowed. Please use a company email address.",
+        });
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const image = req.file ? `/uploads/${req.file.filename}` : null;
+
+      // Create the investor
+      const investor = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+        total_investments,
+        average_check_size,
+        successful_exits,
+        portfolio_ipr,
+        description,
+        role: "Investor",
+        role_id: investorRole.role_id,
+        location,
+        profile_image: image,
       });
+
+      // Create an audit log
+      await createAuditLog({
+        userId: req.user.id,
+        action: "ONBOARD_INVESTOR",
+        details: `Onboarded investor with ID ${investor.id}`,
+        ip_address: req.ip,
+      });
+
+      res.status(201).json({
+        status: true,
+        message: "Investor onboarded successfully.",
+        investor,
+      });
+    } catch (error) {
+      res.status(500).json({ status: false, message: error.message });
     }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the investor
-    const investor = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      total_investments,
-      average_check_size,
-      successful_exits,
-      portfolio_ipr,
-      description,
-      role: "Investor",
-      role_id: investorRole.role_id,
-      location,
-    });
-
-    // Create an audit log
-    await createAuditLog({
-      userId: req.user.id,
-      action: "ONBOARD_INVESTOR",
-      details: `Onboarded investor with ID ${investor.id}`,
-      ip_address: req.ip,
-    });
-
-    res.status(201).json({
-      status: true,
-      message: "Investor onboarded successfully.",
-      investor,
-    });
-  } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
-  }
+  });
 };
 // Function to get users by type
 const getUsersByType = async (req, res) => {
