@@ -77,6 +77,13 @@ const createDeal = async (req, res) => {
           message: "A deal with the same title or project already exists.",
         });
       }
+      // Validate that retainer_amount is less than deal_size
+      if (parseInt(retainer_amount) >= parseInt(deal_size)) {
+        return res.status(400).json({
+          status: false,
+          message: "Retainer amount must be less than the deal size.",
+        });
+      }
       const image = req.file ? `/uploads/${req.file.filename}` : null;
 
       const newDeal = await Deal.create({
@@ -642,7 +649,13 @@ const updateDeal = async (req, res) => {
         ? `/uploads/${req.file.filename}`
         : deal.image_url;
       const image = req.file ? `/uploads/${req.file.filename}` : null;
-
+      // Validate that retainer_amount is less than deal_size
+      if (parseInt(retainer_amount) >= parseInt(deal_size)) {
+        return res.status(400).json({
+          status: false,
+          message: "Retainer amount must be less than the deal size.",
+        });
+      }
       await deal.update({
         title,
         description,
