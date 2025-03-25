@@ -58,7 +58,7 @@ router.post("/profile", upload.single("avatar"), function (req, res, next) {
   res.send("Hello world");
 });
 router.post("/onboard-target-company", authMiddleware, onboardTargetCompany);
-router.post("/onboard-investor", authMiddleware, onboardInvestor);
+router.post("/onboard-investor", onboardInvestor);
 router.post("/signup", userAuth.saveUser, signup);
 router.put("/profile", authMiddleware, updateUserProfile); // Add this line
 router.put("/:id/archive", authMiddleware, markUserAsArchived); // Add this line
