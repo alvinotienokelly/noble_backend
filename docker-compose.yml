@@ -14,8 +14,9 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_DB: ${DB_NAME}
-    # volumes:
-    #   - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    volumes:
+      - noblestrideservice-db-data:/var/lib/postgresql/data # Persist database data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh # Initialization script
     ports:
       - "5436:5432"
     healthcheck:
@@ -23,8 +24,8 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
-    volumes:
-      - noblestrideservice-db-data:/var/lib/postgresql/data
+    # volumes:
+    #   - noblestrideservice-db-data:/var/lib/postgresql/data
     networks:
       - noblestride-network
 
