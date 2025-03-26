@@ -106,6 +106,8 @@ const createDeal = async (req, res) => {
         retainer_amount, // Include retainer_amount
         success_fee_percentage, // Include access_fee_amount
         image_url: image,
+        sector_id,
+        subsector_id,
         // image_url,
       });
       // Loop through deal_leads and create entries in DealLead
@@ -671,7 +673,8 @@ const updateDeal = async (req, res) => {
         consultant_name,
         maximum_selling_stake,
         ticket_size,
-
+        sector_id,
+        subsector_id,
         project,
         model,
         retainer_amount, // Include retainer_amount
