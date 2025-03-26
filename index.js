@@ -64,6 +64,7 @@ const subSectorPreferenceRoutes = require("./Routes/subSectorPreferenceRoutes");
 const continentPreferenceRoutes = require("./Routes/continentPreferenceRoutes");
 const regionPreferenceRoutes = require("./Routes/regionPreferenceRoutes");
 const countryPreferenceRoutes = require("./Routes/countryPreferencesRoutes");
+const path = require("path");
 
 require("dotenv").config();
 
@@ -83,7 +84,7 @@ app.use(cookieParser());
 db.sequelize.sync({ force: false }).then(() => {
   console.log("db has been re sync");
 });
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/users", userRoutes);
 app.use("/api/deals", dealRoutes);
 app.use("/api/documents", documentRoutes);
