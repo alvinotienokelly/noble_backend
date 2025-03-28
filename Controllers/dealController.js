@@ -26,6 +26,8 @@ const Continent = db.continents;
 const DealLead = db.deal_leads;
 const upload = require("../Middlewares/imageUpload");
 const path = require("path");
+const Sector = db.sectors;
+const Subsector = db.subsectors;
 
 // Create a new deal
 const createDeal = async (req, res) => {
@@ -529,6 +531,8 @@ const getDealById = async (req, res) => {
           ],
         },
         { model: User, as: "createdBy" },
+        { model: Sector, as: "dealSector" },
+        { model: Subsector, as: "dealSubsector" },
         { model: User, as: "targetCompany" },
         {
           model: DealStage,
