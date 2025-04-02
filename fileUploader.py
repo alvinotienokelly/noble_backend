@@ -1,6 +1,8 @@
 import pandas as pd
 import json
 from tkinter import Tk, filedialog
+import logging
+import requests
 
 def select_file():
     """Open a file dialog to select a file."""
@@ -47,6 +49,7 @@ def extract_data(file_path):
                 item["success_fee"] = 0
                 item['maximum_selling_stake']="Minority"
 
+                logging.info(f"Processed Item: {item}")
             return json.dumps(extracted_data, indent=4)
         else:
             missing_columns = [column for column in required_columns if column not in data.columns]
@@ -73,7 +76,13 @@ if __name__ == "__main__":
         extracted_data = extract_data(file_path)
         if extracted_data:
             print("Extracted Data in JSON format:")
-            print(extracted_data)
+            for index, item in enumerate(json.loads(extracted_data), start=1):
+                response = requests.post("http://localhost:3030/api/deals", json=item)
+                if response.status_code == 201:
+                    print(f"Item {index} successfully sent.")
+                else:
+                    print(f"Failed to send Item {index}. Status Code: {response.status_code}, Response: {response.text}")
+                print(f"Item {index}: {item}")
             copy_to_clipboard(extracted_data)
             print("Data copied to clipboard.")
         else:
