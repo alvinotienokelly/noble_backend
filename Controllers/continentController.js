@@ -2,6 +2,8 @@
 const db = require("../Models");
 const Continent = db.continents;
 const Country = db.country;
+const Region = db.regions;
+
 // Create a new continent
 const createContinent = async (req, res) => {
   try {
@@ -78,10 +80,18 @@ const getContinentWithCountries = async (req, res) => {
   res.status(200).json({ status: true, continent });
 };
 
+const getContinentWithRegions = async (req, res) => {
+  const continent = await Continent.findByPk(req.params.id, {
+    include: [{ model: Region, as: "regions" }],
+  });
+  res.status(200).json({ status: true, continent });
+};
+
 module.exports = {
   createContinent,
   getAllContinents,
   updateContinent,
   deleteContinent,
   getContinentWithCountries,
+  getContinentWithRegions,
 };
