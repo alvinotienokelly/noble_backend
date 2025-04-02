@@ -635,6 +635,21 @@ db.permissions.belongsToMany(db.roles, {
   as: "roles",
 });
 
+// Define associations
+db.role_permissions.belongsTo(db.permissions, {
+  foreignKey: "permission_id",
+  as: "permission",
+});
+db.role_permissions.belongsTo(db.roles, {
+  foreignKey: "role_id",
+  as: "role",
+});
+
+db.roles.hasMany(db.role_permissions, {
+  foreignKey: "role_id",
+  as: "permissions",
+});
+
 // Define sector associations
 db.deals.belongsTo(db.sectors, { foreignKey: "sector_id", as: "dealSector" });
 db.sectors.hasMany(db.deals, { foreignKey: "sector_id", as: "deals" });
