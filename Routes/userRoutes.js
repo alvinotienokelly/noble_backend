@@ -39,6 +39,7 @@ const {
   uploadProfileImage,
   onboardTargetCompany,
   addEmployee,
+  updateEmployee,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
