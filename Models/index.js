@@ -623,17 +623,22 @@ db.investor_deal_stages.belongsTo(db.deal_stages, {
 db.users.belongsTo(db.roles, { foreignKey: "role_id", as: "userRole" });
 db.roles.hasMany(db.users, { foreignKey: "role_id", as: "users" });
 
-// Define role permission associations
-db.roles.belongsToMany(db.permissions, {
-  through: db.role_permissions,
-  foreignKey: "role_id",
-  as: "permissions",
-});
-db.permissions.belongsToMany(db.roles, {
-  through: db.role_permissions,
+db.permissions.hasMany(db.role_permissions, {
   foreignKey: "permission_id",
-  as: "roles",
+  as: "rolePermissions",
 });
+
+// Define role permission associations
+// db.roles.belongsToMany(db.permissions, {
+//   through: db.role_permissions,
+//   foreignKey: "role_id",
+//   as: "permissions",
+// });
+// db.permissions.belongsToMany(db.roles, {
+//   through: db.role_permissions,
+//   foreignKey: "permission_id",
+//   as: "roles",
+// });
 
 // Define associations
 db.role_permissions.belongsTo(db.permissions, {
