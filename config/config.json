@@ -10,14 +10,14 @@
     "username": "postgres",
     "password": "@@7389",
     "database": "noblestride",
-    "host": "localhost",
+    "host": "noblestride-service-db",
     "dialect": "postgres"
   },
   "production": {
     "username": "postgres",
     "password": "@@7389",
     "database": "noblestride",
-    "host": "localhost",
+    "host": "noblestride-service-db",
     "dialect": "postgres"
   }
 }
