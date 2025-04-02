@@ -641,6 +641,7 @@ const verifyCode = async (req, res) => {
       res.status(200).json({
         status: true,
         message: "Verification successful.",
+        token: token,
         user: {
           id: user.id,
           email: user.email,
