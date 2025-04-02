@@ -98,6 +98,33 @@ const uploadProfileImage = async (req, res) => {
   });
 };
 
+const addEmployee = async (req, res) => {
+  try {
+    const { name, email, password, role_id } = req.body;
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role_id: role_id,
+      role: "Administrator",
+    });
+
+    res.status(201).json({
+      status: true,
+      message: "Employee added successfully.",
+      user,
+    });
+  } catch (error) {
+    console.error("Error adding employee:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 const onboardTargetCompany = async (req, res) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
@@ -1634,4 +1661,5 @@ module.exports = {
   uploadProfileImage,
   onboardInvestor,
   onboardTargetCompany,
+  addEmployee,
 };
