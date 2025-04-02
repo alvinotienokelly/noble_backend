@@ -28,6 +28,8 @@ const Country = db.country;
 const { createNotification } = require("./notificationController");
 const upload = require("../Middlewares/imageUpload");
 const path = require("path");
+const Permission = db.permissions;
+const RolePermission = db.role_permissions;
 
 const personalEmailDomains = [
   "gmail.com",
@@ -619,11 +621,32 @@ const verifyCode = async (req, res) => {
         expiresIn: 1 * 24 * 60 * 60 * 1000,
       });
 
-      return res.status(200).json({
+      // Fetch the user's role
+      const role = await Role.findByPk(user.role_id);
+      if (!role) {
+        return res
+          .status(404)
+          .json({ status: false, message: "Role not found for the user." });
+      }
+
+      // Fetch the permissions assigned to the user's role
+      const rolePermissions = await RolePermission.findAll({
+        where: { role_id: role.role_id },
+        include: [{ model: Permission, as: "permission" }],
+      });
+
+      // Extract permission names
+      const permissions = rolePermissions.map((rp) => rp.permission.name);
+
+      res.status(200).json({
         status: true,
         message: "Verification successful.",
-        token: token,
-        user: user,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: role.name,
+          permissions,
+        },
       });
     } else {
       // Code is invalid or expired
