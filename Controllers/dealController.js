@@ -31,10 +31,7 @@ const Subsector = db.subsectors;
 
 // Create a new deal
 const createDeal = async (req, res) => {
-  upload.single("image")(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ status: false, message: err });
-    }
+  
     try {
       const {
         title,
@@ -72,6 +69,7 @@ const createDeal = async (req, res) => {
           [Op.or]: [{ title }, { project }],
         },
       });
+      console.log("Loading Now");
 
       if (existingDeal) {
         return res.status(400).json({
@@ -162,7 +160,7 @@ const createDeal = async (req, res) => {
     } catch (error) {
       res.status(500).json({ status: false, message: error.message });
     }
-  });
+ 
 };
 
 // Get deals based on user's saved preference_sector & preference_region

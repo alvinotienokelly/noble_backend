@@ -3,10 +3,10 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn("deals", "image_url", {
-      type: Sequelize.STRING,
-      allowNull: true, // Image is not mandatory
-    });
+    // await queryInterface.addColumn("deals", "image_url", {
+    //   type: Sequelize.STRING,
+    //   allowNull: true, // Image is not mandatory
+    // });
   },
 
   down: async (queryInterface, Sequelize) => {

@@ -45,6 +45,7 @@ def extract_data(file_path):
                 item["deal_lead"] = 3
                 item["retainer_amount"] = 0
                 item["success_fee"] = 0
+                item['maximum_selling_stake']="Minority"
 
             return json.dumps(extracted_data, indent=4)
         else:
