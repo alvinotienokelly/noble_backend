@@ -28,10 +28,19 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
+      region_id: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: "regions", // Name of the table in the database
+          key: "region_id", // Primary key in the Region model
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
     },
     { timestamps: true }
   );
-  
 
   return Country;
 };

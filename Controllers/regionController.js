@@ -3,6 +3,7 @@ const db = require("../Models");
 const Region = db.regions;
 const Continent = db.continents;
 const { createAuditLog } = require("./auditLogService");
+const Country = db.country;
 
 // Create a new region
 const createRegion = async (req, res) => {
@@ -115,9 +116,17 @@ const deleteRegion = async (req, res) => {
   }
 };
 
+const getRegionWithCountries = async (req, res) => {
+  const region = await Region.findByPk(req.params.id, {
+    include: [{ model: Country, as: "countries" }],
+  });
+  res.status(200).json({ status: true, region });
+};
+
 module.exports = {
   createRegion,
   getAllRegions,
   updateRegion,
   deleteRegion,
+  getRegionWithCountries,
 };

@@ -795,6 +795,15 @@ db.continents.hasMany(db.country, {
   as: "countries",
 });
 
+db.country.belongsTo(db.regions, {
+  foreignKey: "region_id",
+  as: "region",
+});
+db.regions.hasMany(db.country, {
+  foreignKey: "region_id",
+  as: "countries",
+});
+
 // Define country associations
 db.country.hasMany(db.deal_countries, {
   foreignKey: "country_id",
