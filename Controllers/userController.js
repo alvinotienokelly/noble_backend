@@ -1624,6 +1624,48 @@ const adminUpdateUserProfile = async (req, res) => {
   }
 };
 
+const updateEmployee = async (req, res) => {
+  try {
+    const { id } = req.params; // Employee ID from the route parameter
+    const { name, email, password, role_id } = req.body;
+
+    // Find the user by ID
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Employee not found." });
+    }
+
+    // Update the user's name and email if provided
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (role_id) user.role_id = role_id;
+
+    // Update the user's password if provided
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Save the updated user
+    await user.save();
+
+    res.status(200).json({
+      status: true,
+      message: "Employee information updated successfully.",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating employee:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   updateAddressableMarket,
   updateCurrentMarket,
@@ -1662,4 +1704,5 @@ module.exports = {
   onboardInvestor,
   onboardTargetCompany,
   addEmployee,
+  updateEmployee,
 };
