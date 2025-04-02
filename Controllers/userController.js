@@ -1666,6 +1666,31 @@ const updateEmployee = async (req, res) => {
   }
 };
 
+const deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params; // Employee ID from the route parameter
+
+    // Find the user by ID
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Employee not found." });
+    }
+
+    // Delete the user
+    await user.destroy();
+
+    res.status(200).json({
+      status: true,
+      message: "Employee deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   updateAddressableMarket,
   updateCurrentMarket,
@@ -1705,4 +1730,5 @@ module.exports = {
   onboardTargetCompany,
   addEmployee,
   updateEmployee,
+  deleteEmployee,
 };

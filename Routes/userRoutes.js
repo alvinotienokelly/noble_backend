@@ -40,6 +40,7 @@ const {
   onboardTargetCompany,
   addEmployee,
   updateEmployee,
+  deleteEmployee,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -61,6 +62,7 @@ router.post("/profile", upload.single("avatar"), function (req, res, next) {
 });
 router.post("/add-employee", authMiddleware, addEmployee);
 router.put("/update-employee/:id", authMiddleware, updateEmployee);
+router.delete("/delete-employee/:id", authMiddleware, deleteEmployee);
 router.post("/onboard-target-company", authMiddleware, onboardTargetCompany);
 router.post("/onboard-investor", onboardInvestor);
 router.post("/signup", userAuth.saveUser, signup);
