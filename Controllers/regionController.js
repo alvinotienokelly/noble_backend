@@ -123,6 +123,7 @@ const getRegionWithCountries = async (req, res) => {
   res.status(200).json({ status: true, region });
 };
 
+
 module.exports = {
   createRegion,
   getAllRegions,
