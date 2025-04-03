@@ -31,7 +31,10 @@ const Subsector = db.subsectors;
 
 // Create a new deal
 const createDeal = async (req, res) => {
-  
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ status: false, message: err });
+    }
     try {
       const {
         title,
@@ -58,25 +61,24 @@ const createDeal = async (req, res) => {
         retainer_amount,
         success_fee,
       } = req.body;
-      console.log("Request Body:", req.body);
-      const created_by = 3; // Assuming the user ID is available in req.user
+      const created_by = req.user.id; // Assuming the user ID is available in req.user
       const success_fee_percentage = (success_fee / 100) * deal_size;
       // const image_url = req.file ? `/uploads/${req.file.filename}` : null;
       // const { originalname, path } = req.file;
 
       // Check if a deal with the same title or project already exists
-      // const existingDeal = await Deal.findOne({
-      //   where: {
-      //     [Op.or]: [{ title }, { project }],
-      //   },
-      // });
+      const existingDeal = await Deal.findOne({
+        where: {
+          [Op.or]: [{ title }, { project }],
+        },
+      });
 
-      // if (existingDeal) {
-      //   return res.status(400).json({
-      //     status: false,
-      //     message: "A deal with the same title or project already exists.",
-      //   });
-      // }
+      if (existingDeal) {
+        return res.status(400).json({
+          status: false,
+          message: "A deal with the same title or project already exists.",
+        });
+      }
       // Validate that retainer_amount is less than deal_size
       if (parseInt(retainer_amount) >= parseInt(ticket_size)) {
         return res.status(400).json({
@@ -149,18 +151,18 @@ const createDeal = async (req, res) => {
         }
       }
       // Create an audit log entry
-      // await createAuditLog({
-      //   userId: created_by,
-      //   action: "CREATE_DEAL",
-      //   details: `Deal ${newDeal.title} created with ID ${newDeal.deal_id}`,
-      //   ip_address: req.ip,
-      // });
+      await createAuditLog({
+        userId: created_by,
+        action: "CREATE_DEAL",
+        details: `Deal ${newDeal.title} created with ID ${newDeal.deal_id}`,
+        ip_address: req.ip,
+      });
 
       res.status(201).json({ status: true, deal: newDeal });
     } catch (error) {
       res.status(500).json({ status: false, message: error.message });
     }
- 
+  });
 };
 
 // Get deals based on user's saved preference_sector & preference_region
