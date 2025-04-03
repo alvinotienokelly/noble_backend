@@ -171,6 +171,7 @@ db.country_preferences = require("./CountryPreferenceModel")(
   DataTypes
 );
 db.deal_leads = require("./dealLeadModel")(sequelize, DataTypes);
+db.settings = require("./settingsModel")(sequelize, DataTypes);
 
 // Define associations
 db.users.hasMany(db.deal_leads, {

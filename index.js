@@ -67,6 +67,7 @@ const countryPreferenceRoutes = require("./Routes/countryPreferencesRoutes");
 const emailRoutes = require("./Routes/emailRoutes");
 const swaggerSpec = require("./config/swagger");
 const swaggerUi = require("swagger-ui-express");
+const settingsRoutes = require("./Routes/settingsRoutes");
 
 const path = require("path");
 
@@ -142,6 +143,7 @@ app.use("/api/region-preferences", regionPreferenceRoutes);
 app.use("/api/country-preferences", countryPreferenceRoutes);
 app.use("/api/emails", emailRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api/settings", settingsRoutes);
 
 // Route to run the seeder
 app.get("/run-seeder", (req, res) => {
