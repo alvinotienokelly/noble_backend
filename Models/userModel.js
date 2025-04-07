@@ -125,6 +125,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      // Existing fields...
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: true, // Allow null if the phone number is optional
+        validate: {
+          is: /^[0-9+\-() ]*$/, // Regex to validate phone numbers
+        },
+      },
     },
     { timestamps: true }
   );

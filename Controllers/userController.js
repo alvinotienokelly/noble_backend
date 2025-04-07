@@ -100,7 +100,7 @@ const uploadProfileImage = async (req, res) => {
 
 const addEmployee = async (req, res) => {
   try {
-    const { name, email, password, role_id } = req.body;
+    const { name, email, password, role_id, phone } = req.body;
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -109,6 +109,7 @@ const addEmployee = async (req, res) => {
     const user = await User.create({
       name,
       email,
+      phone,
       password: hashedPassword,
       role_id: role_id,
       role: "Administrator",
@@ -135,6 +136,7 @@ const onboardTargetCompany = async (req, res) => {
         name,
         email,
         password,
+        phone,
         location,
         total_assets,
         ebitda,
@@ -185,6 +187,7 @@ const onboardTargetCompany = async (req, res) => {
         email,
         password: hashedPassword,
         location,
+        phone,
         description,
         role: "Target Company",
         role_id: targetCompanyRole.role_id,
@@ -233,6 +236,7 @@ const onboardInvestor = async (req, res) => {
         total_investments,
         average_check_size,
         successful_exits,
+        phone,
         portfolio_ipr,
         description,
         location,
@@ -270,6 +274,7 @@ const onboardInvestor = async (req, res) => {
       const investor = await User.create({
         name,
         email,
+        phone,
         password: hashedPassword,
         total_investments,
         average_check_size,
@@ -450,6 +455,7 @@ const signup = async (req, res) => {
       name,
       email,
       role,
+      phone,
       role_id,
       password,
       continent_ids,
@@ -464,6 +470,7 @@ const signup = async (req, res) => {
     const data = {
       name,
       email,
+      phone,
       role,
       role_id,
       password: await bcrypt.hash(password, 10),
