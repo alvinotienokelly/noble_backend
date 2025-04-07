@@ -817,6 +817,7 @@ const filterDeals = async (req, res) => {
       continent_id, // Add continent_id
       region_id, // Add region_id
       country_id, // Add country_id
+      consultant_name,
     } = req.query;
 
     const offset = (page - 1) * limit;
@@ -854,6 +855,9 @@ const filterDeals = async (req, res) => {
       whereClause.subsector_id = subsector_id;
     }
 
+    if (consultant_name) {
+      whereClause.consultant_name = { [Op.iLike]: `%${consultant_name}%` }; // Case-insensitive search
+    }
     if (key_investors) {
       whereClause.key_investors = { [Op.iLike]: `%${key_investors}%` }; // Case-insensitive search
     }
