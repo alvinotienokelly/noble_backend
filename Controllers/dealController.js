@@ -66,6 +66,15 @@ const createDeal = async (req, res) => {
       // const image_url = req.file ? `/uploads/${req.file.filename}` : null;
       // const { originalname, path } = req.file;
 
+      // Validate maximum_selling_stake
+      const validSellingStakes = ["Minority", "Majority", "Open", "Full"];
+      if (!validSellingStakes.includes(maximum_selling_stake)) {
+        return res.status(200).json({
+          status: false,
+          message: "Invalid value for maximum selling stake.",
+        });
+      }
+
       // Check if a deal with the same title or project already exists
       const existingDeal = await Deal.findOne({
         where: {
@@ -661,6 +670,17 @@ const updateDeal = async (req, res) => {
         return res.status(400).json({
           status: false,
           message: "Retainer amount must be less than the ticket size.",
+        });
+      }
+      // Validate maximum_selling_stake
+      const validSellingStakes = ["Minority", "Majority", "Open", "Full"];
+      if (
+        maximum_selling_stake &&
+        !validSellingStakes.includes(maximum_selling_stake)
+      ) {
+        return res.status(400).json({
+          status: false,
+          message: "Invalid value for maximum selling stake.",
         });
       }
       await deal.update({

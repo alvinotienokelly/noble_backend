@@ -41,6 +41,8 @@ const {
   addEmployee,
   updateEmployee,
   deleteEmployee,
+  createEmployeeForInvestmentFirm,
+  getEmployeesForInvestmentFirm,
 } = userController;
 const userAuth = require("../Middlewares/userAuth");
 const authMiddleware = require("../Middlewares/authMiddleware");
@@ -60,6 +62,19 @@ router.post("/profile", upload.single("avatar"), function (req, res, next) {
   // req.body will hold the text fields, if there were any
   res.send("Hello world");
 });
+
+// Route to create an employee for an Investment Firm
+router.post(
+  "/investment-firm/:investmentFirmId/employees",
+  createEmployeeForInvestmentFirm
+);
+
+// Route to get all employees for an Investment Firm
+router.get(
+  "/investment-firm/:investmentFirmId/employees",
+  getEmployeesForInvestmentFirm
+);
+
 router.post("/add-employee", authMiddleware, addEmployee);
 router.put("/update-employee/:id", authMiddleware, updateEmployee);
 router.delete("/delete-employee/:id", authMiddleware, deleteEmployee);

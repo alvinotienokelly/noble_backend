@@ -27,9 +27,7 @@ def extract_data(file_path):
             return None
 
         required_columns = [
-            "project", "ticket_size", "status", "deal_type", "sector",
-            "description", "maximum_selling_stake", "teaser",
-            "model"
+            "firm", "website", "phone", "email"
         ]
 
         if all(column in data.columns for column in required_columns):
@@ -37,17 +35,10 @@ def extract_data(file_path):
             
             # Add additional fields to each object
             for item in extracted_data:
-                item["title"] = item["description"][:100]  # First 100 letters of description
-                item["region"] = "Africa"
-                item["ticket_size"] = round(item["ticket_size"])
-                item["deal_stage"] = "Due Diligence"
-                item["key_investors"] = "Financiers"
-                item["deal_size"] = 14.0
-                item["target_company_id"] = 3
-                item["deal_lead"] = 3
-                item["retainer_amount"] = 0
-                item["success_fee"] = 0
-                item['maximum_selling_stake']="Minority"
+                item["name"] = item["firm"][:100] 
+                item["email"] =item["email"]
+                item["website"] =item["website"]
+                item["phone"] =item["phone"]
 
                 logging.info(f"Processed Item: {item}")
             return json.dumps(extracted_data, indent=4)
@@ -77,11 +68,7 @@ if __name__ == "__main__":
         if extracted_data:
             print("Extracted Data in JSON format:")
             for index, item in enumerate(json.loads(extracted_data), start=1):
-                response = requests.post("http://localhost:3030/api/deals", json=item)
-                if response.status_code == 201:
-                    print(f"Item {index} successfully sent.")
-                else:
-                    print(f"Failed to send Item {index}. Status Code: {response.status_code}, Response: {response.text}")
+                # Print each item in the extracted data 
                 print(f"Item {index}: {item}")
             copy_to_clipboard(extracted_data)
             print("Data copied to clipboard.")

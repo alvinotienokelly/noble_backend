@@ -1691,6 +1691,72 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
+// Create an employee for an Investment Firm
+const createEmployeeForInvestmentFirm = async (req, res) => {
+  try {
+    const { name, email, password, investmentFirmId } = req.body;
+
+    // Check if the parent user (Investment Firm) exists
+    const investmentFirm = await User.findByPk(investmentFirmId);
+    if (!investmentFirm || investmentFirm.role !== "Investor") {
+      return res.status(404).json({
+        status: false,
+        message: "Investment Firm not found or invalid role.",
+      });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the employee
+    const employee = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: "InvestmentFirmEmployee", // Role for employees
+      parent_user_id: investmentFirmId,
+    });
+
+    res.status(201).json({
+      status: true,
+      message: "Employee created successfully.",
+      employee,
+    });
+  } catch (error) {
+    console.error("Error creating employee:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Get all employees for an Investment Firm
+const getEmployeesForInvestmentFirm = async (req, res) => {
+  try {
+    const { investmentFirmId } = req.params;
+
+    // Check if the parent user (Investment Firm) exists
+    const investmentFirm = await User.findByPk(investmentFirmId);
+    if (!investmentFirm || investmentFirm.role !== "Investor") {
+      return res.status(404).json({
+        status: false,
+        message: "Investment Firm not found or invalid role.",
+      });
+    }
+
+    // Fetch employees
+    const employees = await User.findAll({
+      where: { parent_user_id: investmentFirmId },
+    });
+
+    res.status(200).json({
+      status: true,
+      employees,
+    });
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   updateAddressableMarket,
   updateCurrentMarket,
@@ -1731,4 +1797,6 @@ module.exports = {
   addEmployee,
   updateEmployee,
   deleteEmployee,
+  createEmployeeForInvestmentFirm,
+  getEmployeesForInvestmentFirm,
 };
