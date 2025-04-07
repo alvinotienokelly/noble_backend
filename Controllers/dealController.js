@@ -818,6 +818,7 @@ const filterDeals = async (req, res) => {
       region_id, // Add region_id
       country_id, // Add country_id
       consultant_name,
+      deal_lead, // Add deal_lead
     } = req.query;
 
     const offset = (page - 1) * limit;
@@ -921,6 +922,16 @@ const filterDeals = async (req, res) => {
         as: "dealCountries",
         where: { country_id },
         include: [{ model: Country, as: "country" }],
+      });
+    }
+
+    // Add filter for deal_lead
+    if (deal_lead) {
+      includeClause.push({
+        model: DealLead,
+        as: "dealLeads",
+        where: { user_id: deal_lead },
+        include: [{ model: User, as: "user", attributes: ["id", "name"] }],
       });
     }
 
