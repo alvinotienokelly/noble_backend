@@ -65,14 +65,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
-      parent_user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-          model: "users",
-          key: "id",
-        },
-      },
+      // parent_user_id: {
+      //   type: DataTypes.INTEGER,
+      //   allowNull: true,
+      //   references: {
+      //     model: "users",
+      //     key: "id",
+      //   },
+      // },
       portfolio_ipr: {
         type: DataTypes.DECIMAL,
         allowNull: true,
@@ -138,18 +138,18 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // Define associations
-  User.associate = (models) => {
-    // An Investment Firm (Investor) can have many employees
-    User.hasMany(models.user, {
-      foreignKey: "parent_user_id",
-      as: "employees",
-    });
+  // User.associate = (models) => {
+  //   // An Investment Firm (Investor) can have many employees
+  //   User.hasMany(models.user, {
+  //     foreignKey: "parent_user_id",
+  //     as: "employees",
+  //   });
 
-    // An employee belongs to an Investment Firm (Investor)
-    User.belongsTo(models.user, {
-      foreignKey: "parent_user_id",
-      as: "investmentFirm",
-    });
-  };
+  //   // An employee belongs to an Investment Firm (Investor)
+  //   User.belongsTo(models.user, {
+  //     foreignKey: "parent_user_id",
+  //     as: "investmentFirm",
+  //   });
+  // };
   return User;
 };
