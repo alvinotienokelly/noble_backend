@@ -68,7 +68,11 @@ if __name__ == "__main__":
         if extracted_data:
             print("Extracted Data in JSON format:")
             for index, item in enumerate(json.loads(extracted_data), start=1):
-                # Print each item in the extracted data 
+                response = requests.post("http://localhost:3030/api/deals", json=item)
+                if response.status_code == 201:
+                    print(f"Item {index} successfully sent.")
+                else:
+                    print(f"Failed to send Item {index}. Status Code: {response.status_code}, Response: {response.text}")
                 print(f"Item {index}: {item}")
             copy_to_clipboard(extracted_data)
             print("Data copied to clipboard.")

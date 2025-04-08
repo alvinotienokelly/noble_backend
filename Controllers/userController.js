@@ -830,7 +830,7 @@ const login = async (req, res) => {
           code: verificationCode,
         });
 
-        await sendVerificationCode(user.email, verificationCode);
+        // await sendVerificationCode(user.email, verificationCode);
 
         //if password matches wit the one in the database
         //go ahead and generate a cookie for the user
