@@ -4,9 +4,9 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Add "Full Stake" to the ENUM type
-    await queryInterface.sequelize.query(`
-      ALTER TYPE "enum_deals_maximum_selling_stake" ADD VALUE 'Full';
-    `);
+    // await queryInterface.sequelize.query(`
+    //   ALTER TYPE "enum_deals_maximum_selling_stake" ADD VALUE 'Full';
+    // `);
   },
 
   down: async (queryInterface, Sequelize) => {
