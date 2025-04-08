@@ -88,6 +88,40 @@ const recordDealMeeting = async (req, res) => {
   }
 };
 
+const updateDealMeeting = async (req, res) => {
+  try {
+    const { meetingId } = req.params; // Meeting ID to identify the meeting
+    const { subject, startDateTime, endDateTime, attendees } = req.body;
+
+    // Find the meeting by ID
+    const meeting = await dealMeetings.findByPk(meetingId);
+
+    if (!meeting) {
+      return res.status(404).json({
+        status: false,
+        message: "Meeting not found.",
+      });
+    }
+
+    // Update the meeting details
+    await meeting.update({
+      subject: subject || meeting.subject,
+      start: startDateTime || meeting.start,
+      end: endDateTime || meeting.end,
+      attendees: attendees || meeting.attendees,
+    });
+
+    res.status(200).json({
+      status: true,
+      message: "Meeting updated successfully.",
+      meeting,
+    });
+  } catch (error) {
+    console.error("Error updating meeting:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 const filterDealMeetings = async (req, res) => {
   try {
     const {
@@ -177,4 +211,5 @@ module.exports = {
   recordDealMeeting,
   getMeetingsByDealId,
   filterDealMeetings,
+  updateDealMeeting,
 };
