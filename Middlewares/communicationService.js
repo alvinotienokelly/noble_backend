@@ -1,19 +1,18 @@
-// Middlewares/emailService.js
 const nodemailer = require("nodemailer");
 
-// Configure the transporter for Office 365
+// Configure the transporter for cPanel SMTP
 const transporter = nodemailer.createTransport({
-  host: "smtp.office365.com", // Office 365 SMTP server
-  port: 587, // Port for TLS
-  secure: false, // Use TLS (not SSL)
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: process.env.SMTP_PORT == 465, // Use SSL for port 465
   auth: {
-    user: process.env.OFFICE365_EMAIL, // Your Office 365 email address
-    pass: process.env.OFFICE365_PASSWORD, // Your Office 365 email password or app password
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
 /**
- * Send an email using Office 365
+ * Send an email using cPanel SMTP
  * @param {string} to - Recipient email address
  * @param {string} subject - Email subject
  * @param {string} text - Email body (plain text)
@@ -22,7 +21,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (to, subject, text, html = null) => {
   try {
     const mailOptions = {
-      from: process.env.OFFICE365_EMAIL, // Sender's email address
+      from: "noreply@yourdomain.com", // Sender's email address
       to, // Recipient's email address
       subject, // Email subject
       text, // Plain text body
