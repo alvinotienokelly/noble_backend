@@ -265,7 +265,7 @@ const getDocumentById = async (req, res) => {
       const returnUrl = "http://localhost:8080"; // Replace with your return URL
 
       const signingUrl = await createEmbeddedSigningUrl(
-        document,
+        document.docusign_envelope_id,
         email,
         name,
         returnUrl
@@ -282,7 +282,7 @@ const getDocumentById = async (req, res) => {
         "Document Signing",
         `Signing URL for document ${document.document_id} retrieved successfully`
       );
-      return res.status(200).json({ status: true, signingUrl });
+      return res.status(200).json({ status: true, document: document, signingUrl });
     }
     res.status(200).json({ status: true, document });
   } catch (error) {

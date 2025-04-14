@@ -5,6 +5,7 @@ const Document = db.documents;
 const { sendEmail } = require("../Middlewares/emailService");
 const { createAuditLog } = require("./auditLogService");
 const { createNotification } = require("./notificationController");
+const { createEnvelope } = require("../Middlewares/docusignService");
 
 // Function to share a document
 const shareDocument = async (req, res) => {
@@ -23,10 +24,26 @@ const shareDocument = async (req, res) => {
       user_email,
     });
 
+    // If the document requires a signature, create a DocuSign envelope
+    if (document.requires_signature) {
+      const envelopeId = await createEnvelope({
+        file_path: document.file_path,
+        file_name: document.file_name,
+        file_type: document.file_type || "pdf", // Default to PDF if not specified
+        recipientEmail: user_email,
+        recipientName: "Recipient Name", // Replace with the recipient's name if available
+      });
+
+      // Update the document with the DocuSign envelope ID
+      document.docusign_envelope_id = envelopeId;
+      await document.save();
+    }
+
+
     // Send email to user
     const emailSubject = "Document Access Invitation";
     const emailBody = `Hello,\n\nYou have been invited to access the document "${document.file_name}". Please log in to your account to view the details.\n\nBest regards,\nYour Team`;
-    await sendEmail(user_email, emailSubject, emailBody);
+    // await sendEmail(user_email, emailSubject, emailBody);
 
     await createAuditLog({
       action: "SHARE_DOCUMENT",
@@ -37,11 +54,11 @@ const shareDocument = async (req, res) => {
 
     const user = await db.users.findOne({ where: { email: user_email } });
 
-    await createNotification(
-      user.id,
-      "Document Access Invitation",
-      "You have been invited to access a document. " + document.file_name
-    );
+    // await createNotification(
+    //   user.id,
+    //   "Document Access Invitation",
+    //   "You have been invited to access a document. " + document.file_name
+    // );
     res.status(200).json({ status: true, share });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
