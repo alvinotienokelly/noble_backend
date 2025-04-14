@@ -15,10 +15,28 @@ const createAuditLog = async (req, res) => {
 // Get all audit logs
 const getAllAuditLogs = async (req, res) => {
   try {
-    const auditLogs = await AuditLog.findAll({
-      include: [{ model: User, as: "user" }],
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10 if not provided
+
+    const offset = (page - 1) * limit;
+
+    // Fetch audit logs with pagination
+    const { count: totalAuditLogs, rows: auditLogs } =
+      await AuditLog.findAndCountAll({
+        include: [{ model: User, as: "user" }],
+        offset,
+        limit: parseInt(limit),
+        order: [["createdAt", "DESC"]], // Order by most recent logs
+      });
+
+    const totalPages = Math.ceil(totalAuditLogs / limit);
+
+    res.status(200).json({
+      status: "true",
+      totalAuditLogs,
+      totalPages,
+      currentPage: parseInt(page),
+      auditLogs,
     });
-    res.status(200).json({ status: "true", auditLogs });
   } catch (error) {
     res.status(500).json({ status: "false", message: error.message });
   }
