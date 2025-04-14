@@ -95,7 +95,7 @@ const createDeal = async (req, res) => {
           message: "Retainer amount must be less than the ticket size.",
         });
       }
-      const image = req.file ? `/uploads/${req.file.filename}` : null;
+      const image = req.file ? `/uploads/profile_images/${req.file.filename}` : null;
 
       const newDeal = await Deal.create({
         title,
