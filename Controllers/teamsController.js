@@ -4,6 +4,8 @@ const Deal = db.deals;
 const graphClient = require("../Middlewares/graphClient");
 const axios = require("axios");
 const { Op } = require("sequelize");
+const moment = require("moment"); // Import moment.js for date formatting
+const timezonemoment = require("moment-timezone"); // Import moment-timezone for timezone handling
 
 const scheduleDealMeeting = async (req, res) => {
   try {
@@ -43,11 +45,15 @@ const scheduleDealMeeting = async (req, res) => {
 
     // const response = await graphClient.api("/me/events").post(event);
 
+    // Convert start and end times to EAT timezone
+    const startEAT = timezonemoment.tz(startDateTime, "Africa/Nairobi").toDate(); // Convert to EAT and store as a Date object
+    const endEAT = timezonemoment.tz(endDateTime, "Africa/Nairobi").toDate(); // Convert to EAT and store as a Date object
+
     const meeting = await dealMeetings.create({
       deal_id: dealId,
       subject,
-      start: startDateTime,
-      end: endDateTime,
+      start: startEAT,
+      end: endEAT,
       attendees,
       meeting_link: "response.onlineMeeting.joinUrl", // Todo ::  intergration with Microsoft Graph API
     });
@@ -198,7 +204,14 @@ const getMeetingsByDealId = async (req, res) => {
       });
     }
 
-    res.status(200).json({ status: true, meetings: meetings });
+    // Format the start and end dates into a human-readable format
+    const formattedMeetings = meetings.map((meeting) => ({
+      ...meeting.toJSON(), // Convert Sequelize instance to plain object
+      start: moment(meeting.start).format("MMMM Do YYYY, h:mm A"), // e.g., "November 1st 2023, 10:00 AM"
+      end: moment(meeting.end).format("MMMM Do YYYY, h:mm A"), // e.g., "November 1st 2023, 11:00 AM"
+    }));
+
+    res.status(200).json({ status: true, meetings: formattedMeetings });
   } catch (error) {
     res
       .status(200)
