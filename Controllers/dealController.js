@@ -535,8 +535,7 @@ const getDealById = async (req, res) => {
             {
               model: User,
               as: "investor",
-              // attributes: ["id", "name", "email"],
-              required: false, // Ensures the query doesn't fail if 'investor' is null
+              attributes: ["id", "name", "email"],
             },
           ],
         },
@@ -575,14 +574,14 @@ const getDealById = async (req, res) => {
       order: [["createdAt", "ASC"]],
     });
 
-    const groupedMilestones = milestones.reduce((acc, milestone) => {
-      const stageName = milestone.dealStage.name; // Assuming dealStage has a 'name' field
-      if (!acc[stageName]) {
-        acc[stageName] = [];
-      }
-      acc[stageName].push(milestone);
-      return acc;
-    }, {});
+    // const groupedMilestones = milestones.reduce((acc, milestone) => {
+    //   const stageName = milestone.dealStage.name; // Assuming dealStage has a 'name' field
+    //   if (!acc[stageName]) {
+    //     acc[stageName] = [];
+    //   }
+    //   acc[stageName].push(milestone);
+    //   return acc;
+    // }, {});
 
     // Fetch tasks and group them by deal stages
     const tasks = await Task.findAll({
@@ -612,7 +611,7 @@ const getDealById = async (req, res) => {
     res.status(200).json({
       status: true,
       deal,
-      dealStages: groupedMilestones,
+      // dealStages: groupedMilestones,
       tasks: groupedTasks,
     });
   } catch (error) {
