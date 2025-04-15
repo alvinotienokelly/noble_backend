@@ -95,7 +95,9 @@ const createDeal = async (req, res) => {
           message: "Retainer amount must be less than the ticket size.",
         });
       }
-      const image = req.file ? `/uploads/profile_images/${req.file.filename}` : null;
+      const image = req.file
+        ? `/uploads/profile_images/${req.file.filename}`
+        : null;
 
       const newDeal = await Deal.create({
         title,
@@ -368,6 +370,21 @@ const getAllDeals = async (req, res) => {
       ip_address: req.ip,
     });
 
+    // Format numeric fields into money format
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+
+    const formattedDeals = deals.map((deal) => ({
+      ...deal.toJSON(), // Convert Sequelize instance to plain object
+      ticket_size: deal.ticket_size ? formatter.format(deal.ticket_size) : null,
+      deal_size: deal.deal_size ? formatter.format(deal.deal_size) : null,
+      retainer_amount: deal.retainer_amount
+        ? formatter.format(deal.retainer_amount)
+        : null,
+    }));
+
     res.status(200).json({
       status: true,
       totalDealSize: totalDealSize,
@@ -379,7 +396,7 @@ const getAllDeals = async (req, res) => {
       totalDealSizePercentageChange: totalDealSizePercentageChange,
       currentPage: parseInt(page),
       totalPages: totalPages,
-      deals,
+      deals: formattedDeals,
     });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
@@ -608,9 +625,24 @@ const getDealById = async (req, res) => {
       ip_address: req.ip,
     });
 
+    // Format numeric fields into money format
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+
+    const formattedDeal = {
+      ...deal.toJSON(), // Convert Sequelize instance to plain object
+      ticket_size: deal.ticket_size ? formatter.format(deal.ticket_size) : null,
+      deal_size: deal.deal_size ? formatter.format(deal.deal_size) : null,
+      retainer_amount: deal.retainer_amount
+        ? formatter.format(deal.retainer_amount)
+        : null,
+    };
+
     res.status(200).json({
       status: true,
-      deal,
+      deal: formattedDeal,
       dealStages: groupedMilestones,
       // tasks: groupedTasks,
     });

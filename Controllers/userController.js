@@ -341,6 +341,44 @@ const getUsersByType = async (req, res) => {
 
     const totalPages = Math.ceil(totalUsersCount / limit);
 
+    // Format numeric fields into money format
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+
+    const formattedUsers = users.map((user) => ({
+      ...user.toJSON(), // Convert Sequelize instance to plain object
+      total_investments: user.total_investments
+        ? formatter.format(user.total_investments)
+        : null,
+      average_check_size: user.average_check_size
+        ? formatter.format(user.average_check_size)
+        : null,
+      portfolio_ipr: user.portfolio_ipr
+        ? formatter.format(user.portfolio_ipr)
+        : null,
+      addressable_market: user.addressable_market
+        ? formatter.format(user.addressable_market)
+        : null,
+      current_market: user.current_market
+        ? formatter.format(user.current_market)
+        : null,
+      total_assets: user.total_assets
+        ? formatter.format(user.total_assets)
+        : null,
+      ebitda: user.ebitda ? formatter.format(user.ebitda) : null,
+      gross_margin: user.gross_margin
+        ? formatter.format(user.gross_margin)
+        : null,
+      cac_payback_period: user.cac_payback_period
+        ? formatter.format(user.cac_payback_period)
+        : null,
+      tam: user.tam ? formatter.format(user.tam) : null,
+      sam: user.sam ? formatter.format(user.sam) : null,
+      som: user.som ? formatter.format(user.som) : null,
+    }));
+
     if (users.length > 0) {
       return res.status(200).json({
         status: true,
@@ -349,7 +387,7 @@ const getUsersByType = async (req, res) => {
         currentPage: parseInt(page),
         activeUsersCount: counts.Verified,
         rejectedUsersCount: counts.Rejected,
-        users,
+        users: formattedUsers,
       });
     } else {
       return res
