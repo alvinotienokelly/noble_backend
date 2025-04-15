@@ -590,14 +590,14 @@ const getDealById = async (req, res) => {
       order: [["createdAt", "ASC"]],
     });
 
-    const groupedTasks = tasks.reduce((acc, task) => {
-      const stageName = task.dealStage.name; // Assuming dealStage has a 'name' field
-      if (!acc[stageName]) {
-        acc[stageName] = [];
-      }
-      acc[stageName].push(task);
-      return acc;
-    }, {});
+    // const groupedTasks = tasks.reduce((acc, task) => {
+    //   const stageName = task.dealStage.name; // Assuming dealStage has a 'name' field
+    //   if (!acc[stageName]) {
+    //     acc[stageName] = [];
+    //   }
+    //   acc[stageName].push(task);
+    //   return acc;
+    // }, {});
 
     await trackInvestorBehavior(created_by, deal.deal_id);
 
@@ -612,7 +612,7 @@ const getDealById = async (req, res) => {
       status: true,
       deal,
       dealStages: groupedMilestones,
-      tasks: groupedTasks,
+      // tasks: groupedTasks,
     });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
