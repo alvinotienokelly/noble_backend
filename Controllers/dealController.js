@@ -536,6 +536,7 @@ const getDealById = async (req, res) => {
               model: User,
               as: "investor",
               attributes: ["id", "name", "email"],
+              required: false, // Ensures the query doesn't fail if 'investor' is null
             },
           ],
         },
