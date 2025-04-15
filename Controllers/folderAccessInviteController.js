@@ -39,18 +39,20 @@ const sendFolderAccessInvite = async (req, res) => {
 
         const user = await User.findOne({ where: { email: user_email } });
 
-        await createAuditLog({
-          action: "SEND_FOLDER_ACCESS_INVITE",
-          description: `Invite sent to ${user_email} for folder ${folder.name}`,
-          userId: req.user.id,
-          ip_address: req.ip,
-        });
+        if (user) {
+          await createAuditLog({
+            action: "SEND_FOLDER_ACCESS_INVITE",
+            description: `Invite sent to ${user_email} for folder ${folder.name}`,
+            userId: req.user.id,
+            ip_address: req.ip,
+          });
 
-        await createNotification(
-          user.id,
-          "Folder Access Invitation",
-          "You have been invited to access a folder."
-        );
+          await createNotification(
+            user.id,
+            "Folder Access Invitation",
+            "You have been invited to access a folder."
+          );
+        }
 
         return invite;
       })
