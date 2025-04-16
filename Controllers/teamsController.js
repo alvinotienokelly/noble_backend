@@ -34,8 +34,7 @@ function formatDateTimeByTimezone(dateTime, timezone) {
 
 const scheduleDealMeeting = async (req, res) => {
   try {
-    const { dealId, subject, startDateTime, endDateTime, attendees, timeZone } =
-      req.body;
+    const { dealId, subject, startDateTime, endDateTime, attendees } = req.body;
 
     const deal = await Deal.findByPk(dealId);
     if (!deal) {
@@ -73,8 +72,14 @@ const scheduleDealMeeting = async (req, res) => {
 
     // Convert start and end times to EAT timezone
     // Convert start and end times to EAT timezone with 3-hour subtraction
-    const startEAT = formatDateTimeByTimezone(startDateTime, timeZone);
-    const endEAT = formatDateTimeByTimezone(endDateTime, timeZone);
+    const startEAT = timezonemoment
+      .tz(startDateTime, "Africa/Nairobi")
+      .subtract(3, "hours")
+      .toDate(); // Convert to EAT, subtract 3 hours, and store as a Date object
+    const endEAT = timezonemoment
+      .tz(endDateTime, "Africa/Nairobi")
+      .subtract(3, "hours")
+      .toDate(); // Convert to EAT, subtract 3 hours, and store as a Date object
 
     const meeting = await dealMeetings.create({
       deal_id: dealId,
