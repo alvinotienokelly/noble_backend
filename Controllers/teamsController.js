@@ -7,9 +7,35 @@ const { Op } = require("sequelize");
 const moment = require("moment"); // Import moment.js for date formatting
 const timezonemoment = require("moment-timezone"); // Import moment-timezone for timezone handling
 
+// Function to convert and format date/time based on the provided timezone
+function formatDateTimeByTimezone(dateTime, timezone) {
+  // Define timezone mappings (IANA timezone identifiers)
+  const timezoneMap = {
+    PST: "America/Los_Angeles",
+    EST: "America/New_York",
+    GMT: "Europe/London",
+    CET: "Europe/Paris",
+    WAT: "Africa/Lagos",
+    CAT: "Africa/Harare",
+    EAT: "Africa/Nairobi",
+    SAST: "Africa/Johannesburg",
+    MST: "Indian/Mauritius",
+    "GMT+2": "Africa/Cairo",
+  };
+
+  // Get the appropriate IANA timezone identifier
+  const ianaTimezone = timezoneMap[timezone] || "UTC";
+
+  // Convert dateTime to the specified timezone
+  return timezonemoment
+    .tz(dateTime, ianaTimezone)
+    .format("YYYY-MM-DD HH:mm:ss z");
+}
+
 const scheduleDealMeeting = async (req, res) => {
   try {
-    const { dealId, subject, startDateTime, endDateTime, attendees } = req.body;
+    const { dealId, subject, startDateTime, endDateTime, attendees, timeZone } =
+      req.body;
 
     const deal = await Deal.findByPk(dealId);
     if (!deal) {
@@ -47,14 +73,9 @@ const scheduleDealMeeting = async (req, res) => {
 
     // Convert start and end times to EAT timezone
     // Convert start and end times to EAT timezone with 3-hour subtraction
-    const startEAT = timezonemoment
-      .tz(startDateTime, "Africa/Nairobi")
-      .subtract(3, "hours")
-      .toDate(); // Convert to EAT, subtract 3 hours, and store as a Date object
-    const endEAT = timezonemoment
-      .tz(endDateTime, "Africa/Nairobi")
-      .subtract(3, "hours")
-      .toDate(); // Convert to EAT, subtract 3 hours, and store as a Date object
+    const startEAT = formatDateTimeByTimezone(startDateTime, timeZone);
+    const endEAT = formatDateTimeByTimezone(endDateTime, timeZone);
+
     const meeting = await dealMeetings.create({
       deal_id: dealId,
       subject,
