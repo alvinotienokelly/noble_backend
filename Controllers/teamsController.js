@@ -52,8 +52,8 @@ const scheduleDealMeeting = async (req, res) => {
     const meeting = await dealMeetings.create({
       deal_id: dealId,
       subject,
-      start: startEAT,
-      end: endEAT,
+      start: startDateTime,
+      end: endDateTime,
       attendees,
       meeting_link: "response.onlineMeeting.joinUrl", // Todo ::  intergration with Microsoft Graph API
     });
