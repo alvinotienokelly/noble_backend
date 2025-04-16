@@ -121,6 +121,25 @@ const addEmployee = async (req, res) => {
       user,
     });
   } catch (error) {
+    // Handle Sequelize validation errors
+    if (error.name === "SequelizeValidationError") {
+      const validationErrors = error.errors.map((err) => err.message);
+      return res.status(400).json({
+        status: false,
+        message: "Unique email or name required",
+        errors: validationErrors,
+      });
+    }
+
+    // Handle Sequelize unique constraint errors
+    if (error.name === "SequelizeUniqueConstraintError") {
+      const uniqueErrors = error.errors.map((err) => err.message);
+      return res.status(400).json({
+        status: false,
+        message: "Unique email or name required.",
+        errors: uniqueErrors,
+      });
+    }
     console.error("Error adding employee:", error);
     res.status(500).json({ status: false, message: error.message });
   }
