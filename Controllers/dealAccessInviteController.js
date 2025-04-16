@@ -131,7 +131,7 @@ const withdrawDealInterest = async (req, res) => {
 
     // Find the deal access invite for the investor and deal
     const invite = await DealAccessInvite.findOne({
-      where: { investor_id, deal_id, status: "Accepted" },
+      where: { investor_id, deal_id},
     });
 
     if (!invite) {
