@@ -971,7 +971,25 @@ const filterDeals = async (req, res) => {
 
     const { count: totalDeals, rows: deals } = await Deal.findAndCountAll({
       where: whereClause,
-      include: includeClause.length > 0 ? includeClause : undefined,
+      include: [
+        { model: User, as: "createdBy" },
+        { model: User, as: "targetCompany" },
+        {
+          model: DealStage,
+          as: "dealStage",
+        },
+        {
+          model: DealCountry,
+          as: "dealCountries",
+          include: [{ model: Country, as: "country" }],
+        },
+        {
+          model: DealRegion,
+          as: "dealRegions",
+          include: [{ model: Region, as: "region" }],
+        },
+        { model: DealContinent, as: "dealContinents", include: ["continent"] },
+      ],
       offset,
       limit: parseInt(limit),
     });
