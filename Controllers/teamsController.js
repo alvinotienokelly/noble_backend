@@ -46,9 +46,15 @@ const scheduleDealMeeting = async (req, res) => {
     // const response = await graphClient.api("/me/events").post(event);
 
     // Convert start and end times to EAT timezone
-    const startEAT = timezonemoment.tz(startDateTime, "Europe/London").toDate(); // Convert to EAT and store as a Date object
-    const endEAT = timezonemoment.tz(endDateTime, "Europe/London").toDate(); // Convert to EAT and store as a Date object
-
+    // Convert start and end times to EAT timezone with 3-hour subtraction
+    const startEAT = timezonemoment
+      .tz(startDateTime, "Africa/Nairobi")
+      .subtract(3, "hours")
+      .toDate(); // Convert to EAT, subtract 3 hours, and store as a Date object
+    const endEAT = timezonemoment
+      .tz(endDateTime, "Africa/Nairobi")
+      .subtract(3, "hours")
+      .toDate(); // Convert to EAT, subtract 3 hours, and store as a Date object
     const meeting = await dealMeetings.create({
       deal_id: dealId,
       subject,
