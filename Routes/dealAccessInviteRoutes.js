@@ -26,6 +26,10 @@ router.get("/deal/:deal_id/invites", authMiddleware, getDealInvites);
 router.put("/invite/:invite_id/accept", authMiddleware, acceptDealInvite); // Add this line
 router.put("/invite/:invite_id/reject", authMiddleware, rejectDealInvite); // Add this line
 router.post("/interest", authMiddleware, expressDealInterest);
-router.put("/deals/:deal_id/withdraw-interest", withdrawDealInterest);
+router.put(
+  "/deals/:deal_id/withdraw-interest",
+  authMiddleware,
+  withdrawDealInterest
+);
 
 module.exports = router;
