@@ -372,8 +372,9 @@ const getAllDeals = async (req, res) => {
 
     // Format numeric fields into money format
     const formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+      style: "decimal", // Use "decimal" to exclude currency symbols
+      minimumFractionDigits: 0, // Ensure two decimal places
+      maximumFractionDigits: 2,
     });
 
     const formattedDeals = deals.map((deal) => ({
@@ -627,8 +628,9 @@ const getDealById = async (req, res) => {
 
     // Format numeric fields into money format
     const formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+      style: "decimal", // Use "decimal" to exclude currency symbols
+      minimumFractionDigits: 2, // Ensure two decimal places
+      maximumFractionDigits: 2,
     });
 
     const formattedDeal = {
