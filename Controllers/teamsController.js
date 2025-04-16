@@ -46,14 +46,14 @@ const scheduleDealMeeting = async (req, res) => {
     // const response = await graphClient.api("/me/events").post(event);
 
     // Convert start and end times to EAT timezone
-    const startEAT = timezonemoment.tz(startDateTime, "Africa/Nairobi").toDate(); // Convert to EAT and store as a Date object
-    const endEAT = timezonemoment.tz(endDateTime, "Africa/Nairobi").toDate(); // Convert to EAT and store as a Date object
+    const startEAT = timezonemoment.tz(startDateTime, "Europe/London").toDate(); // Convert to EAT and store as a Date object
+    const endEAT = timezonemoment.tz(endDateTime, "Europe/London").toDate(); // Convert to EAT and store as a Date object
 
     const meeting = await dealMeetings.create({
       deal_id: dealId,
       subject,
-      start: startDateTime,
-      end: endDateTime,
+      start: startEAT,
+      end: endEAT,
       attendees,
       meeting_link: "response.onlineMeeting.joinUrl", // Todo ::  intergration with Microsoft Graph API
     });
