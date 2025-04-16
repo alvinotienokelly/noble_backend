@@ -123,6 +123,51 @@ const expressDealInterest = async (req, res) => {
   }
 };
 
+const withdrawDealInterest = async (req, res) => {
+  try {
+    const { deal_id } = req.params; // Deal ID from the request parameters
+    const { reason } = req.body; // Reason for withdrawal from the request body
+    const investor_id = req.user.id; // Get the logged-in user's ID
+
+    // Find the deal access invite for the investor and deal
+    const invite = await DealAccessInvite.findOne({
+      where: { investor_id, deal_id, status: "Accepted" },
+    });
+
+    if (!invite) {
+      return res.status(404).json({
+        status: false,
+        message: "No active interest found for this deal.",
+      });
+    }
+
+    // Update the invite status to "Withdrawn" and store the reason
+    invite.status = "Withdrawn";
+    invite.withdraw_reason = reason || null; // Store the reason if provided
+    await invite.save();
+
+    // Create an audit log for the withdrawal
+    await createAuditLog({
+      userId: req.user.id,
+      action: "WITHDRAW_DEAL_INTEREST",
+      details: `Investor ${investor_id} withdrew interest in deal ${deal_id} with reason: ${
+        reason || "No reason provided"
+      }`,
+      ip_address: req.ip,
+    });
+
+    // Send a notification to the investor
+
+    res.status(200).json({
+      status: true,
+      message: "Interest in the deal has been successfully withdrawn."
+    });
+  } catch (error) {
+    console.error("Error withdrawing deal interest:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 //Function to get invites for a deal
 const getDealInvites = async (req, res) => {
   try {
@@ -287,5 +332,6 @@ module.exports = {
   rejectDealInvite,
   acceptDealInvite,
   expressDealInterest,
+  withdrawDealInterest,
   checkAcceptedDealAccessInvite,
 };
