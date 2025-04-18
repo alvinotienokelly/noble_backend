@@ -3,6 +3,7 @@ const db = require("../Models");
 const Continent = db.continents;
 const Country = db.country;
 const Region = db.regions;
+const { Sequelize } = require("../Models");
 
 // Create a new continent
 const createContinent = async (req, res) => {
@@ -22,7 +23,24 @@ const createContinent = async (req, res) => {
 // Get all continents
 const getAllContinents = async (req, res) => {
   try {
-    const continents = await Continent.findAll();
+    const continents = await Continent.findAll({
+      attributes: {
+        include: [
+          [
+            Sequelize.fn("COUNT", Sequelize.col("regions.region_id")),
+            "regionCount",
+          ],
+        ],
+      },
+      include: [
+        {
+          model: Region,
+          as: "regions",
+          attributes: [], // Exclude region details, only count them
+        },
+      ],
+      group: ["continent.continent_id"], // Group by continent to ensure correct counts
+    });
     res.status(200).json({ status: true, continents });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
