@@ -3,13 +3,45 @@ const db = require("../Models");
 const Role = db.roles;
 const Permission = db.permissions;
 const RolePermission = db.role_permissions;
+const User = db.users;
+const { Sequelize } = require("sequelize");
 
 // Get all roles
 const getAllRoles = async (req, res) => {
   try {
-    const roles = await Role.findAll();
+    const roles = await Role.findAll({
+      include: [
+        {
+          model: RolePermission,
+          as: "permissions",
+          include: [
+            {
+              model: Permission,
+              as: "permission",
+              attributes: ["permission_id", "name"], // Include permission details
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "users",
+          attributes: ["id", "name", "email"], // Include user details
+        },
+      ],
+      attributes: {
+        include: [
+          [
+            Sequelize.fn("COUNT", Sequelize.col("users.id")),
+            "userCount", // Count the number of users with this role
+          ],
+        ],
+      },
+      group: ["role.role_id", "permissions.role_permission_id", "permissions->permission.permission_id", "users.id"], // Group by role and associated entities
+    });
+
     res.status(200).json({ status: true, roles });
   } catch (error) {
+    console.error("Error fetching roles:", error);
     res.status(500).json({ status: false, message: error.message });
   }
 };
