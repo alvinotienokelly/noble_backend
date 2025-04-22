@@ -20,6 +20,7 @@ const {
   filterDealsByLocation,
   updateDealStage,
   markAllDealsAsOpen,
+  markDealAsOpen
 } = dealController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
@@ -36,6 +37,7 @@ router.get("/getTargetCompanyDeals", authMiddleware, getTargetCompanyDeals);
 router.get("/accepted-deals", authMiddleware, getAcceptedDealsForInvestor); // Add this line
 router.put("/:id/mark-active", authMiddleware, markDealAsActive); // Add this line
 router.put("/:id/mark-pending", authMiddleware, markDealAsPending); // Add this line
+router.put("/:id/mark-open", authMiddleware, markDealAsOpen); // Add this line
 router.put("/:id/mark-archived", authMiddleware, markDealAsArchived); // Add this line
 router.put("/:id/on-hold", authMiddleware, markDealOnhold); // Add this line
 router.put("/:id/mark-closed", authMiddleware, markDealClosed); // Add this line
