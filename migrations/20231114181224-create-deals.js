@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('deals', {
+    await queryInterface.createTable("deals", {
       deal_id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -20,42 +20,51 @@ module.exports = {
       sector: {
         type: Sequelize.ENUM,
         values: [
-          'Tech',
-          'Finance',
-          'Healthcare',
-          'Energy',
-          'Consumer Goods',
-          'Industrial',
-          'Real Estate',
-          'Telecommunications',
-          'Utilities',
-          'Materials',
+          "Tech",
+          "Finance",
+          "Healthcare",
+          "Energy",
+          "Consumer Goods",
+          "Industrial",
+          "Real Estate",
+          "Telecommunications",
+          "Utilities",
+          "Materials",
         ],
         allowNull: false,
       },
       region: {
         type: Sequelize.ENUM,
         values: [
-          'North America',
-          'Africa',
-          'Europe',
-          'Asia',
-          'South America',
-          'Australia',
-          'Antarctica',
+          "North America",
+          "Africa",
+          "Europe",
+          "Asia",
+          "South America",
+          "Australia",
+          "Antarctica",
         ],
         allowNull: false,
       },
       deal_stage: {
         type: Sequelize.ENUM,
-        values: ['Due Diligence', 'Term Sheet', 'Closed'],
+        values: ["Due Diligence", "Term Sheet", "Closed"],
         allowNull: false,
       },
       status: {
         type: Sequelize.ENUM,
-        values: ['Active', 'Pending', 'Inactive'],
+        values: [
+          "Active",
+          "Pending",
+          "Open",
+          "On Hold",
+          "Inactive",
+          "Closed",
+          "Closed & Reopened",
+          "Archived", // Add Archived status
+        ],
         allowNull: false,
-        defaultValue: 'Active',
+        defaultValue: "Open",
       },
       deal_size: {
         type: Sequelize.DECIMAL,
@@ -65,8 +74,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'users',
-          key: 'id',
+          model: "users",
+          key: "id",
         },
       },
       key_investors: {
@@ -77,29 +86,29 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'users',
-          key: 'id',
+          model: "users",
+          key: "id",
         },
       },
       visibility: {
         type: Sequelize.ENUM,
-        values: ['Public', 'Private'],
-        defaultValue: 'Public',
+        values: ["Public", "Private"],
+        defaultValue: "Public",
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.fn('now'),
+        defaultValue: Sequelize.fn("now"),
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.fn('now'),
+        defaultValue: Sequelize.fn("now"),
       },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('deals');
-  }
+    await queryInterface.dropTable("deals");
+  },
 };

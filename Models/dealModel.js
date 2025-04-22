@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
           "Archived", // Add Archived status
         ],
         allowNull: false,
-        defaultValue: "Active",
+        defaultValue: "Open",
       },
       ticket_size: {
         type: DataTypes.INTEGER,

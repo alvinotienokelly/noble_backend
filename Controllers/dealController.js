@@ -29,6 +29,39 @@ const path = require("path");
 const Sector = db.sectors;
 const Subsector = db.subsectors;
 
+const markAllDealsAsOpen = async (req, res) => {
+  try {
+    // Update the status of all deals to "Open"
+    const [updatedCount] = await Deal.update(
+      { status: "Open" }, // Set status to "Open"
+      { where: {} } // No conditions, update all rows
+    );
+
+    if (updatedCount === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No deals were updated.",
+      });
+    }
+
+    // Create an audit log for the action
+    await createAuditLog({
+      userId: req.user.id,
+      action: "MARK_ALL_DEALS_AS_OPEN",
+      details: `Marked all deals as Open`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({
+      status: true,
+      message: `Successfully marked ${updatedCount} deals as Open.`,
+    });
+  } catch (error) {
+    console.error("Error marking all deals as Open:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 // Create a new deal
 const createDeal = async (req, res) => {
   upload.single("image")(req, res, async (err) => {
@@ -1454,4 +1487,5 @@ module.exports = {
   markDealClosedAndOpened,
   filterDealsByLocation,
   updateDealStage,
+  markAllDealsAsOpen,
 };

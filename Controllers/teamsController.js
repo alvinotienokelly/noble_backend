@@ -47,28 +47,30 @@ const scheduleDealMeeting = async (req, res) => {
 
     //ToDo :: Integrate with Microsoft Graph API
 
-    // const event = {
-    //   subject,
-    //   start: {
-    //     dateTime: startDateTime,
-    //     timeZone: "UTC",
-    //   },
-    //   end: {
-    //     dateTime: endDateTime,
-    //     timeZone: "UTC",
-    //   },
-    //   attendees: attendees.map((email) => ({
-    //     emailAddress: {
-    //       address: email,
-    //       name: email,
-    //     },
-    //     type: "required",
-    //   })),
-    //   isOnlineMeeting: true,
-    //   onlineMeetingProvider: "teamsForBusiness",
-    // };
+    const event = {
+      subject,
+      start: {
+        dateTime: startDateTime,
+        timeZone: "UTC",
+      },
+      end: {
+        dateTime: endDateTime,
+        timeZone: "UTC",
+      },
+      attendees: attendees.map((email) => ({
+        emailAddress: {
+          address: email,
+          name: email,
+        },
+        type: "required",
+      })),
+      isOnlineMeeting: true,
+      onlineMeetingProvider: "teamsForBusiness",
+    };
 
-    // const response = await graphClient.api("/me/events").post(event);
+    const response = await graphClient
+      .api(`/users/${CONFIG.organizerEmail}/calendar/events`)
+      .post(event);
 
     // Convert start and end times to EAT timezone
     // Convert start and end times to EAT timezone with 3-hour subtraction
