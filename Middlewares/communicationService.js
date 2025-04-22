@@ -1,13 +1,18 @@
 const nodemailer = require("nodemailer");
 
-// Configure the transporter for cPanel SMTP
+const userEmail = process.env.USER_EMAIL;
+const userPassword = process.env.USER_PASSWORD;
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_PORT == 465, // Use SSL for port 465
+  host: "smtp.office365.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
+    user: userEmail,
+    pass: userPassword,
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
@@ -21,11 +26,10 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (to, subject, text, html = null) => {
   try {
     const mailOptions = {
-      from: "noreply@yourdomain.com", // Sender's email address
-      to, // Recipient's email address
-      subject, // Email subject
-      text, // Plain text body
-      ...(html && { html }), // HTML body (optional)
+      from: userEmail,
+      to: to,
+      subject: subject,
+      text: text,
     };
 
     const info = await transporter.sendMail(mailOptions);
