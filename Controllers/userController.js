@@ -983,21 +983,36 @@ const getProfile = async (req, res) => {
 const getEmployees = async (req, res) => {
   try {
     // Find the role_id for the Employee role
-    const employeeRole = await Role.findOne({ where: { name: "Employee" } });
+    // const employeeRole = await Role.findOne({ where: { name: "Employee" } });
 
-    if (!employeeRole) {
-      return res
-        .status(404)
-        .json({ status: false, message: "Employee role not found." });
-    }
+    // if (!employeeRole) {
+    //   return res
+    //     .status(404)
+    //     .json({ status: false, message: "Employee role not found." });
+    // }
 
     const employees = await User.findAll({
-      where: {
-        [db.Sequelize.Op.or]: [
-          // { role: "Employee" },
-          { role_id: employeeRole.role_id },
-        ],
-      },
+      where: { role: "Administrator" },
+      include: [
+        {
+          model: Role,
+          as: "userRole", // Alias defined in the Sequelize association
+          attributes: ["role_id", "name"], // Include role details
+          include: [
+            {
+              model: RolePermission,
+              as: "permissions", // Alias defined in the Sequelize association
+              include: [
+                {
+                  model: Permission,
+                  as: "permission", // Alias defined in the Sequelize association
+                  attributes: ["permission_id", "name"], // Include permission details
+                },
+              ],
+            },
+          ],
+        },
+      ],
     });
 
     if (employees.length === 0) {
