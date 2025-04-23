@@ -11,15 +11,31 @@ const {
   assignPermissionsToRoleName,
 } = roleController;
 const authMiddleware = require("../Middlewares/authMiddleware");
+const checkRole = require("../Middlewares/roleMiddleware");
+const checkPermission = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.get("/", authMiddleware, getAllRoles);
 router.get("/:id", authMiddleware, getRoleById);
-router.post("/", authMiddleware, createRole);
-router.put("/:id", authMiddleware, updateRole);
-router.delete("/:id", authMiddleware, deleteRole);
-router.post("/assign-permissions", authMiddleware, assignPermissionsToRole);
-router.post("/assign-permissions-to-role-name", authMiddleware, assignPermissionsToRoleName);
+router.post("/", authMiddleware, checkPermission("CREATE_ROLE"), createRole);
+router.put("/:id", authMiddleware, checkPermission("UPDATE_ROLE"), updateRole);
+router.delete(
+  "/:id",
+  authMiddleware,
+  checkPermission("DELETE_ROLE"),
+  deleteRole
+);
+router.post(
+  "/assign-permissions",
+  authMiddleware,
+  checkPermission("ASSIGN_PERMISSIONS_TO_ROLE"),
+  assignPermissionsToRole
+);
+router.post(
+  "/assign-permissions-to-role-name",
+  authMiddleware,
+  assignPermissionsToRoleName
+);
 
 module.exports = router;

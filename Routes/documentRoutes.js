@@ -14,10 +14,19 @@ const {
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
 const fileUpload = require("../Middlewares/fileUpload");
+const checkRole = require("../Middlewares/roleMiddleware");
+const checkPermission = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, fileUpload, createDocument);
+router.post(
+  "/",
+  authMiddleware,
+  fileUpload,
+  checkPermission("CREATE_DOCUMENT"),
+
+  createDocument
+);
 router.get("/", authMiddleware, getAllDocuments);
 router.get(
   "/user/documents",
@@ -25,8 +34,23 @@ router.get(
   getDocumentsForUserWithShareStatus
 ); // Add this line
 router.get("/:id", authMiddleware, getDocumentById);
-router.put("/:id", authMiddleware, checkAdmin, fileUpload, updateDocument);
-router.delete("/:id", authMiddleware, checkAdmin, deleteDocument);
+router.put(
+  "/:id",
+  authMiddleware,
+  checkAdmin,
+  fileUpload,
+  checkPermission("UPDATE_DOCUMENT"),
+
+  updateDocument
+);
+router.delete(
+  "/:id",
+  authMiddleware,
+  checkAdmin,
+  checkPermission("DELETE_DOCUMENT"),
+
+  deleteDocument
+);
 router.get("/user-deals/documents", authMiddleware, getDocumentsByUserDeals);
 router.get("/filter/documents", authMiddleware, documentsFilter);
 router.put("/:id/archive", authMiddleware, archiveDocument); // Add this line

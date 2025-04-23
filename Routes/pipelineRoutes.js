@@ -3,6 +3,8 @@ const express = require("express");
 const pipelineController = require("../Controllers/pipelineController");
 const { createPipeline, getAllPipelines, getPipelineById, updatePipeline, deletePipeline } = pipelineController;
 const authMiddleware = require("../Middlewares/authMiddleware");
+const checkRole = require("../Middlewares/roleMiddleware");
+const checkPermission = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 

@@ -11,14 +11,16 @@ const {
 } = sectorController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const upload = require("../Middlewares/bulkUpload");
+const checkRole = require("../Middlewares/roleMiddleware");
+const checkPermission = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.get("/", getAllSectors);
 router.get("/:id", getSectorById);
-router.post("/", createSector);
-router.put("/:id", updateSector);
-router.delete("/:id", deleteSector);
+router.post("/", checkPermission("CREATE_SECTOR"), createSector);
+router.put("/:id", checkPermission("UPDATE_SECTOR"), updateSector);
+router.delete("/:id", checkPermission("DELETE_SECTOR"), deleteSector);
 router.post(
   "/bulk-upload",
   upload.single("file"),

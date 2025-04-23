@@ -50,6 +50,8 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 const db = require("../Models");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
+const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkRole = require("../Middlewares/roleMiddleware");
 
 const User = db.users;
 

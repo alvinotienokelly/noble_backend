@@ -17,21 +17,38 @@ const {
   getUserTasksByDealId,
 } = taskController;
 const authMiddleware = require("../Middlewares/authMiddleware");
+const checkRole = require("../Middlewares/roleMiddleware");
+const checkPermission = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, createTask);
+router.post("/", authMiddleware, checkPermission("CREATE_TASK"), createTask);
 router.get("/", authMiddleware, getAllTasks);
 router.get("/deal/:dealId/user-tasks", authMiddleware, getUserTasksByDealId); // Add this line
 router.get("/user", authMiddleware, getTasksByUserId);
 router.get("/:id", authMiddleware, getTaskById);
-router.put("/:id", authMiddleware, updateTask);
+router.put("/:id", authMiddleware, checkPermission("UPDATE_TASK"), updateTask);
 router.get("/deal/:dealId", authMiddleware, getTaskByDealId);
 router.get("/date/due-date-range", authMiddleware, getTasksByDueDateRange);
-router.delete("/:id", authMiddleware, deleteTask);
+router.delete(
+  "/:id",
+  checkPermission("DELETE_TASK"),
+  authMiddleware,
+  deleteTask
+);
 router.get("/filter/tasks", authMiddleware, filterTasks);
-router.post("/assign/user", authMiddleware, assignTaskToUser);
-router.put("/change/status", authMiddleware, changeTaskStatus);
+router.post(
+  "/assign/user",
+  authMiddleware,
+  checkPermission("ASSIGN_TASK_TO_USER"),
+  assignTaskToUser
+);
+router.put(
+  "/change/status",
+  authMiddleware,
+  checkPermission("UPDATE_TASK"),
+  changeTaskStatus
+);
 router.get("/user-tasks/tasks", authMiddleware, getTasksForUserDeals);
 
 module.exports = router;

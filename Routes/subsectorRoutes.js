@@ -10,14 +10,16 @@ const {
   deleteSubsector,
 } = subsectorController;
 const authMiddleware = require("../Middlewares/authMiddleware");
+const checkRole = require("../Middlewares/roleMiddleware");
+const checkPermission = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.get("/", getAllSubsectors);
 router.get("/sector/:sector_id", getSubsectorBySectorId); // Add this line
 router.get("/:id", getSubsectorById);
-router.post("/", createSubsector);
-router.put("/:id", updateSubsector);
-router.delete("/:id", deleteSubsector);
+router.post("/", checkPermission("CREATE_SUBSECTOR"), createSubsector);
+router.put("/:id", checkPermission("UPDATE_SUBSECTOR"), updateSubsector);
+router.delete("/:id", checkPermission("DELETE_SUBSECTOR"), deleteSubsector);
 
 module.exports = router;
