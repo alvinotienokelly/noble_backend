@@ -1831,16 +1831,16 @@ const deleteUser = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ status: false, message: "Employee not found." });
+        .json({ status: false, message: "User not found." });
     }
 
     // Check if the user is an employee
-    const employeeRole = await Role.findOne({ where: { name: "Employee" } });
-    if (user.role_id !== employeeRole.role_id) {
-      return res
-        .status(400)
-        .json({ status: false, message: "The user is not an employee." });
-    }
+    // const employeeRole = await Role.findOne({ where: { name: "Employee" } });
+    // if (user.role_id !== employeeRole.role_id) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: false, message: "The user is not an employee." });
+    // }
 
     // Delete the user
     await user.destroy();

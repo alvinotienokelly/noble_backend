@@ -54,7 +54,7 @@ const upload = multer({ dest: "uploads/" });
 const User = db.users;
 
 const router = express.Router();
-router.delete("/employees/:id", authMiddleware, deleteUser);
+router.delete("/:id", authMiddleware, deleteUser);
 //signup endpoint
 //passing the middleware function to the signup
 router.post("/upload-profile-image", authMiddleware, uploadProfileImage);
