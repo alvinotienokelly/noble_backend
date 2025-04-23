@@ -1821,6 +1821,48 @@ const getEmployeesForInvestmentFirm = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params; // Employee ID from the route parameter
+
+    // Find the user by ID
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Employee not found." });
+    }
+
+    // Check if the user is an employee
+    const employeeRole = await Role.findOne({ where: { name: "Employee" } });
+    if (user.role_id !== employeeRole.role_id) {
+      return res
+        .status(400)
+        .json({ status: false, message: "The user is not an employee." });
+    }
+
+    // Delete the user
+    await user.destroy();
+
+    // Create an audit log for the deletion
+    await createAuditLog({
+      userId: req.user.id,
+      action: "DELETE_EMPLOYEE",
+      details: `Deleted employee with ID ${id}`,
+      ip_address: req.ip,
+    });
+
+    res.status(200).json({
+      status: true,
+      message: "Employee deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 module.exports = {
   updateAddressableMarket,
   updateCurrentMarket,
@@ -1863,4 +1905,5 @@ module.exports = {
   deleteEmployee,
   createEmployeeForInvestmentFirm,
   getEmployeesForInvestmentFirm,
+  deleteUser,
 };
