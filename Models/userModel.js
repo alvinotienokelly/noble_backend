@@ -134,7 +134,11 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
     },
-    { timestamps: true }
+    {
+      timestamps: true, // Enables createdAt and updatedAt timestamps
+      paranoid: true, // Enables soft deletes
+      deletedAt: "deleted_at", // Column name for soft deletes
+    }
   );
 
   // Define associations
