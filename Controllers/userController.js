@@ -1846,12 +1846,12 @@ const deleteUser = async (req, res) => {
     await user.destroy();
 
     // Create an audit log for the deletion
-    await createAuditLog({
-      userId: req.user.id,
-      action: "DELETE_EMPLOYEE",
-      details: `Deleted employee with ID ${id}`,
-      ip_address: req.ip,
-    });
+    // await createAuditLog({
+    //   userId: req.user.id,
+    //   action: "DELETE_EMPLOYEE",
+    //   details: `Deleted employee with ID ${id}`,
+    //   ip_address: req.ip,
+    // });
 
     res.status(200).json({
       status: true,
