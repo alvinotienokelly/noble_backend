@@ -307,6 +307,13 @@ const getAllDeals = async (req, res) => {
           as: "dealRegions",
           include: [{ model: Region, as: "region" }],
         },
+        {
+          model: DealLead,
+          as: "dealLeads", // Include DealLead
+          include: [
+            { model: User, as: "user", attributes: ["id", "name", "email"] },
+          ], // Include user details for DealLead
+        },
         { model: DealContinent, as: "dealContinents", include: ["continent"] },
       ],
       offset,
@@ -602,6 +609,13 @@ const getDealById = async (req, res) => {
           model: DealCountry,
           as: "dealCountries",
           include: [{ model: Country, as: "country" }],
+        },
+        {
+          model: DealLead,
+          as: "dealLeads", // Include DealLead
+          include: [
+            { model: User, as: "user", attributes: ["id", "name", "email"] },
+          ], // Include user details for DealLead
         },
         {
           model: DealRegion,
@@ -1021,6 +1035,13 @@ const filterDeals = async (req, res) => {
           as: "dealRegions",
           include: [{ model: Region, as: "region" }],
         },
+        {
+          model: DealLead,
+          as: "dealLeads", // Include DealLead
+          include: [
+            { model: User, as: "user", attributes: ["id", "name", "email"] },
+          ], // Include user details for DealLead
+        },
         { model: DealContinent, as: "dealContinents", include: ["continent"] },
       ],
       offset,
@@ -1280,8 +1301,6 @@ const markDealAsPending = async (req, res) => {
     res.status(200).json({ status: false, message: error.message });
   }
 };
-
-
 
 // Function to mark a deal status as Open
 const markDealAsOpen = async (req, res) => {
