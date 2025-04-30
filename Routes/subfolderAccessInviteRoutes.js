@@ -9,14 +9,14 @@ const {
 } = subfolderAccessInviteController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/invite",
   authMiddleware,
-  checkPermission("SEND_SUBFOLDER_ACCESS_INVITE"),
+  checkPermissions(["SEND_SUBFOLDER_ACCESS_INVITE"]),
   sendSubfolderAccessInvite
 );
 router.put(
@@ -32,7 +32,7 @@ router.put(
 router.get(
   "/subfolder/:subfolder_id/invites",
   authMiddleware,
-  checkPermission("GET_SUBFOLDER_INVITES"),
+  checkPermissions(["GET_SUBFOLDER_INVITES"]),
   getSubfolderInvites
 );
 

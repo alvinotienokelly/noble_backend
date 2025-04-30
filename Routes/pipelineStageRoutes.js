@@ -11,20 +11,20 @@ const {
 } = pipelineStageController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_PIPELINE_STAGE"),
+  checkPermissions(["CREATE_PIPELINE_STAGE"]),
   createPipelineStage
 );
 router.get(
   "/",
   authMiddleware,
-  checkPermission("VIEW_ALL_PIPELINE_STAGES"),
+  checkPermissions(["VIEW_ALL_PIPELINE_STAGES"]),
 
   getAllPipelineStages
 );
@@ -32,14 +32,14 @@ router.get("/:id", authMiddleware, getPipelineStageById);
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_PIPELINE_STAGE"),
+  checkPermissions(["UPDATE_PIPELINE_STAGE"]),
 
   updatePipelineStage
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_PIPELINE_STAGE"),
+  checkPermissions(["DELETE_PIPELINE_STAGE"]),
 
   deletePipelineStage
 );

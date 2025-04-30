@@ -10,35 +10,35 @@ const {
 } = permissionController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.get(
   "/",
   authMiddleware,
-  checkPermission("VIEW_ALL_PERMISSIONS"),
+  checkPermissions(["VIEW_ALL_PERMISSIONS"]),
   getAllPermissions
 );
 router.get("/:id", authMiddleware, getPermissionById);
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_PERMISSION"),
+  checkPermissions(["CREATE_PERMISSION"]),
 
   createPermission
 );
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_PERMISSION"),
+  checkPermissions(["UPDATE_PERMISSION"]),
 
   updatePermission
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_PERMISSION"),
+  checkPermissions(["DELETE_PERMISSION"]),
   deletePermission
 );
 

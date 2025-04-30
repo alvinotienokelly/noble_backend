@@ -10,42 +10,42 @@ const {
 } = dealMilestoneController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_DEAL_MILESTONE"),
+  checkPermissions(["CREATE_DEAL_MILESTONE", "EDIT_DEAL"]),
 
   createDealMilestone
 );
 router.get(
   "/",
   authMiddleware,
-  checkPermission("VIEW_ALL_DEAL_MILESTONES"),
+  checkPermissions(["VIEW_ALL_DEAL_MILESTONES", "EDIT_DEAL"]),
 
   getAllDealMilestones
 );
 router.get(
   "/:id",
   authMiddleware,
-  checkPermission("VIEW_DEAL_MILESTONE_BY_ID"),
+  checkPermissions(["VIEW_DEAL_MILESTONE_BY_ID", "EDIT_DEAL"]),
 
   getDealMilestoneById
 );
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_DEAL_MILESTONE"),
+  checkPermissions(["UPDATE_DEAL_MILESTONE", "EDIT_DEAL"]),
 
   updateDealMilestone
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_DEAL_MILESTONE"),
+  checkPermissions(["DELETE_DEAL_MILESTONE", "EDIT_DEAL"]),
 
   deleteDealMilestone
 );

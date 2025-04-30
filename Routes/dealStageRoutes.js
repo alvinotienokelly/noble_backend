@@ -10,14 +10,14 @@ const {
 } = dealStageController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_DEAL_STAGE"),
+  checkPermissions(["CREATE_DEAL_STAGE", "EDIT_DEAL", "UPDATE_DEAL"]),
 
   createDealStage
 );
@@ -26,14 +26,14 @@ router.get("/:id", authMiddleware, getDealStageById);
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_DEAL_STAGE"),
+  checkPermissions(["UPDATE_DEAL_STAGE", "EDIT_DEAL", "UPDATE_DEAL"]),
 
   updateDealStage
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_DEAL_STAGE"),
+  checkPermissions(["DELETE_DEAL_STAGE"]),
 
   deleteDealStage
 );

@@ -26,16 +26,21 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
 const fileUpload = require("../Middlewares/fileUpload");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, checkPermission("CREATE_DEAL"), createDeal);
+router.post(
+  "/",
+  authMiddleware,
+  checkPermissions(["CREATE_DEAL", "EDIT_DEAL", "UPDATE_DEAL"]),
+  createDeal
+);
 router.get("/", authMiddleware, getAllDeals);
 router.put(
   "/deals/mark-all-open",
   authMiddleware,
-  checkPermission("MARK_DEAL_AS_ACTIVE"),
+  checkPermissions(["MARK_DEAL_AS_ACTIVE", "EDIT_DEAL", "UPDATE_DEAL"]),
   markAllDealsAsOpen
 );
 router.put("/:id/update-stage", authMiddleware, updateDealStage); // Add this line
@@ -45,48 +50,52 @@ router.get("/accepted-deals", authMiddleware, getAcceptedDealsForInvestor); // A
 router.put(
   "/:id/mark-active",
   authMiddleware,
-  checkPermission("MARK_DEAL_AS_ACTIVE"),
+  checkPermissions(["MARK_DEAL_AS_ACTIVE", "EDIT_DEAL", "UPDATE_DEAL"]),
 
   markDealAsActive
 ); // Add this line
 router.put(
   "/:id/mark-pending",
   authMiddleware,
-  checkPermission("MARK_DEAL_AS_ACTIVE"),
+  checkPermissions(["MARK_DEAL_AS_ACTIVE", "EDIT_DEAL", "UPDATE_DEAL"]),
 
   markDealAsPending
 ); // Add this line
 router.put(
   "/:id/mark-open",
   authMiddleware,
-  checkPermission("MARK_DEAL_AS_ACTIVE"),
+  checkPermissions(["MARK_DEAL_AS_ACTIVE", "EDIT_DEAL", "UPDATE_DEAL"]),
 
   markDealAsOpen
 ); // Add this line
 router.put(
   "/:id/mark-archived",
   authMiddleware,
-  checkPermission("MARK_DEAL_AS_ARCHIVED"),
+  checkPermissions(["MARK_DEAL_AS_ARCHIVED", "EDIT_DEAL", "UPDATE_DEAL"]),
 
   markDealAsArchived
 ); // Add this line
 router.put(
   "/:id/on-hold",
   authMiddleware,
-  checkPermission("MARK_DEAL_AS_ON_HOLD"),
+  checkPermissions(["MARK_DEAL_AS_ON_HOLD", "EDIT_DEAL", "UPDATE_DEAL"]),
 
   markDealOnhold
 ); // Add this line
 router.put(
   "/:id/mark-closed",
   authMiddleware,
-  checkPermission("MARK_DEAL_AS_CLOSED"),
+  checkPermissions(["MARK_DEAL_AS_CLOSED", "EDIT_DEAL"]),
   markDealClosed
 ); // Add this line
 router.put(
   "/:id/mark-closed-opened",
   authMiddleware,
-  checkPermission("MARK_DEAL_AS_CLOSED_AND_REOPENED"),
+  checkPermissions([
+    "MARK_DEAL_AS_CLOSED_AND_REOPENED",
+    "EDIT_DEAL",
+    "UPDATE_DEAL",
+  ]),
 
   markDealClosedAndOpened
 ); // Add this line
@@ -95,14 +104,14 @@ router.put(
   "/:id",
   authMiddleware,
   checkAdmin,
-  checkPermission("UPDATE_DEAL"),
+  checkPermissions(["UPDATE_DEAL", "EDIT_DEAL", "UPDATE_DEAL"]),
 
   updateDeal
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_DEAL"),
+  checkPermissions(["DELETE_DEAL", "EDIT_DEAL", "UPDATE_DEAL", "UPDATE_DEAL"]),
 
   deleteDeal
 );

@@ -15,7 +15,7 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
 const fileUpload = require("../Middlewares/fileUpload");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
@@ -23,7 +23,7 @@ router.post(
   "/",
   authMiddleware,
   fileUpload,
-  checkPermission("CREATE_DOCUMENT"),
+  checkPermissions(["CREATE_DOCUMENT"]),
 
   createDocument
 );
@@ -39,7 +39,7 @@ router.put(
   authMiddleware,
   checkAdmin,
   fileUpload,
-  checkPermission("UPDATE_DOCUMENT"),
+  checkPermissions(["UPDATE_DOCUMENT"]),
 
   updateDocument
 );
@@ -47,7 +47,7 @@ router.delete(
   "/:id",
   authMiddleware,
   checkAdmin,
-  checkPermission("DELETE_DOCUMENT"),
+  checkPermissions(["DELETE_DOCUMENT"]),
 
   deleteDocument
 );

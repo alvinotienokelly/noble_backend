@@ -10,14 +10,14 @@ const {
 } = regionController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
-router.post("/", checkPermission("CREATE_REGION"), createRegion);
+router.post("/", checkPermissions(["CREATE_REGION"]), createRegion);
 router.get("/:id/with-countries", getRegionWithCountries);
 router.get("/", getAllRegions);
-router.put("/:id", checkPermission("UPDATE_REGION"), updateRegion);
-router.delete("/:id", checkPermission("DELETE_REGION"), deleteRegion);
+router.put("/:id", checkPermissions(["UPDATE_REGION"]), updateRegion);
+router.delete("/:id", checkPermissions(["DELETE_REGION"]), deleteRegion);
 
 module.exports = router;

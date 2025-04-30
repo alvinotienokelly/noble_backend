@@ -5,28 +5,28 @@ const { addCountryToDeal, getCountriesForDeal, removeCountryFromDeal } =
   dealCountryController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/add",
   authMiddleware,
-  checkPermission("ADD_COUNTRY_TO_DEAL"),
+  checkPermissions(["ADD_COUNTRY_TO_DEAL", "EDIT_DEAL"]),
 
   addCountryToDeal
 );
 router.get(
   "/:deal_id/countries",
   authMiddleware,
-  checkPermission("VIEW_COUNTRIES_FOR_DEAL"),
+  checkPermissions(["VIEW_COUNTRIES_FOR_DEAL", "EDIT_DEAL"]),
 
   getCountriesForDeal
 );
 router.delete(
   "/remove",
   authMiddleware,
-  checkPermission("REMOVE_COUNTRY_FROM_DEAL"),
+  checkPermissions(["REMOVE_COUNTRY_FROM_DEAL", "EDIT_DEAL"]),
 
   removeCountryFromDeal
 );

@@ -11,14 +11,14 @@ const {
 } = dealTypePreferencesController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_DEAL_TYPE_PREFERENCE"),
+  checkPermissions(["CREATE_DEAL_TYPE_PREFERENCE"]),
   createDealTypePreference
 );
 router.get("/", authMiddleware, getDealTypePreferences);
@@ -26,20 +26,20 @@ router.get("/unique", authMiddleware, getUniqueDealTypePreferences); // Add this
 router.post(
   "/multiple",
   authMiddleware,
-  checkPermission("CREATE_DEAL_TYPE_PREFERENCE"),
+  checkPermissions(["CREATE_DEAL_TYPE_PREFERENCE"]),
 
   createMultipleDealTypePreferences
 ); // Add this line
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_DEAL_TYPE_PREFERENCE"),
+  checkPermissions(["UPDATE_DEAL_TYPE_PREFERENCE"]),
   updateDealTypePreference
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_DEAL_TYPE_PREFERENCE"),
+  checkPermissions(["DELETE_DEAL_TYPE_PREFERENCE"]),
 
   deleteDealTypePreference
 );

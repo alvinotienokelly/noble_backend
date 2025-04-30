@@ -10,14 +10,14 @@ const {
 } = require("../Controllers/subfolderController");
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_SUBFOLDER"),
+  checkPermissions(["CREATE_SUBFOLDER"]),
   createSubfolder
 );
 router.get("/filter", authMiddleware, filterSubfolders); // Add this line
@@ -30,13 +30,13 @@ router.get(
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_SUBFOLDER"),
+  checkPermissions(["UPDATE_SUBFOLDER"]),
   updateSubfolder
 ); // Add this line
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_SUBFOLDER"),
+  checkPermissions(["DELETE_SUBFOLDER"]),
   deleteSubfolder
 ); // Add this line
 router.put("/:id/archive", authMiddleware, archiveSubfolder); // Add this line

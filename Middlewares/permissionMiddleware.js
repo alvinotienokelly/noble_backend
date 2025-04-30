@@ -2,16 +2,15 @@ const db = require("../Models");
 const RolePermission = db.role_permissions;
 const Permission = db.permissions;
 
-const checkPermission = (permissionName) => {
+const checkPermissions = (permissionNames) => {
   return async (req, res, next) => {
     try {
-      const user = req.user.id; // Assuming `req.user` contains the authenticated user's details
-
+      const userId = req.user.id; // Assuming `req.user` contains the authenticated user's details
 
       // Fetch the user's role by their ID
       const userRecord = await db.users.findOne({
-        where: { id: user },
-        attributes: ['role_id'], // Assuming the user's role ID is stored in the `role_id` field
+        where: { id: userId },
+        attributes: ["role_id"], // Assuming the user's role ID is stored in the `role_id` field
       });
 
       if (!userRecord) {
@@ -22,39 +21,42 @@ const checkPermission = (permissionName) => {
       }
 
       const userRole = userRecord.role_id;
-      // Fetch the permission by name
-      const permission = await Permission.findOne({
-        where: { name: permissionName },
+
+      // Fetch all permissions by the provided names
+      const permissions = await Permission.findAll({
+        where: { name: permissionNames },
+        attributes: ["permission_id", "name"],
       });
-      if (!permission) {
+
+      if (!permissions.length) {
         return res.status(403).json({
           status: false,
-          message: "Permission not found.",
+          message: "None of the specified permissions were found.",
         });
       }
 
-      console.log("Permission ID:", permission.permission_id);
-      console.log("Role ID:", req.user);
-      // Check if the user's role has the required permission
-      const rolePermission = await RolePermission.findOne({
+      // Check if the user's role has at least one of the required permissions
+      const permissionIds = permissions.map((permission) => permission.permission_id);
+      const rolePermissions = await RolePermission.findAll({
         where: {
           role_id: userRole,
-          permission_id: permission.permission_id,
+          permission_id: permissionIds,
         },
       });
 
-      if (!rolePermission) {
+      if (!rolePermissions.length) {
         return res.status(403).json({
           status: false,
-          message: "Access denied. You do not have the required permission.",
+          message: "Access denied. You do not have any of the required permissions.",
         });
       }
 
-      next(); // User has the required permission, proceed to the next middleware or controller
+      next(); // User has at least one of the required permissions, proceed to the next middleware or controller
     } catch (error) {
+      console.error("Error checking permissions:", error);
       res.status(500).json({ status: false, message: error.message });
     }
   };
 };
 
-module.exports = checkPermission;
+module.exports = checkPermissions;

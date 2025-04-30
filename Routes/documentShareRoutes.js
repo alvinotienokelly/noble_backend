@@ -9,14 +9,19 @@ const {
 } = documentShareController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/share",
   authMiddleware,
-  checkPermission("SHARE_DOCUMENT"),
+  checkPermissions([
+    "SHARE_DOCUMENT",
+    "EDIT_DOCUMENT",
+    "EDIT_DEAL",
+    "UPDATE_DEAL",
+  ]),
 
   shareDocument
 );
@@ -25,7 +30,12 @@ router.put("/share/:share_id/reject", authMiddleware, rejectDocumentShare);
 router.get(
   "/document/:document_id/shares",
   authMiddleware,
-  checkPermission("VIEW_DOCUMENT_SHARES"),
+  checkPermissions([
+    "VIEW_DOCUMENT_SHARES",
+    "EDIT_DOCUMENT",
+    "EDIT_DEAL",
+    "UPDATE_DEAL",
+  ]),
 
   getDocumentShares
 );

@@ -13,7 +13,7 @@ const {
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkAdmin = require("../Middlewares/checkAdmin");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ const router = express.Router();
 router.post(
   "/schedule-call",
   authMiddleware,
-  checkPermission("SCHEDULE_DEAL_MEETING"),
+  checkPermissions(["SCHEDULE_DEAL_MEETING", "EDIT_DEAL"]),
   scheduleDealMeeting
 );
 // Record and transcribe a call using Read.ai
@@ -29,7 +29,7 @@ router.post("/record-call", authMiddleware, recordDealMeeting);
 // Get all meetings by deal ID
 router.put(
   "/update-schedule-call/:meetingId",
-  checkPermission("UPDATE_DEAL_MEETING"),
+  checkPermissions(["UPDATE_DEAL_MEETING", "EDIT_DEAL"]),
   updateDealMeeting
 );
 router.get("/deal/:dealId/meetings", authMiddleware, getMeetingsByDealId);

@@ -10,14 +10,14 @@ const {
 } = require("../Controllers/folderController");
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_FOLDER"),
+  checkPermissions(["CREATE_FOLDER"]),
 
   createFolder
 );
@@ -26,21 +26,21 @@ router.get("/", authMiddleware, getFoldersByUser);
 router.get(
   "/filter",
   authMiddleware,
-  checkPermission("VIEW_ALL_FOLDERS"),
+  checkPermissions(["VIEW_ALL_FOLDERS"]),
 
   filterFolders
 ); // Add this line
 router.get(
   "/user",
   authMiddleware,
-  checkPermission("FILTER_FOLDERS"),
+  checkPermissions(["FILTER_FOLDERS"]),
 
   getAllFolders
 );
 router.get(
   "/:id",
   authMiddleware,
-  checkPermission("VIEW_FOLDER_BY_ID"),
+  checkPermissions(["VIEW_FOLDER_BY_ID"]),
 
   getFolderById
 ); // Add this line

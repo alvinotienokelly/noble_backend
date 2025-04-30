@@ -10,21 +10,21 @@ const {
 } = documentTypeController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_DOCUMENT_TYPE"),
+  checkPermissions(["CREATE_DOCUMENT_TYPE"]),
 
   createDocumentType
 );
 router.get(
   "/",
   authMiddleware,
-  checkPermission("VIEW_ALL_DOCUMENT_TYPES"),
+  checkPermissions(["VIEW_ALL_DOCUMENT_TYPES"]),
 
   getAllDocumentTypes
 );
@@ -32,7 +32,7 @@ router.get("/:id", authMiddleware, getDocumentTypeById);
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_DOCUMENT_TYPE"),
+  checkPermissions(["UPDATE_DOCUMENT_TYPE"]),
 
   updateDocumentType
 );

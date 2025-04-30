@@ -10,41 +10,41 @@ const {
 } = dealMilestoneStatusController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_DEAL_MILESTONE_STATUS"),
+  checkPermissions(["CREATE_DEAL_MILESTONE_STATUS", "EDIT_DEAL"]),
 
   createDealMilestoneStatus
 );
 router.get(
   "/",
   authMiddleware,
-  checkPermission("VIEW_ALL_DEAL_MILESTONE_STATUSES"),
+  checkPermissions(["VIEW_ALL_DEAL_MILESTONE_STATUSES", "EDIT_DEAL"]),
 
   getAllDealMilestoneStatuses
 );
 router.get(
   "/:id",
   authMiddleware,
-  checkPermission("VIEW_DEAL_MILESTONE_STATUS_BY_ID"),
+  checkPermissions(["VIEW_DEAL_MILESTONE_STATUS_BY_ID", "EDIT_DEAL"]),
   getDealMilestoneStatusById
 );
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_DEAL_MILESTONE_STATUS"),
+  checkPermissions("UPDATE_DEAL_MILESTONE_STATUS", "EDIT_DEAL"),
 
   updateDealMilestoneStatus
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_DEAL_MILESTONE_STATUS"),
+  checkPermissions(["DELETE_DEAL_MILESTONE_STATUS", "EDIT_DEAL"]),
 
   deleteDealMilestoneStatus
 );

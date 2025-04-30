@@ -11,34 +11,34 @@ const {
 } = milestoneController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_MILESTONE"),
+  checkPermissions(["CREATE_MILESTONE", "EDIT_DEAL"]),
   createMilestone
 );
 router.get(
   "/deal/:dealId",
   authMiddleware,
-  checkPermission("VIEW_MILESTONE_BY_ID"),
+  checkPermissions(["VIEW_MILESTONE_BY_ID"]),
 
   getMilestonesByDealId
 );
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_MILESTONE"),
+  checkPermissions(["UPDATE_MILESTONE"]),
 
   updateMilestone
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_MILESTONE"),
+  checkPermissions(["DELETE_MILESTONE"]),
   deleteMilestone
 );
 router.get("/filter/milestones", authMiddleware, filterMilestones);

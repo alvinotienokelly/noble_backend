@@ -14,20 +14,20 @@ const {
 } = investorMilestoneStatusController;
 const authMiddleware = require("../Middlewares/authMiddleware");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
   authMiddleware,
-  checkPermission("CREATE_INVESTOR_MILESTONE_STATUS"),
+  checkPermissions(["CREATE_INVESTOR_MILESTONE_STATUS", "EDIT_DEAL"]),
   createInvestorMilestoneStatus
 );
 router.get(
   "/",
   authMiddleware,
-  checkPermission("VIEW_ALL_INVESTOR_MILESTONE_STATUSES"),
+  checkPermissions(["VIEW_ALL_INVESTOR_MILESTONE_STATUSES", "EDIT_DEAL"]),
 
   getAllInvestorMilestoneStatuses
 );
@@ -48,14 +48,14 @@ router.get("/:id", authMiddleware, getInvestorMilestoneStatusById);
 router.put(
   "/:id",
   authMiddleware,
-  checkPermission("UPDATE_INVESTOR_MILESTONE_STATUS"),
+  checkPermissions(["UPDATE_INVESTOR_MILESTONE_STATUS"]),
 
   updateInvestorMilestoneStatus
 );
 router.delete(
   "/:id",
   authMiddleware,
-  checkPermission("DELETE_INVESTOR_MILESTONE_STATUS"),
+  checkPermissions(["DELETE_INVESTOR_MILESTONE_STATUS"]),
 
   deleteInvestorMilestoneStatus
 );

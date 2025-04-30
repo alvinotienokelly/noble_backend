@@ -12,15 +12,15 @@ const {
 const authMiddleware = require("../Middlewares/authMiddleware");
 const upload = require("../Middlewares/bulkUpload");
 const checkRole = require("../Middlewares/roleMiddleware");
-const checkPermission = require("../Middlewares/permissionMiddleware");
+const checkPermissions = require("../Middlewares/permissionMiddleware");
 
 const router = express.Router();
 
 router.get("/", getAllSectors);
 router.get("/:id", getSectorById);
-router.post("/", checkPermission("CREATE_SECTOR"), createSector);
-router.put("/:id", checkPermission("UPDATE_SECTOR"), updateSector);
-router.delete("/:id", checkPermission("DELETE_SECTOR"), deleteSector);
+router.post("/", checkPermissions(["CREATE_SECTOR"]), createSector);
+router.put("/:id", checkPermissions(["UPDATE_SECTOR"]), updateSector);
+router.delete("/:id", checkPermissions(["DELETE_SECTOR"]), deleteSector);
 router.post(
   "/bulk-upload",
   upload.single("file"),
