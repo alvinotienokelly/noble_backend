@@ -81,7 +81,28 @@ const PORT = process.env.PORT || 8080;
 
 const app = express();
 
-app.use(cors());
+/ Allow specific origins
+const allowedOrigins = [
+  "https://dealflow.noblestride.co.ke", // Frontend origin
+  "https://another-allowed-origin.com", // Add other allowed origins if needed
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = "The CORS policy for this site does not allow access from the specified origin.";
+        return callback(new Error(msg), false);
+      }
+
+      return callback(null, true);
+    },
+    credentials: true, // Allow cookies and credentials to be sent
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
